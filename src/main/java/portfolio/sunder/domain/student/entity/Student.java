@@ -2,6 +2,7 @@ package portfolio.sunder.domain.student.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,5 +33,14 @@ public class Student { // TODO: 2024-01-13 extends TimeEntity
     // TODO: 2024-01-13 @ManyToOne School
     private String school;
 
-    // TODO: 2024-01-13 Constructor and @Builder
+    @Builder
+    public Student(String uid, String upw, String name, String status, int grade, int classroom, String school) {
+        this.uid = uid;
+        this.upw = upw;
+        this.name = name;
+        this.status = status;
+        this.grade = grade;
+        this.classroom = classroom;
+        this.school = school;
+    }
 }
