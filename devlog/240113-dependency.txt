@@ -1,0 +1,123 @@
+★☆
+기본적으로 이 프로젝트는 java 언어를 사용하며, spring 과 jpa 에 기반을 두고 있다.
+여기서는 gradle 을 중심으로 구체적으로 의존하는 라이브러리, 프레임워크에 대해 간단히 정리해본다.
+자세한 내용은 build.gradle 원본을 참고.
+
+1. test ★★★★★
+스프링에서 항상 기본으로 제공하는 테스트 라이브러리이다.
+```
+// test
+testImplementation 'org.springframework.boot:spring-boot-starter-test'
+```
+
+2. dev ★☆☆☆☆
+개발을 위한 기본 도구이다. devtools 는 개발 중 빠른 재실행 등을 위해 사용된다.
+딱히 없어도 개발하는 데 큰 무리는 없다.
+자세한 사용법은 여러 블로그에도 소개되어 있으니 레퍼런스를 참고하면 충분할 것이다.
+- Property Defaults
+- Automatic Restart
+- Live Reload
+- Global Settings
+- Remote Applications
+```
+// dev
+developmentOnly 'org.springframework.boot:spring-boot-devtools'
+```
+
+3. web ★★★★★
+웹 개발을 위해 필요한 라이브러리이다. web 과 validation 은 필수이지만 thymeleaf 는 굳이 필요하진 않다.
+다만 현재로서는 CSR 을 할지 SSR 을 할지 구체적으로 결정하지 않았으니 혹시 몰라 추가해두기만 했다.
+굳이 thymeleaf 를 쓸 필요도 없고 백엔드 개발자는 JSP 만 해도 별 문제는 없을 것이다.
+```
+// web
+implementation 'org.springframework.boot:spring-boot-starter-web'
+implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+implementation 'org.springframework.boot:spring-boot-starter-validation'
+```
+
+4. security ★★★☆☆
+보안을 위한 라이브러리이다. UserDetails 등 구현해야 하는 게 많아 번거롭고 개인적으로는 유연성도 조금 부족하다는 생각이 든다.
+보안은 유연성보다도 안전성이 더 중요하니 이해는 한다만, spring security 의 모든 기능이 필요한 것처럼 보이진 않는다.
+경험부족에서 기인한 걸 수도 있지만 꼭 필요한 라이브러리는 아니라고 생각하며, 메모리 서버와 세션을 이용하는 등의 대안도 있으니 필요에 따라 사용하면 될 것이다.
+JWT 는 서버에서 인가한 사용자를 확인하기 위해 발급해주는 토큰이며 비대칭키 방식을 활용하는데, 이는 현재까지 유용하게 사용되는 보안 기법이다.
+비대칭키는 `RSA 의 원리` 등으로 검색해보면 좋은 레퍼런스가 많으니 참고하자.
+참고로 현재 다니는 회사는 spring security 는 쓰지 않고 있지만, JWT 는 항상 사용하고 있다.
+```
+// security
+implementation 'org.springframework.boot:spring-boot-starter-security'
+implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+testImplementation 'org.springframework.security:spring-security-test'
+implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+```
+
+5. data ★★★★★
+web 과 security 가 주로 presentation tier 와 결합도가 높다면, data 는 persistence tier 와 결합도가 높다.
+jpa 와 querydsl, mariadb client 를 사용하고 있으며, jpa 와 querydsl 은 java 웹개발에서는 거의 필수라고 여겨진다.
+유독 (개발자 인력을 갈아넣는...?) 한국과 중국에서만 MyBatis 가 인기가 많았는데, 코로나 유행 이후로는 한국과 중국도 jpa 사용도가 더 강세로 바뀌었다.
+```
+// data
+implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.1'
+```
+
+6. product ★★★★☆
+완성된 코드의 실제 서비스와 함께 관련된 통계 데이터(헬스 등)를 수집하고 관리하기 위한 라이브러리이다.
+prometheus, grafana 를 함께 사용하여 서비스 중에 발생하는 장애에 빠르게 대응하고, 서비스와 관련된 통계(ex. API 호출 횟수, 주문 횟수 등)도 수집할 수 있다.
+```
+// product
+implementation 'org.springframework.boot:spring-boot-starter-actuator'
+implementation 'io.micrometer:micrometer-registry-prometheus'
+```
+
+7. lombok ★★★★☆
+lombok 은 없어도 개발할 수는 있지만 귀찮고 불필요한 작업을 많이 줄여준다.
+Setter 와 ToString 등 사용상의 주의사항에만 유의하면 큰 문제는 없다.
+```
+// lombok
+compileOnly 'org.projectlombok:lombok'
+runtimeOnly 'org.projectlombok:lombok'
+annotationProcessor 'org.projectlombok:lombok'
+testCompileOnly 'org.projectlombok:lombok'
+testAnnotationProcessor 'org.projectlombok:lombok'
+```
+
+8. rest docs ★★★★☆
+API 문서를 만들기 위한 라이브러리이다. swagger 도 많이 쓰이긴 하지만 swagger 는 프로덕트 코드에 침투적이기에 모듈 간의 결합도가 높아진다.
+```
+// rest docs
+asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+```
+
+9. 기타 라이브러리(excel, email 만 사용. 필요 시 나머지도 추가)
+- email : 이메일 라이브러리. 이메일로 본인인증을 할 때 사용할 수 있다. 본인인증 수단으로는 휴대폰이 가장 좋지만 유료 서비스이기도 하고, 사업자등록증이 필요할 수도 있다.
+- excel : 엑셀 양식으로 전달된 파일에서 데이터를 조작한다.
+- image resize : 썸네일 등을 원하는 크기로 줄여서 저장할 때 사용한다.
+- aws s3 api for naver cloud : aws s3 또는 naver cloud 에 파일을 전송하여 저장한다. ncloud 에서도 amazon client 를 허용하고 있기에 같은 사양이 같다.
+- firebase : 애플리케이션으로 push alert 를 하기 위한 라이브러리이다. 앱 개발은 예정에 없지만 메모해둘 겸 추가하기만 했다.
+```
+// image resize
+implementation 'org.imgscalr:imgscalr-lib:4.2'
+
+// emil
+implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+// excel
+implementation 'org.apache.poi:poi:5.2.2'
+implementation 'org.apache.poi:poi-ooxml:5.2.3'
+implementation 'commons-io:commons-io:2.11.0'
+
+// aws s3 api for naver cloud
+implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+implementation 'com.amazonaws:aws-java-sdk-s3:1.12.13'
+
+// firebase admin sdk
+implementation 'com.google.firebase:firebase-admin:9.2.0'
+```
