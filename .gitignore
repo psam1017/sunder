@@ -7,7 +7,7 @@ build/
 
 ### personal ignore ###
 **/application-prod.properties
-**/main/generated
+src/main/generated
 
 ### STS ###
 .apt_generated
