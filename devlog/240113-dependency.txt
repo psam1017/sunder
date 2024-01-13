@@ -53,7 +53,7 @@ implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 ```
 
 5. data ★★★★★
-web 과 security 가 주로 controller tier 와 결합도가 높다면, data 는 repository tier 와 결합도가 높다.
+web 과 security 가 주로 presentation tier 와 결합도가 높다면, data 는 persistence tier 와 결합도가 높다.
 jpa 와 querydsl, mariadb client 를 사용하고 있으며, jpa 와 querydsl 은 java 웹개발에서는 거의 필수라고 여겨진다.
 유독 (개발자 인력을 갈아넣는...?) 한국과 중국에서만 MyBatis 가 인기가 많았는데, 코로나 유행 이후로는 한국과 중국도 jpa 사용도가 더 강세로 바뀌었다.
 ```

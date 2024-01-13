@@ -1,0 +1,51 @@
+패키지 구조에 대해 설명해보자.
+
+패키지 구조는 크게 'domain 부터 시작' vs 'tier 부터 시작' 으로 나뉘는 것으로 보인다.
+
+domain 부터 시작한다는 것은, 하나의 도메인 영역을 먼저 두고, 그 안에 package 들을 아키텍처에 따라 정리하는 것이다.
+예를 들어 teacher 라는 도메인 영역이 있다면 아래와 같이 나누는 것이다.
+```
+teacher
+├ controller - TeacherController.java
+├ service - TeacherService.java
+├ repository - TeacherCommandRepository.java, TeacherQueryRepository.java
+├ entity  - Teacher.java
+├ enumeration - TeacherStatus.java, ...
+├ exception - NoSuchTeacherException.java, ...
+└ dto
+   ├ request - TeacherSaveForm.java, TeacherUpdateForm.java
+   └ response - TeacherResponse.java, TeacherListResponse.java
+```
+
+tier 부터 시작한다는 것은, 아키텍처(layer, hexagonal 등)부터 아키텍처를 시작하여 각 모듈을 그 안에 모으는 것이다.
+예를 들어 layer architecture 라면 presentation tier, business tier, persistence layer 에 해당하는 패키지에 각 도메인과 모듈을 모은다.
+```
+web
+├ validation
+├ advice.controller
+├ TeacherController.java
+├ StudentController.java
+└ BookController.java
+
+service
+├ TeacherService.java
+├ StudentService.java
+└ BookService.java
+
+domain
+└ teacher
+   ├ Teacher.java
+   └ TeacherRepository.java
+```
+
+패키지 구조를 정의하는 데는 많은 사람들이 고민하고 명확한 '정답'을 내려주는 일은 없다. 다만 오답이 아닌 자신의 의견을 표명하면서 스스로 고민하여 설계할 것을 권장한다.
+같은 맥락에서 나는 패키지 구조를 정의하기 위해 '결합도'와 '응집도'를 고려하라고 조언해준다.
+
+도메인 단위로 기능이 많고 서로 연관성이 많다면 domain 패키지 안에 관련 있는 파일을 모아두는 것이 좋다.
+반면에 각각의 제약사항에 따른 역할을 명확하게 구분해야 할 필요가 있다면 그 역할(ex. controller 역할) 별로 파일을 모아두는 것이 좋을 것이다.
+
+그리하여 현재 내가 개인 프로젝트에서(및 회사에서 설계한 프로제트에서도) 사용하는 패키지 구조는 일반적으로 domain, global, infrastructure 3가지로 나누어 시작한다.
+서비스와 관련이 있고, 결과적으로 클라이언트에게 보여져야 할 부분들은 domain 패키지 아래에 domain 별로 모아둔다.
+반면에 aop 나 설정, 공통 모듈은 global 안에 모아두는데, global 안에서는 컴포넌트의 관련성을 고려하여 모아두기 하고, 역할이 같은 클래스끼리 모아두기도 한다. 즉, 결합도와 응집도를 고려한다는 뜻이다.
+예를 들어, Spring Data JPA 의 Auditing 기능을 하는 TimeEntity.java 와 RecorderEntity.java 를 entity 라는 패키지 안에 같이 둔다면, 기능이나 역할을 의식하지 않더라도 같은 패키지 안에 두는 것이 자연스럽다는 생각이 들 것이다. 이는 패키지 단위로 결합도와 응집도 개념을 활용한 결과라고 생각할 수 있다. 쉽게 말해 관련 있는 것들끼리 보기 편하게 모아두면 되는 것이다.
+infrastructure 에서는 구체적인 기능과 역할을 가지는 외부 컴포넌트를 모아둔다. 예를 들어, JWT 와 관련된 컴포넌트만 모으거나, Excel 과 관련된 컴포넌트만 모아두는 식이다. 의도하지는 않지만 결과적으로는 의존성이 높은 클래스끼리 같은 패키지 안에 모이게 된다.
