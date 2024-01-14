@@ -30,6 +30,5 @@ public class StudentQueryRepository {
                         .fetchOne()
         );
     }
-
     // TODO: 2024-01-13 getById, getOne, findList
 }
