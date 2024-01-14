@@ -54,15 +54,14 @@ implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 5. data ★★★★★
 web 과 security 가 주로 presentation tier 와 결합도가 높다면, data 는 persistence tier 와 결합도가 높다.
-jpa 와 querydsl, mariadb client 를 사용하고 있으며, jpa 와 querydsl 은 java 웹개발에서는 거의 필수라고 여겨진다.
+jpa 와 querydsl 를 사용하고 있으며, 이 둘은 java 웹개발에서는 거의 필수라고 여겨진다.
 유독 (개발자 인력을 갈아넣는...?) 한국과 중국에서만 MyBatis 가 인기가 많았는데, 코로나 유행 이후로는 한국과 중국도 jpa 사용도가 더 강세로 바뀌었다.
 SQL 로깅을 위해서 p6spy 를 추가하였다. Spring Boot 3.x 이상에서는 해당 라이브러리 1.9.0 이상을 사용해야 한다.
 (h2 추가)
 테스트 실행 도중에 MariaDB 와의 커넥션에 잠깐 문제가 생겼는데, 그 김에 h2 client 를 추가했다.
-테스트 용도로 실행하는 동안에는 h2 를 인메모리 모드로 실행할 생각이고, 실제 제품 프로필(prod)에서는 안전한 곳에서 구축한 Maria DB 를 사용할 계획이다.
+외장 SSD 를 쓰다 보니 DB 를 외장하드에 가지고 다니기에는 호환과 관련된 이슈가 자주 발생할 것으로 예상되기에 이번 프로젝트에서는, 비록 처음 써보지만, h2 로 아예 바꿔볼 계획이다.
 ```
 // data
-runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 runtimeOnly 'com.h2database:h2'
 implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
