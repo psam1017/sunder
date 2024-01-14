@@ -1,0 +1,22 @@
+Spring Boot 3.x 는 p6spy 설정하는 방법도 2.X 와 다르기에 주의가 필요하다.
+
+1. Spring Boot 3.x 에서는 p6spy 1.9.0 이상을 사용해야 한다.
+```
+implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+```
+
+2. Spring Boot 3.x 에서 추가로 해야 하는 설정
+www.inflearn.com/questions/721332
+* "src/main/resources" 아래가 아니라 "src/resources" 아래임에 주의하자. 이것 때문에 회사 프로젝트에서 적용이 안 돼서 시간을 꽤 날려먹었었다.
+
+3. p6spy 커스텀
+www.raegon.com/p6spy-query-log
+
+4. application.properties 설정
+```
+logging.level.p6spy=trace
+decorator.datasource.p6spy.enable-logging=true
+```
+
+기본적으로 위 내용들만 참고하면 충분히 적용할 수 있으니 이번엔 별도의 메모는 생략한다.
+한 번 별도의 메모를 남겨보려고 했는데 결국 위 레퍼런스 내용들을 반복하는 것밖에 안 돼서 별 의미가 없는 것 같아 삭제했다.
