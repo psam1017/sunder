@@ -75,24 +75,6 @@ public class JwtUtils {
                 .compact();
     }
 
-    public Optional<JwtStatus> hasInvalidStatus(String token) {
-        if (!StringUtils.hasText(token)) {
-            return Optional.of(BLANK);
-        }
-        try {
-            extractSubject(token);
-        } catch (ExpiredJwtException e) {
-            return Optional.of(EXPIRED);
-        } catch (SignatureException e) {
-            return Optional.of(ILLEGAL_SIGNATURE);
-        } catch (UnsupportedJwtException e) {
-            return Optional.of(UNSUPPORTED);
-        } catch (MalformedJwtException e) {
-            return Optional.of(MALFORMED);
-        }
-        return Optional.empty();
-    }
-
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
@@ -109,5 +91,23 @@ public class JwtUtils {
     private Key getSignInKey(String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public Optional<JwtStatus> hasInvalidStatus(String token) {
+        if (!StringUtils.hasText(token)) {
+            return Optional.of(BLANK);
+        }
+        try {
+            extractSubject(token);
+        } catch (ExpiredJwtException e) {
+            return Optional.of(EXPIRED);
+        } catch (SignatureException e) {
+            return Optional.of(ILLEGAL_SIGNATURE);
+        } catch (UnsupportedJwtException e) {
+            return Optional.of(UNSUPPORTED);
+        } catch (MalformedJwtException e) {
+            return Optional.of(MALFORMED);
+        }
+        return Optional.empty();
     }
 }

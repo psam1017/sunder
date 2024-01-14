@@ -1,16 +1,15 @@
 package portfolio.sunder.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +26,7 @@ import portfolio.sunder.infrastructure.jwt.JwtUtils;
 public class SecurityConfig {
 
     // TODO: 2024-01-14 OAUTH2
+    // TODO: 2024-01-14 onAuthenticationFailure ?
 
     @Bean
     public JwtUtils jwtUtils(@Value("${sunder.security.token.secret-key}") String secretKey) {
@@ -44,16 +44,17 @@ public class SecurityConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) throws Exception {
         return http
-                .authorizeHttpRequests((requests) ->
+                .authorizeHttpRequests(requests ->
                         requests
                                 .requestMatchers(
-                                        "/api/auth/**",
-                                        "/api/open/**",
+                                        PathRequest.toH2Console()
+                                ).permitAll()
+                                .requestMatchers(
+                                        "/api/**",
                                         "/docs/**",
                                         "/css/**",
                                         "/js/**",
-                                        "/image/**",
-                                        "/images/**"
+                                        "/image/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -62,6 +63,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers.frameOptions(FrameOptionsConfig::sameOrigin))
                 .build();
     }
 

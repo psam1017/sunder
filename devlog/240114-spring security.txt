@@ -1,0 +1,69 @@
+제법 시간을 할애하여 spring security 를 정말로 원활하게 사용할 수 있는지 점검하고 구현해보았다.
+
+spring security 관련하여 추가된 클래스들은 다음과 같다. 구현할 때도 아래 순서대로 생성하면 된다.
+```
+UserDetailsImpl.java
+UserDetailsServiceImpl.java
+JwtAuthenticationFilter.java
+SecurityConfig.java
+```
+
+아래의 클래스들은 security 와 별개로 추가한 것이다. 관련이 있으나 spring security 에 종속적이지는 않다.
+참고로 JwtStatus 는 JwtUtils 에서 예외가 발생하면 그 상태값을 알기 쉽게 알려주기 위하여 만든 열거형 타입이다.
+즉, JwtUtils 는 JwtStatus 를 직접적으로 알고 있는 상태이다.
+```
+JwtStatus.java (enum)
+JwtUtils.java
+```
+
+지금은 일부 지웠지만 spring security 의 테스트를 위해 제법 많은 클래스들을 실제 프로덕트처럼 의미 있게 만들었다. 이것 때문에 예상치 못 하게 시간을 제법 잡아먹혔다.
+대표적으로 아래와 같은 것들이다.
+```
+UserRole.java (enum)
+UserStatus.java (enum)
+```
+
+이렇게까지 다 만들고 나서 테스트까지 수행한 결과 내린 결론은 다음과 같다.
+1. SecurityContextHolder 에 Authentication 을 저장하기 위해서 spring security 를 사용한다. Authentication 은 차후 JPA Auditing 에 사용될 수 있다.
+2. 예상하지 못 한 경로에 대한 요청을 방어하는 것을 포함하여 global 한 설정을 위해 사용한다.
+3. 비즈니스 로직과 관련하여 검증하는 것은 spring security 에 맡기지 않고 직접 interceptor 로 제어한다.
+
+3번과 같은 결론을 내린 이유는 URI 에 대한 상세한 제어가 불편하다고 느꼈기 때문이다.
+spring security 에서는 아래 예시와 같이 path 나 RequestMatcher 를 전달하고, 각각에 대하여 permitAll, authenticated, hasAnyRole 과 같은 메소드들을 사용해서 접근을 상세하게 제어할 수 있다.
+```
+// (생략)
+authorizeHttpRequests(requests ->
+        requests
+                .requestMatchers(
+                        PathRequest.toH2Console()
+                ).permitAll()
+                .requestMatchers(
+                        "/api/**",
+                        "/docs/**",
+                        "/css/**",
+                        "/js/**",
+                        "/image/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+)
+// (생략)
+```
+
+이 경우 내가 느낀 문제점은 다음과 같다.
+1. @Controller 에서 어떤 권한이 허용되는지를 알 수 없다. 미리 정보를 파악하고 있지 않다면 @Configuration 에 직접 가서 권한을 확인해야 하는데, 이것은 정보 은닉에 위배된다고 생각했다.
+
+2. prefix 에 대한 문제도 있다. security 를 사용할 때 허용되는 권한을 명시할 때 어떤 때는 "ADMIN" 이라고 해야 하고, 어떤 때는 "ROLE_ADMIN" 이라고 해야 한다.
+규칙이 어렵진 않다. 그리고 prefix 를 제거할 수도 있다. 하지만 security 를 사용할 때마다 이런 점들을 의식하면서 사용해야 한다는 게 다소 불편하게 느껴진다.
+
+3. 메소드 단위에 대한 권한 적용과 하드코딩에 대한 문제이다. 우선, 위 예시와 같이 @Configuration 에서 URI 단위로 권한을 적용한다면 메소드별로 권한을 달리 주기가 애매해진다.
+URI 를 "/api/admin", "/api/user" 와 같이 ROLE 부터 시작하도록 만든다면 어느 정도 해결될 문제이지만, 이 경우 URI 를 그렇게 만들도록 강제된다는 문제가 생긴다.
+만약 그렇게 권한 별로 API 의 URI 를 나눠야 할 정도의 관리가 필요하다면 차라리 애플리케이션 단위로 분리하는 게 맞을 수도 있다. 물론 패키지 단위로 분리하는 것도 한 방법이다.
+URI 설정에 대하여 AOP 를 적용할 수 있도록 @Secured 라는 애노테이션이 존재하는데, 이것으로 해결될 것 같지만, 이 애노테이션에 입력해야 하는 값들이 문자열이라는 게 또 문제다.
+@Secured({"ROLE_ADMIN", "ROLE_MANAGER"}) 와 같이 직접적으로 입력한다면 컴파일 시점에서 에러가 발생하지 않을 것이고, 결과적으로 테스트를 통해서만 개발자의 실수를 인지할 수 있게 된다.
+
+따라서 나는 메소드 단위로 권한을 적용할 건데, Interceptor 와 커스텀 annotation 을 사용하여 직접 권한을 검증하고 관리할 생각이다.
+
+spring security 와 관련하여 추가로 결정해야 할 사안을 다음과 같다.
+1. 개인적으로 OAuth2 로그인도 추가하고 싶다. 이 경우 spring security 를 사용할 것인지, 아니면 직접 구현할 것인지에 대하여 결정해야 한다.
+2. spring security 에 의해 http 응답이 200(OK) 이 아닌 경우 내가 그 응답값을 완벽하게 제어할 수 있는지 알아봐야 한다. 나는 요청이 거부되더라도 필요한 경우 그 상세한 원인과 해결방안을 제시하기를 원한다.
+이는 REST API 의 제약 조건 중 하나인 "Self-descriptive messages" 와 관련이 있다. 완벽하게는 아니더라도 내가 제어할 수 있는 영역에 대해서는 제어를 하려고 하는데, spring security 에 의해 내가 의도하지 않은 응답값이 반환된다면 spring security 의 기능을 더 축소하거나 아예 프로젝트에서 제외할 생각이다.
