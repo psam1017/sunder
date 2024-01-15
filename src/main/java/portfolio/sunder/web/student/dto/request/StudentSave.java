@@ -1,14 +1,14 @@
-package portfolio.sunder.domain.student.dto.request;
+package portfolio.sunder.web.student.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import portfolio.sunder.domain.student.entity.Student;
-import portfolio.sunder.domain.user.enumeration.UserStatus;
+import portfolio.sunder.web.student.entity.Student;
+import portfolio.sunder.web.user.enumeration.UserStatus;
 
 import java.util.Set;
 
-import static portfolio.sunder.domain.user.enumeration.UserRole.*;
+import static portfolio.sunder.web.user.enumeration.UserRole.*;
 
 @AllArgsConstructor
 @NoArgsConstructor

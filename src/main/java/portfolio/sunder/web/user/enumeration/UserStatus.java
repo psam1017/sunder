@@ -1,4 +1,4 @@
-package portfolio.sunder.domain.user.enumeration;
+package portfolio.sunder.web.user.enumeration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
