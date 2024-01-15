@@ -1,0 +1,89 @@
+이번 프로젝트는 백엔드에서 HTTP API 로, response body 에는 json 을 응답할 계획이다.
+굳이 간단하게 REST API 라고 하지 않는 이유는, RESTful 이 일반적으로 통용되는 의미보다 더 까다롭기 때문이다.
+
+REST API 에 대하여 궁금하다면 아래의 영상을 시청해보자. 제법 유명한 영상이다.
+https://www.youtube.com/watch?v=RP_f5dMoHFc&t=36s
+
+아무튼 HTTP API 의 응답을 좀 더 Self-secriptive 한 interface 로 만들기 위해 아래 3가지 클래스를 생성했다.
+1. ApiStatus.java (enum)
+2. ApiResponse.java
+3. ApiException.java
+
+ApiException 은 상속하여 던지면 Controller Advice 에서 이를 잡아서 ApiResponse 를 응답하도록 만들 계획이다.
+ApiResponse 는 응답값에 더해 ApiStatus 를 같이 반환하여 백엔드의 의도를 좀 더 명확히 전달할 예정이다.
+
+ApiResponse 는 다음과 같이 응답될 것이다.
+```
+{
+    "code":"200",
+    "status":"OK",
+    "reasons":[]
+    "data":{ ... }
+}
+```
+
+data 에는 실제 응답값이 들어간다.
+
+code 와 status 는 ApiStatus 의 필드이며 각각 코드와 상태 메시지를 의미한다.
+code 는 기본적으로 http status 의 그것과 동일하나, 0xx 코드를 추가하여 비즈니스 예외를 알려주고 있으며 "ax01" 과 같이 문자열을 포함한 코드도 반환할 수 있도록 문자열 타입으로 정했다.
+자세한 내용은 ApiStatus 의 주석에 기재되어 있다.
+
+reasons 는 예외가 발생할 때에만 값이 들어가며, 예외가 발생한 원인에 대한 구체적인 코드 형식의 문자열이 들어간다.
+현재 프로젝트는 spring message 기능을 사용하지 않고 있으며, reasons 는 일정한 규칙에 의해 자동적으로 생성된다.
+reasons 는 필드와 "." 으로 구성되는데, 필드는 4개까지 생성되도록 할 생각이나, 경우에 따라서 그 이상으로 늘어날 수도 있다.
+
+(reasons 예시)
+```
+"NotBlank.request[0].user[0].name"
+"NotNull.content.id"
+"NotNull.categoryList[1].name"
+```
+
+처음에는 스프링의 DefaultMessageCodesResolver 의 형식을 차용하려는 의도를 지니고 있었으나, 구현을 하다 보니 어느 시점부터 독자적인 규칙이 생성되었다.
+특히 `@RequestBody List<@Valid UserRequest> requestDTO` 처럼 컨트롤러에서 컬렉션을 전달인자로 받을 때 제네릭 타입에 대한 검증을 시도할 때는 BindingException 이 발생하는 게 아니라 ConstraintViolationException 이 발생하게 되었고, 그 상황에 맞게 reasons 를 생성하여 반환하도록 만들었다.
+아래는 ConstraintViolationException 을 발생시키는 테스트 결과 자동으로 생성되어 반환된 reasons 예시이다.
+```
+{
+    "code": "400",
+    "message": "Bad Request",
+    "reasons": [
+        "NotEmpty.request[0].list",
+        "NotBlank.request[0].hello",
+        "NotBlank.request[1].list[0].<list element>",
+        "NotBlank.request[1].hello",
+        "NotBlank.request[0].insides[0].insideProperty",
+        "NotEmpty.request[1].insides"
+    ],
+    "data": null
+}
+```
+
+백엔드에서는 이러한 reasons 들을 반환하고, API 문서에 이를 명시하여 렌더링 책임을 맡은 프론트엔드에서 reasons 들에 대한 처리 및 메시지 생성을 처리하도록 의도하였다.
+
+참고로, BindingException 및 ConstraintViolationException 으로부터 reasons 를 만들어내는 코드는 ApiResponse 안에 포함되어 있다.
+(Exception 에서 reasons 생성하는 코드)
+```
+private static List<String> collectBindExceptionReasons(BindException e) {
+    return e.getFieldErrors().stream().map(fe -> fe.getCode() + "." + fe.getField()).toList();
+}
+
+private static List<String> collectConstraintViolationExceptionReasons(ConstraintViolationException e) {
+    return e.getConstraintViolations().stream().map(cve -> {
+        String property = cve.getPropertyPath().toString();
+        String field = property.substring(property.contains("[") ? property.indexOf("[") : property.indexOf("."));
+        String anno = cve.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
+        return anno + ".request" + field;
+    }).toList();
+}
+```
+
+(message 에 대한 썰)
+지금 재직 중인 회사는 내가 취업한 당시 spring 을 쓰고는 있었으나 spring 이 제공하는 여러 편의기능을 거의 쓰지 않고 servlet 을 대체하는 수준으로만 이를 사용하고 있었다.
+그리하여 내가 취업한 직후에 message, argument resolver 등 몇 가지 기술을 도입했다.
+예외 메시지를 @Service 안에서 직접 코딩하던 이전과 비교하면 훨씬 사정이 나아졌으나, 메시지를 일일이 작성하고 서로가 작성한 메시지 코드가 겹치지 않도록 하다 보니, 그리고 그러한 메시지를 DTO 검증이나 Exception 을 던질 때마다 매번 메시지 코드를 작성하다 보니 메시지 코드를 기억하거나 실제로 있는지 찾아보는 등 결국 관리 비용이 늘어나서 이전과 상황이 비슷해졌다.
+어차피 SSR 을 하는 것도 아니고 하니, 메시지는 백엔드에서 작성하지 않고 에러 원인인 reasons 만을 자동으로 생성하여 반환하기로 하면서 백엔드의 예외 및 검증에 대한 메시지 처리 비용이 매우 크게 감소하는 효과를 볼 수 있었다.
+
+하지만 모두가 행복해진 것만도 아니다.
+백엔드에서 응답해주던 메시지를 프론트엔드에서 담당하게 되었으니, 백엔드는 발생할 수 있는 모든 reasons 를 API 문서를 통해 전달해야 할 책임이 생기면서 추가적인 소통 비용이 발생하게 되었다.
+그리고 백엔드에서 지불하던 비용 일부를 프론트에 전가한 것이니 업무 분장에 대해 신경 쓸 것도 새로 생겼다.
+이러한 시스템 도입에 의한 트레이드 오프 결과 전체적인 비용을 절감할 수는 있었으나, 환경과 경우에 따라서 오히려 전체 비용이 증가할 수도 있기 때문에 이 방법이 언제나 정답이 아닐 수 있음을 명심해야 한다.

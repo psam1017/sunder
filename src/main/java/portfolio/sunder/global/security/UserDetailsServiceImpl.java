@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import portfolio.sunder.domain.user.entity.User;
-import portfolio.sunder.domain.user.exception.NoSuchUserException;
-import portfolio.sunder.domain.user.repository.UserQueryRepository;
+import portfolio.sunder.web.user.entity.User;
+import portfolio.sunder.web.user.exception.NoSuchUserException;
+import portfolio.sunder.web.user.repository.UserQueryRepository;
 
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {

@@ -1,13 +1,13 @@
-package portfolio.sunder.domain.student.service;
+package portfolio.sunder.web.student.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import portfolio.sunder.domain.student.dto.request.StudentSave;
-import portfolio.sunder.domain.student.dto.response.StudentResponse;
-import portfolio.sunder.domain.student.entity.Student;
-import portfolio.sunder.domain.student.repository.StudentCommandRepository;
-import portfolio.sunder.domain.student.repository.StudentQueryRepository;
+import portfolio.sunder.web.student.dto.request.StudentSave;
+import portfolio.sunder.web.student.dto.response.StudentResponse;
+import portfolio.sunder.web.student.entity.Student;
+import portfolio.sunder.web.student.repository.StudentCommandRepository;
+import portfolio.sunder.web.student.repository.StudentQueryRepository;
 
 @RequiredArgsConstructor
 @Transactional

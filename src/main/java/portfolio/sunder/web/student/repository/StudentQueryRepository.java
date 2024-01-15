@@ -1,15 +1,15 @@
-package portfolio.sunder.domain.student.repository;
+package portfolio.sunder.web.student.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import portfolio.sunder.domain.student.entity.Student;
+import portfolio.sunder.web.student.entity.Student;
 
 import java.util.Optional;
 
-import static portfolio.sunder.domain.student.entity.QStudent.student;
+import static portfolio.sunder.web.student.entity.QStudent.student;
 
 @RequiredArgsConstructor
 @Repository

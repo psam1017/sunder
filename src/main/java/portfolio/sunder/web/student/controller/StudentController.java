@@ -1,10 +1,10 @@
-package portfolio.sunder.domain.student.controller;
+package portfolio.sunder.web.student.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import portfolio.sunder.domain.student.dto.request.StudentSave;
-import portfolio.sunder.domain.student.dto.response.StudentResponse;
-import portfolio.sunder.domain.student.service.StudentService;
+import portfolio.sunder.web.student.dto.request.StudentSave;
+import portfolio.sunder.web.student.dto.response.StudentResponse;
+import portfolio.sunder.web.student.service.StudentService;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/student")

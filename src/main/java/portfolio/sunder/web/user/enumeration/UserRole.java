@@ -1,4 +1,4 @@
-package portfolio.sunder.domain.user.enumeration;
+package portfolio.sunder.web.user.enumeration;
 
 public enum UserRole { // ROLE_XXX(spring security 규칙)
 

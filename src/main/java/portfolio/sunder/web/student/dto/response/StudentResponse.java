@@ -1,8 +1,8 @@
-package portfolio.sunder.domain.student.dto.response;
+package portfolio.sunder.web.student.dto.response;
 
 import lombok.Getter;
-import portfolio.sunder.domain.student.entity.Student;
-import portfolio.sunder.domain.user.enumeration.UserStatus;
+import portfolio.sunder.web.student.entity.Student;
+import portfolio.sunder.web.user.enumeration.UserStatus;
 
 @Getter
 public class StudentResponse {

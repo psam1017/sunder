@@ -1,11 +1,11 @@
-package portfolio.sunder.domain.user.entity;
+package portfolio.sunder.web.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import portfolio.sunder.domain.user.enumeration.UserRole;
-import portfolio.sunder.domain.user.enumeration.UserStatus;
+import portfolio.sunder.web.user.enumeration.UserRole;
+import portfolio.sunder.web.user.enumeration.UserStatus;
 
 import java.util.Set;
 

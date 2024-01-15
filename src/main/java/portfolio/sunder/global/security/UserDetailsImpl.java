@@ -3,7 +3,7 @@ package portfolio.sunder.global.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import portfolio.sunder.domain.user.entity.User;
+import portfolio.sunder.web.user.entity.User;
 
 import java.util.Collection;
 import java.util.HashSet;
