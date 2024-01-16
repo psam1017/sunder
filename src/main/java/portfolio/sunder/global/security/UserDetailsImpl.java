@@ -23,7 +23,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getUid();
+        return String.valueOf(user.getId());
     }
 
     @Override

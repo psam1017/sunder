@@ -64,7 +64,7 @@ public class SecurityConfig {
                                         "/js/**",
                                         "/image/**"
                                 ).permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().hasRole("ADMIN") // hasRole, hasAnyRole 은 prefix 를 생략해야 한다.
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)

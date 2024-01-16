@@ -22,12 +22,12 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    // UserQueryRepository 로 직접 조회해도 괜찮다.
     private final UserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         String authorization = request.getHeader(AUTHORIZATION);
         if(StringUtils.hasText(authorization) && Pattern.matches("^Bearer .*", authorization)) {
             String token = authorization.replaceAll("^Bearer( )*", "");

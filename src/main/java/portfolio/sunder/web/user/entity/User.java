@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import portfolio.sunder.global.entity.BaseEntity;
 import portfolio.sunder.web.user.enumeration.UserRole;
 import portfolio.sunder.web.user.enumeration.UserStatus;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
 @Entity
-public class User { // TODO: 2024-01-13 extends TimeEntity
+public class User extends BaseEntity { // TODO: 2024-01-13 extends TimeEntity
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
