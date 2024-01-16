@@ -5,8 +5,20 @@ security 적용 범위에 대해서도 좀 고민을 하고 있다.
 1. interceptor 에 의한 권한 검증은 자주 사용해보고 익숙해져 있기도 하다. 그러니 이번에는 안 쓰던 것을 써보기로 한다.
 2. @Secured 의 내부 값이 하드코딩이 되는 것을 문제 삼았는데 사실 이 부분은 controller 테스트를 충분히 수행하면 서비스 이전에 발견할 수 있는 내용이기 때문에 testabiliy 와 테스트 커버리지에 달린 문제로 해석할 수도 있다.
 
-그래도 interceptor 검증 내용을 안 쓰고 넘어가기에는 아쉬우니 이번 메모에서 관련된 코드를 남기고 가려고 한다.
+그래도 interceptor 검증 내용을 안 쓰고 넘어가기에는 아쉬우니 이번 메모 아래 쪽에 관련된 코드를 남기고 가려고 한다.
 
+(spring security 구현과 interceptor & annotation 구현 비교)
+다만, 이 방식에도 단점이 하나 있기는 한데, 검증을 위한 interceptor 및 annotation 이 (jpa 와 결합된) domain entity 의 속성에 직접적으로 의존한다는 것이다.
+의존하는 방향이 entity 가 interceptor 나 annotation 에 직접 의존하는 건 아니라서 형편이 좀 낫기는 하지만, 결국 이 interceptor 와 annotation 을 재사용하기 위해서는 코드의 일부를 항상 수정해야 할 필요가 생긴다.
+그래도 최대한 단순하고 보편적인 구조로 만들었기 때문에 실제로 다른 프로젝트에서 재사용했을 때 수정에 의한 수고보다, 구현 이후의 편리함이 훨씬 더 컸다. 자동완성이라든가 컴파일 에러 같은 부분에서 말이다.
+
+따라서 철저하게 재사용 관점에서 언급된 두 개의 방식을 비교하면, spring security 가 문자열로 직접 입력을 하기 때문에 더 재사용성이 높다고 평가할 수 있는 건 사실이다.
+하지만 interceptor 방식으로 구현하면 enum 을 입력할 수 있는 편리함을 생기기 때문에 트레이드 오프 관점에서 생각하면 이 방식이 더 나을 수 있다. 아주 잠깐만 구현하고 나면 그 이후에는 엄청 편리하게 쓸 수 있기 때문이다.
+프로젝트 규모와 안정성 측면에서 평가하면 물론 interceptor 하나 다는 것보다는 spring security 가 무조건 우수할 것이다.
+
+결론적으로, 재사용 및 안정성, 규모 측면에서 spring security 가 더 우수하다고 평가할 수 있으나, 조금 작은 규모의 프로젝트에서라면 개발 속도, 비용, 편리함을 고려했을 때 interceptor 구현이 더 좋을 수 있어서 각기 일장일단이 있다고 볼 수 있겠다.
+
+(annotation)
 ```
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -17,6 +29,7 @@ public @interface HasAnyRole {
 }
 ```
 
+(interceptor)
 ```
 import portfolio.sunder.global.api.ApiResponse;
 import portfolio.sunder.global.api.ApiStatus;
@@ -115,6 +128,7 @@ public class HasAnyRoleInterceptor implements HandlerInterceptor {
 }
 ```
 
+(configuration)
 ```
 @RequiredArgsConstructor
 @Configuration

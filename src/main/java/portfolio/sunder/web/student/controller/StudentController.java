@@ -19,7 +19,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public StudentResponse find(@PathVariable Long id) {
+    public StudentResponse find(@PathVariable("id") Long id) {
         return studentService.find(id);
     }
 }

@@ -29,7 +29,7 @@ UserStatus.java (enum)
 3. 비즈니스 로직과 관련하여 검증하는 것은 spring security 에 맡기지 않고 직접 interceptor 로 제어한다.
 
 3번과 같은 결론을 내린 이유는 URI 에 대한 상세한 제어가 불편하다고 느꼈기 때문이다.
-spring security 에서는 아래 예시와 같이 path 나 RequestMatcher 를 전달하고, 각각에 대하여 permitAll, authenticated, hasAnyRole 과 같은 메소드들을 사용해서 접근을 상세하게 제어할 수 있다.
+spring security 에서는 아래 예시와 같이 path 나 RequestMatcher 를 전달하고, 각각에 대하여 permitAll, authenticated, hasAnyRole, hasAnyAuthority 등의 메소드들을 사용해서 접근을 상세하게 제어할 수 있다.
 ```
 // (생략)
 authorizeHttpRequests(requests ->
@@ -44,7 +44,7 @@ authorizeHttpRequests(requests ->
                         "/js/**",
                         "/image/**"
                 ).permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().hasRole("ADMIN") // hasRole, hasAnyRole 은 prefix 를 생략해야 한다.
 )
 // (생략)
 ```
@@ -52,8 +52,8 @@ authorizeHttpRequests(requests ->
 이 경우 내가 느낀 문제점은 다음과 같다.
 1. @Controller 에서 어떤 권한이 허용되는지를 알 수 없다. 미리 정보를 파악하고 있지 않다면 @Configuration 에 직접 가서 권한을 확인해야 하는데, 이것은 정보 은닉에 위배된다고 생각했다.
 
-2. prefix 에 대한 문제도 있다. security 를 사용할 때 허용되는 권한을 명시할 때 어떤 때는 "ADMIN" 이라고 해야 하고, 어떤 때는 "ROLE_ADMIN" 이라고 해야 한다.
-규칙이 어렵진 않다. 그리고 prefix 를 제거할 수도 있다. 하지만 security 를 사용할 때마다 이런 점들을 의식하면서 사용해야 한다는 게 다소 불편하게 느껴진다.
+2. prefix 에 대한 문제도 있다. spring security 를 사용할 때 허용되는 권한을 명시할 때 어떤 때는 "ADMIN" 이라고 해야 하고, 어떤 때는 "ROLE_ADMIN" 이라고 해야 한다.
+규칙이 어렵진 않다. 그리고 prefix 를 제거할 수도 있다. 하지만 spring security 를 사용할 때마다 이런 점들을 의식하면서 사용해야 한다는 게 다소 불편하게 느껴진다.
 
 3. 메소드 단위에 대한 권한 적용과 하드코딩에 대한 문제이다. 우선, 위 예시와 같이 @Configuration 에서 URI 단위로 권한을 적용한다면 메소드별로 권한을 달리 주기가 애매해진다.
 URI 를 "/api/admin", "/api/user" 와 같이 ROLE 부터 시작하도록 만든다면 어느 정도 해결될 문제이지만, 이 경우 URI 를 그렇게 만들도록 강제된다는 문제가 생긴다.
