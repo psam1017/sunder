@@ -28,10 +28,20 @@ developmentOnly 'org.springframework.boot:spring-boot-devtools'
 웹 개발을 위해 필요한 라이브러리이다. web 과 validation 은 필수이지만 thymeleaf 는 굳이 필요하진 않다.
 다만 현재로서는 CSR 을 할지 SSR 을 할지 구체적으로 결정하지 않았으니 혹시 몰라 추가해두기만 했다.
 굳이 thymeleaf 를 쓸 필요도 없고 백엔드 개발자는 JSP 만 해도 별 문제는 없을 것이다.
+(변경사항)
+CSR 로 vue 프레임워크를 써 볼 생각이기에 thymeleaf 를 제외시키기로 결정했다.
 ```
+(변경 전)
 // web
 implementation 'org.springframework.boot:spring-boot-starter-web'
 implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+(변경 후)
+// web
+implementation 'org.springframework.boot:spring-boot-starter-web'
+
+// validation
 implementation 'org.springframework.boot:spring-boot-starter-validation'
 ```
 

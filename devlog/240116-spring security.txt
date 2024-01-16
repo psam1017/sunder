@@ -1,0 +1,134 @@
+security 적용 범위에 대해서도 좀 고민을 하고 있다.
+그 고민이란, 14일에 기록한 내용처럼 interceptor 로 직접 접근 권한을 관리할 것인지, 아니면 spring security 의 @Secured 를 사용할 것인지이다.
+이 글을 쓰고 있는 고민 중이다. 그래도 일단 지금 생각은 @Secured 를 사용하는 것이다. 물론 나중에 또 번복할 수도 있다. 그 이유는 다음과 같다.
+
+1. interceptor 에 의한 권한 검증은 자주 사용해보고 익숙해져 있기도 하다. 그러니 이번에는 안 쓰던 것을 써보기로 한다.
+2. @Secured 의 내부 값이 하드코딩이 되는 것을 문제 삼았는데 사실 이 부분은 controller 테스트를 충분히 수행하면 서비스 이전에 발견할 수 있는 내용이기 때문에 testabiliy 와 테스트 커버리지에 달린 문제로 해석할 수도 있다.
+
+그래도 interceptor 검증 내용을 안 쓰고 넘어가기에는 아쉬우니 이번 메모에서 관련된 코드를 남기고 가려고 한다.
+
+```
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface HasAnyRole {
+
+    // 접근 가능한 UserRole 을 입력한다.
+    UserRole[] roles();
+}
+```
+
+```
+import portfolio.sunder.global.api.ApiResponse;
+import portfolio.sunder.global.api.ApiStatus;
+import portfolio.sunder.infrastructure.jwt.JwtStatus;
+import portfolio.sunder.infrastructure.jwt.JwtUtils;
+import portfolio.sunder.web.user.entity.User;
+import portfolio.sunder.web.user.enumeration.UserRole;
+import portfolio.sunder.web.user.repository.UserQueryRepository;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import static org.springframework.http.HttpStatus.OK;
+
+@RequiredArgsConstructor
+public class HasAnyRoleInterceptor implements HandlerInterceptor {
+
+    private final JwtUtils jwtUtils;
+    private final ObjectMapper objectMapper;
+    private final UserQueryRepository userQueryRepository;
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        // interceptor 적용대상 컨트롤러가 아니면 true
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
+            return true;
+        }
+
+        // HasAnyRole annotation 이 없으면 true
+        if (handlerMethod.getMethodAnnotation(HasAnyRole.class) == null && handlerMethod.getBeanType().getAnnotation(HasAnyRole.class) == null) {
+            return true;
+        }
+
+        // 토큰이 제대로 형성되어 있지 않으면 false
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if(!StringUtils.hasText(authorization) || !Pattern.matches("^Bearer .*", authorization)) {
+            sendError(response, ApiResponse.error(ApiStatus.UNAUTHORIZED, JwtStatus.class, JwtStatus.BLANK.name(), null));
+            return false;
+        }
+
+        String token = authorization.replaceAll("^Bearer( )*", "");
+        Optional<JwtStatus> status = jwtUtils.hasInvalidStatus(token);
+        if (status.isPresent()) {
+            sendError(response, ApiResponse.error(ApiStatus.UNAUTHORIZED, JwtStatus.class, status.get().name(), null));
+            return false;
+        }
+
+        // user 의 상태가 올바르지 않으면 false
+        int userId = Integer.parseInt(jwtUtils.extractSubject(token));
+        User user = userQueryRepository.getById(userId);
+
+        if (!user.isActive() || !user.isTrial()) {
+            sendError(response, ApiResponse.error(ApiStatus.ACCESS_DENIAL, User.class, user.getStatus().name(), null));
+            return false;
+        }
+
+        // user 의 접근 권한이 부족하면 false
+        HasAnyRole annotation = handlerMethod.getMethodAnnotation(HasAnyRole.class);
+        UserRole[] allowedRoles = annotation == null ? new UserRole[0] : annotation.roles();
+        Set<UserRole> roles = user.getRoles();
+
+        if (Arrays.stream(allowedRoles).noneMatch(roles::contains)) {
+            sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, JwtStatus.class, JwtStatus.FORBIDDEN.name(), null));
+            return false;
+        }
+        return true;
+    }
+
+    // interceptor 에서 예외를 던지면 경우에 따라 Contoller Advice 에서 예외를 잡지 못 할 수 있기 때문에 가능하면 예외를 던지지 않고, http response message 를 직접 생성하여 반환한다.
+    private void sendError(HttpServletResponse response, ApiResponse<?> responseBody) throws IOException {
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+        response.setStatus(OK.value());
+
+        PrintWriter writer = response.getWriter();
+        writer.write(objectMapper.writeValueAsString(responseBody));
+        writer.flush();
+        writer.close();
+    }
+}
+```
+
+```
+@RequiredArgsConstructor
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    private final JwtUtils jwtUtils;
+    private final ObjectMapper objectMapper;
+    private final UserQueryRepository userQueryRepository;
+
+    // /api/** path 에 HasAnyRoleInterceptor 를 적용한다.
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new HasAnyRoleInterceptor(jwtUtils, objectMapper, userQueryRepository))
+                .addPathPatterns("/api/**");
+    }
+}
+```

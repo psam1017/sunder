@@ -1,0 +1,83 @@
+오늘은 회사에서 썸네일 이미지를 저장하는 것과 관련된 충돌 이슈와 알파 테스트에 협조하는 일 때문에 좀 퇴근이 늦어졌다.
+그래서 깊은 내용을 만들진 않고 전체적인 패키지 구조를 생성하고, 그 중 entity 부분에서 JPA Auditing 기능만 구현했다.
+
+그 외에는 global 아래에 entity, dto, advice.controller, resolver.argument 가 추가하는 작업을 했다.
+추가로 dto 의 경우 아래에 command, enumpattern, pagination, time 로 세부적으로 나누어 서로 의존도가 높거나 응집도가 높은 클래스들끼리 모아두었다.
+
+Jpa Auditing 과 관련된 클래스는 다음과 같이 구현할 수 있다.
+
+1. @EnableJpaAuditing 추가
+2. @EntityListeners(AuditingEntityListener.class) 를 추가한 Auditing 클래스 추가 후 Auditing 을 사용하려는 엔티티가 이것을 상속
+3. @CreatedBy, @LastModifiedBy 의 경우 AuditorAware 를 구현하여 스프링 빈으로 등록.
+
+* 나의 경우 @CreatedBy, @LastModifiedBy 로 무엇을 사용할까 고민했는데, 사실 User 를 등록할 수 있다면 가장 좋겠지만 연관관계 맵핑 없이는 엔티티를 필드로 삼을 수 없다는 점이 걸렸다.
+따라서 연관관계 맵핑을 시도해서 User 로 하거나, 아니면 UserDetails 에서 username 을 id 로 하고 id 를 필드로 저장하거나, 그것도 아니면 다른 고유값(ex. 로그인 아이디)을 저장할지 선택해야 했다.
+연관관계 맵핑을 통해 User 를 시도하면, 그건 그거대로 좀 곤란한 게 온갖 table 이 user 와 외래키 참조 관계를 가질 수 있기 때문에 괜시리 부담스러운 마음이 들었다.
+로그인 아이디 같은 것도 괜찮을 것 같긴 했는데, Auditing 정보를 좀 더 적극적으로 활용하려면 역시 PK 인 id 를 필드로 삼는 게 가장 좋겠다는 생각이 들어서 그렇게 구현하기로 했다.
+
+(Auditing 을 위한 super class)
+```
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
+@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
+@Getter
+public abstract class BaseEntity {
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDateTime;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedDateTime;
+
+    @CreatedBy
+    @Column(updatable = false)
+    private Long createdBy;
+
+    @LastModifiedBy
+    private Long modifiedBy;
+}
+```
+
+(Jpa Auditing Configuration)
+```
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
+@EnableJpaAuditing
+@Configuration
+public class RepositoryConfig {
+
+    @Bean
+    public AuditorAware<Long> auditorAware() {
+        return () -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null
+                    && authentication.isAuthenticated()
+                    && authentication.getPrincipal() instanceof UserDetails) {
+
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                return Optional.of(Long.valueOf(userDetails.getUsername()));
+            }
+            return Optional.empty();
+        };
+    }
+}
+```
