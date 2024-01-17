@@ -1,0 +1,113 @@
+CORS 개념 자체에 대해서는 아래 사이트를 참조하자. 어느 블로그보다도 잘 정리되어 있는 것 같다.
+https://developer.mozilla.org/ko/docs/Web/HTTP/CORS
+
+이전까지는 WebMvcConfigurer 를 상속한 @Configuration 클래스에서 CORS 설정을 했는데,
+기능상 spring security 에서 설정하는 편이 응집도가 높다고 판단하여 SecurityFilterChain 으로 CORS 를 설정했다.
+
+아래부터는 CORS 설정 및 테스트 코드이다. CorsConfigurationSource 는 전달인자로 주입하려고 하니 빈 기본 설정정보와 충돌이 있었는지 qualifying 되지 않아서 @Primary 를 부여했다.
+그리고 처음으로 CORS 를 MockMvc 로 직접 테스트를 해보면서 불필요한 테스트 및 확인 작업을 줄일 수 있었다.
+* localhost:3000 은 프론트서버를 위한 예비 포트로 준비해두었다.
+
+(SecurityConfiguration)
+```
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            CorsConfigurationSource corsConfigurationSource
+    ) throws Exception {
+        return http
+                .authorizeHttpRequests(requests ->
+                        requests
+                                .requestMatchers(
+                                        "/api/**",
+                                        "/docs/**",
+                                        "/css/**",
+                                        "/js/**",
+                                        "/image/**"
+                                ).permitAll()
+                                .anyRequest().hasRole("ADMIN") // hasRole, hasAnyRole 은 prefix 를 생략해야 한다.
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .build();
+    }
+
+    @Primary
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+        source.registerCorsConfiguration("/api/**", configuration);
+
+        return source;
+    }
+```
+
+(SecurityConfigurationTest)
+```
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.ResultActions;
+import portfolio.sunder.SunderApplicationTests;
+import portfolio.sunder.web.student.dto.request.StudentSave;
+import portfolio.sunder.web.user.enumeration.UserStatus;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+public class SecurityConfigurationTest extends SunderApplicationTests {
+
+    @DisplayName("허용하지 않는 Origin 의 접근을 막을 수 있다.")
+    @Test
+    void corsCrossOriginNotAllowed() throws Exception {
+        // given
+        StudentSave body = new StudentSave("uid", "upw", "name", UserStatus.ACTIVE, 1, 1, "school");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/api/student")
+                        .content(createJson(body))
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Origin", "http://www.google.com")
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isForbidden());
+    }
+
+    // WebConfiguration 에서 "http://localhost:3000" 을 허용함
+    @DisplayName("프론트서버인 localhost:3000 을 Origin 으로 허용할 수 있다.")
+    @Test
+    void corsCrossOriginFrontEndAllowed() throws Exception {
+        // given
+        StudentSave body = new StudentSave("uid", "upw", "name", UserStatus.ACTIVE, 1, 1, "school");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                post("/api/student")
+                        .content(createJson(body))
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Origin", "http://localhost:3000")
+                        .contentType(MediaType.APPLICATION_JSON)
+        );
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+}
+```
+
+정리하자면, 이때까지는 WebMvcConfigurer 로 CORS 를 설정하고 알파테스트를 거쳤다면
+이번에는 정리할 겸 공부를 하면서 spring security 로 설정하고 그에 맞는 테스트 코드까지 작성하는 경험을 쌓았다.
