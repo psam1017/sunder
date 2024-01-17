@@ -1,4 +1,4 @@
-package portfolio.sunder.global.dto.enumpattern;
+package portfolio.sunder.global.enumpattern;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

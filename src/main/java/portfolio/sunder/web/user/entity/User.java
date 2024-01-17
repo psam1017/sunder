@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import portfolio.sunder.global.entity.BaseEntity;
+import portfolio.sunder.global.audit.BaseEntity;
 import portfolio.sunder.web.user.enumeration.UserRole;
 import portfolio.sunder.web.user.enumeration.UserStatus;
 
