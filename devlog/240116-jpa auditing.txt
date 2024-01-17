@@ -4,6 +4,12 @@
 그 외에는 global 아래에 entity, dto, advice.controller, resolver.argument 가 추가하는 작업을 했다.
 추가로 dto 의 경우 아래에 command, enumpattern, pagination, time 로 세부적으로 나누어 서로 의존도가 높거나 응집도가 높은 클래스들끼리 모아두었다.
 
+(변경내용)
+```
+dto 아래의 패키지들을 모두 바깥으로 빼서 global 아래에 두었다. 생각해보면 command 라는 기능과 관련된 코드를 보고 싶은데 global 에 갔더니 바로 command 가 보이지 않고, 뒤져봤더니 dto 패키지 아래에 있으면 황당할 것 같았다.
+응집도의 측면에서 맞지 않다고 생각해서 dto 패키지는 삭제하는 리팩토링을 거쳤다.
+```
+
 Jpa Auditing 과 관련된 클래스는 다음과 같이 구현할 수 있다.
 
 1. @EnableJpaAuditing 추가

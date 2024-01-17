@@ -1,4 +1,4 @@
-package portfolio.sunder.global.dto.command;
+package portfolio.sunder.global.command;
 
 import portfolio.sunder.global.api.ApiException;
 import portfolio.sunder.global.api.ApiResponse;

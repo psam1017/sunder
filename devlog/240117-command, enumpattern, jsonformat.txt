@@ -1,113 +1,116 @@
-CORS 개념 자체에 대해서는 아래 사이트를 참조하자. 어느 블로그보다도 잘 정리되어 있는 것 같다.
-https://developer.mozilla.org/ko/docs/Web/HTTP/CORS
+오늘은 global 을 끝내려고 했는데 spring security 로 CORS 를 설정하고 테스트 코드를 작성하다 보니 의외의 곳에서 시간을 뺏겨서 global 을 마무리짓지 못 했다.
 
-이전까지는 WebMvcConfigurer 를 상속한 @Configuration 클래스에서 CORS 설정을 했는데,
-기능상 spring security 에서 설정하는 편이 응집도가 높다고 판단하여 SecurityFilterChain 으로 CORS 를 설정했다.
+오늘은 아래와 같은 global 기능을 추가했다.
 
-아래부터는 CORS 설정 및 테스트 코드이다. CorsConfigurationSource 는 전달인자로 주입하려고 하니 빈 기본 설정정보와 충돌이 있었는지 qualifying 되지 않아서 @Primary 를 부여했다.
-그리고 처음으로 CORS 를 MockMvc 로 직접 테스트를 해보면서 불필요한 테스트 및 확인 작업을 줄일 수 있었다.
-* localhost:3000 은 프론트서버를 위한 예비 포트로 준비해두었다.
+1. CRUDCommand
 
-(SecurityConfiguration)
+enum 타입으로, 안에 CREATE, READ, UPDATE, DELETE 4개의 상수를 가지고 있다.
+현재 재직 중인 회사에 api 를 기능 별로 분리하는 게 아니라 한번에 통합하는 걸 선호하고 있어서 사용하게 되었다.
+
+예를 들어, 학생 리스트를 수정한다고 했을 때 학생 한 명씩 수정하는 게 아니라 전체 학생 리스트의 생성, 수정, 삭제를 한번에 처리하는 방식이다.
+이 경우 넘어 온 전체 학생 리스트의 각각이 생성인지, 수정인지, 삭제인지를 구분하기 위해 프론트로부터 그 요청을 받고 있다.
+
 ```
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter,
-            CorsConfigurationSource corsConfigurationSource
-    ) throws Exception {
-        return http
-                .authorizeHttpRequests(requests ->
-                        requests
-                                .requestMatchers(
-                                        "/api/**",
-                                        "/docs/**",
-                                        "/css/**",
-                                        "/js/**",
-                                        "/image/**"
-                                ).permitAll()
-                                .anyRequest().hasRole("ADMIN") // hasRole, hasAnyRole 은 prefix 를 생략해야 한다.
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .csrf(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .build();
-    }
-
-    @Primary
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
-        configuration.setAllowCredentials(true);
-        source.registerCorsConfiguration("/api/**", configuration);
-
-        return source;
-    }
+[
+    {... "command":"CREATE" ...}
+]
 ```
 
-(SecurityConfigurationTest)
+위와 같이 넘어온다면 해당 객체를 생성으로 이해하고 처리하는 것이다. 이때 command 가 올바르지 않거나 API 스펙과 다르게 요청한다면 CommandException 이라는 걸 날려서 이를 알려주고 있다.
+
+2. enumpattern
+
+json 으로 넘어 온 request body 를 enum 으로 맵핑시킬 때 이에 대한 검증을 하기 위한 Validator 가 포함되어 있다.
+@EnumPattern 은 안전하게 사용하기 위해서는 생성한 각 enum 마다 다 따로 만들어줘야 한다. 그렇게 되면 Validator 도 다 따로 만들어줘야 한다.
+근데 ... 그렇게 하기에는 시간도 오래 걸리고 분리한 클래스에 의해 오히려 복잡도가 늘어날 수 있기 때문에 enumpattern 안의 클래스들은 문자열인 정규표현식으로 검증을 하고 있다.
+그리하여 @EnumPattern 은 어떠한 enum 타입에도 사용할 수 있게 해두었다. spring security 의 @Secured 와 유사한 방식인데, 사실 이에서 영감을 얻어왔기 때문에 그럴 수 밖에 없을 것이다.
+
+아래는 enumpattern 의 클래스들 코드이다.
+참고로 request body 를 enum 으로 받는 방법은 "@JsonCreator" 를 검색해보면 예시들이 많이 있으니 참고하도록 하자.
+
+(EnumPattern)
 ```
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
-import portfolio.sunder.SunderApplicationTests;
-import portfolio.sunder.web.student.dto.request.StudentSave;
-import portfolio.sunder.web.user.enumeration.UserStatus;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.lang.annotation.*;
 
-public class SecurityConfigurationTest extends SunderApplicationTests {
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
-    @DisplayName("허용하지 않는 Origin 의 접근을 막을 수 있다.")
-    @Test
-    void corsCrossOriginNotAllowed() throws Exception {
-        // given
-        StudentSave body = new StudentSave("uid", "upw", "name", UserStatus.ACTIVE, 1, 1, "school");
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+@Retention(RUNTIME)
+@Documented
+@Constraint(validatedBy = EnumPatternValidator.class)
+public @interface EnumPattern {
 
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/student")
-                        .content(createJson(body))
-                        .header("Access-Control-Request-Method", "POST")
-                        .header("Origin", "http://www.google.com")
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
+    String message() default "EnumPattern";
 
-        // then
-        resultActions.andExpect(status().isForbidden());
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+
+    boolean nullable() default false;
+
+    String regexp();
+}
+```
+
+(EnumPatternValidator)
+```
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+public class EnumPatternValidator implements ConstraintValidator<EnumPattern, Enum<?>> {
+
+    private Pattern pattern;
+    private boolean nullable;
+
+    @Override
+    public void initialize(EnumPattern constraintAnnotation) {
+        try {
+            this.pattern = Pattern.compile(constraintAnnotation.regexp());
+        } catch (PatternSyntaxException e) {
+            throw new IllegalArgumentException("Given regexp is invalid", e);
+        }
+        this.nullable = constraintAnnotation.nullable();
     }
 
-    // WebConfiguration 에서 "http://localhost:3000" 을 허용함
-    @DisplayName("프론트서버인 localhost:3000 을 Origin 으로 허용할 수 있다.")
-    @Test
-    void corsCrossOriginFrontEndAllowed() throws Exception {
-        // given
-        StudentSave body = new StudentSave("uid", "upw", "name", UserStatus.ACTIVE, 1, 1, "school");
-
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/student")
-                        .content(createJson(body))
-                        .header("Access-Control-Request-Method", "POST")
-                        .header("Origin", "http://localhost:3000")
-                        .contentType(MediaType.APPLICATION_JSON)
-        );
-
-        // then
-        resultActions.andExpect(status().isOk());
+    @Override
+    public boolean isValid(Enum<?> value, ConstraintValidatorContext context) {
+        if (nullable) {
+            return value == null || pattern.matcher(value.toString()).matches();
+        }
+        return value != null && pattern.matcher(value.toString()).matches();
     }
 }
 ```
 
-정리하자면, 이때까지는 WebMvcConfigurer 로 CORS 를 설정하고 알파테스트를 거쳤다면
-이번에는 정리할 겸 공부를 하면서 spring security 로 설정하고 그에 맞는 테스트 코드까지 작성하는 경험을 쌓았다.
+3. jsonformat
+LocalDate 또는 LocalDateTime 을 반환할 때 응답값에 조금 문제가 있어서 생성한 @KoreanDate, @KoreanDateTime 이 포함되어 있다.
+
+언급한 문제란 다음과 같다.
+1. 서버나 애플리케이션 환경에 따라 한국시간이 아니라 유럽시간 등 외국 기준 시간이 반환된다.
+2. 반환된 응답값이 ISO8601 이 아닐 수 있다.
+
+이 문제의 해결을 위해서 여러 방법이 있었는데 그 중 하나로서 annotation 기반의 방식을 사용했다.
+@JsonFormat 을 사용하면 해당 문제를 해결할 수 있는데, 이 안에서 매번 적어줘야 하는 내용이 귀찮아서 미리 정해둔 포맷을 지닌 @JsonFormat 을 포함해둔 게 이 패키지의 클래스들이다.
+사용할 때는 그냥 필드에 달아두면 끝이다.
+
+(KoreanDateTime)
+```
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@JacksonAnnotationsInside
+@Retention(RetentionPolicy.RUNTIME)
+@JsonFormat(timezone = "Asia/Seoul", pattern = "yyyy-MM-dd'T'HH:mm:ss")
+public @interface KoreanDateTime {
+}
+```

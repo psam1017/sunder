@@ -1,4 +1,4 @@
-package portfolio.sunder.global.dto.command;
+package portfolio.sunder.global.command;
 
 public enum CRUDCommand {
 

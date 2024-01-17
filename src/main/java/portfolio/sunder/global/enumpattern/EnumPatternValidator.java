@@ -1,4 +1,4 @@
-package portfolio.sunder.global.dto.enumpattern;
+package portfolio.sunder.global.enumpattern;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -23,9 +23,9 @@ public class EnumPatternValidator implements ConstraintValidator<EnumPattern, En
 
     @Override
     public boolean isValid(Enum<?> value, ConstraintValidatorContext context) {
-        if (!nullable) {
-            return value != null && pattern.matcher(value.toString()).matches();
+        if (nullable) {
+            return value == null || pattern.matcher(value.toString()).matches();
         }
-        return value == null || pattern.matcher(value.toString()).matches();
+        return value != null && pattern.matcher(value.toString()).matches();
     }
 }
