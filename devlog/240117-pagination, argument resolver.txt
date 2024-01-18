@@ -1,0 +1,24 @@
+오늘 추가한 작업은 다음과 같다.
+
+1. pagination 과 관련된 DTO 생성
+pagination 은 근본적으로 페이징과 관련하여 persistence 계층에서 요구하는 데이터 및 항상 반환해야 할 데이터들을 모아둔 DTO 로 정의되어 있다.
+그러므로 이 DTO 자체는 persistence 계층과 결합되어 있다.
+하지만 페이징은 여러 개발자에 의한 상당부분이 정형화되어 있어서 오죽하면 Spring Data JPA 에서도 Page 객체가 있을 정도다.
+여기서 정형화되어 있다는 뜻은, 곧 페이징 유스케이스에 대한 기본적인 테크닉도 정해져 있다는 뜻이기도 하다.
+즉, 근본적으로는 persistence 에서 의존하지만 동시에 presentation 의 유스케이스에 대한 정의이기도 하다.
+
+따라서 pagination 은 프로젝트에서 사용할 나만의 페이징 요청과 응답 인터페이스를 정의한 패키지라고 할 수 있다.
+Spring Data JPA 의 Page, PageImpl 도 좋긴 한데 불필요한 정보와 커스텀에 대한 귀찮음, 그리고 결정적으로 Query DSL 에서 fetchResults 와 fetchCount 를 지원하지 않기로 결정했기에, 즉 어차피 내가 페이징에 대한 코드를 대부분 직접 구현해야 하기에 페이징과 관련된 요구사항을 직접 정의한 것이다.
+
+단점 아닌 단점이라면 persistence 에서 페이징을 구현하기 위해 paginaton 에 의존하고 구현에 대한 제약사항을 숙지해야 한다는 것이다.
+그런데 사실 이건 어떻게 구현하더라도 약간씩은 필요한 내용이다. 예를 들어 Spring Data JPA 의 Page 를 쓰겠다고 결정했다면 Page 객체 및 그것을 사용하기 위한 Spring Data JPA 기능을 숙지해야만 한다.
+오히려 가시성이 좋은 global.pagination 아래에 관련 주석과 함께 usage 와 결합도가 높은 코드들을 모아둔 게 득이 될 수 있다.
+
+2. argument resolver 로 AUTHORIZATION 헤더에서 subject 추출
+argument resolver 를 쓰는 방법은 이 프로젝트의 해당 부분(package portfolio.sunder.global.resolver.argument)을 참고해도 되고, 인터넷에 매우 많은 참고자료가 있으니 검색해봐도 된다.
+argument resolver 에서 jwt 를 사용할 때 토큰 검증을 해야 하나 고민했다. 어차피 spring security 가 관련된 검증을 이미 수행할 것이기 때문이다.
+그래도 개발 과정에서 오류가 발생했을 때 원인을 빠르게 찾기 위해서 최소한의 검증과 로깅을 추가해주었다.
+
+3. properties 파일 정리 (진행 중)
+공통설정까지 여러 프로필에 중복해서 담는 건 불필요하다는 생각이 들어 정리를 조금 했다. 프로필 및 properties 설정 정리는 global 기능을 모두 마무리하면 할 생각이다.
+이제 advice.controller 하나만 남았다. 가장 큰 녀석이다. 이 기능의 동작과 추가적인 설정에 따라 spring security 의 사용범위를 최종적으로 결정하게 될 것이다.
