@@ -51,12 +51,21 @@ public enum ApiStatus {
     /**
      * cannot negotiate content with the client.
      * let the client know the available representations of the resources for the client to choose among them.
-     * define "produces" in @RequestMapping.
+     * also, define "produces" in @RequestMapping.
      */
     NOT_ACCEPTABLE("406", "NotAcceptable"),
+    /**
+     * the server refuses to accept the request because the payload format is in an unsupported format.
+     * let the client know the supported media types.
+     * also, define "consumes" in @RequestMapping
+     */
     UNSUPPORTED_MEDIA_TYPE("415", "UnsupportedMediaType"),
+    PRECONDITION_REQUIRED("428", "PreconditionRequired"),
     TOO_MANY_REQUESTS("429", "TooManyRequests"),
-    INTERNAL_SERVER_ERROR("500", "InternalServerError");
+
+    INTERNAL_SERVER_ERROR("500", "InternalServerError"),
+    BAD_GATEWAY("502", "BadGateway"),
+    SERVICE_UNAVAILABLE("503", "ServiceUnavailable");
 
     private final String code;
     private final String message;

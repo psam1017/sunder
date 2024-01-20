@@ -34,6 +34,7 @@ public class SecurityConfiguration {
 
     // TODO: 2024-01-14 OAUTH2
     // TODO: 2024-01-14 onAuthenticationFailure ?
+    // TODO: 2024-01-19 CRS? -> mediate requestMatchers
 
     @Bean
     public SecurityFilterChain securityFilterChain(

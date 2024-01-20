@@ -29,7 +29,7 @@ public class WebConfiguration implements WebMvcConfigurer {
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true); // 필요한 경우 프론트엔드와 협의.
     }
 
     @Override
