@@ -80,3 +80,6 @@ public WebSecurityCustomizer webSecurityCustomizer() {
 ```
 위 코드는 아래 블로그를 참조하였다.
 https://dukcode.github.io/spring/h2-console-with-spring-security
+
+(추가)
+위 블로그 포스트를 참조하되, 프로필로 제어하지 않고 security 에서 제어하도록 통합했다.
