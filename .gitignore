@@ -8,6 +8,7 @@ build/
 ### Project ###
 **/application-prod.properties
 src/main/generated
+log/
 
 ### STS ###
 .apt_generated
