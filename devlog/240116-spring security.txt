@@ -31,13 +31,13 @@ public @interface HasAnyRole {
 
 (interceptor)
 ```
-import portfolio.sunder.global.api.ApiResponse;
-import portfolio.sunder.global.api.ApiStatus;
-import portfolio.sunder.infrastructure.jwt.JwtStatus;
-import portfolio.sunder.infrastructure.jwt.JwtUtils;
-import portfolio.sunder.web.user.entity.User;
-import portfolio.sunder.web.user.enumeration.UserRole;
-import portfolio.sunder.web.user.repository.UserQueryRepository;
+import api.global.psam.portfolio.sunder.english.ApiResponse;
+import api.global.psam.portfolio.sunder.english.ApiStatus;
+import jwt.infrastructure.psam.portfolio.sunder.english.JwtStatus;
+import jwt.infrastructure.psam.portfolio.sunder.english.JwtUtils;
+import entity.user.web.psam.portfolio.sunder.english.User;
+import enumeration.user.web.psam.portfolio.sunder.english.UserRole;
+import repository.user.web.psam.portfolio.sunder.english.UserQueryRepository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

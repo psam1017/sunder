@@ -1,0 +1,6 @@
+사소한 내용이지만, 저번부터 신경 쓰였던 프로젝트 이름을 아래의 convention 을 참고하여 다시 지었다.
+
+https://maven.apache.org/guides/mini/guide-naming-conventions.html
+
+(이전) groupId : portfolio / artifactId : sunder
+(이후) groupId : psam.portfolio / artifactId : sunder.english

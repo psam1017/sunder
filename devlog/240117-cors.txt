@@ -55,13 +55,15 @@ https://developer.mozilla.org/ko/docs/Web/HTTP/CORS
 
 (SecurityConfigurationTest)
 ```
+package psam.portfolio.sunder.english.global.configuration;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
-import portfolio.sunder.SunderApplicationTests;
-import portfolio.sunder.web.student.dto.request.StudentSave;
-import portfolio.sunder.web.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.web.student.dto.request.StudentSave;
+import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
