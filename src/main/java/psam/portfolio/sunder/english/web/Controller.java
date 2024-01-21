@@ -1,5 +1,6 @@
 package psam.portfolio.sunder.english.web;
 
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class Controller {
 
+    @Secured("ADMIN")
     @GetMapping("/api/param")
     public String helloParam(@RequestParam("param") String param) {
         return "hello";

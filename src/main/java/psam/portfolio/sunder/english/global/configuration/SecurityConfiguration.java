@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.global.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,21 +10,22 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.security.JwtAuthenticationFilter;
 import psam.portfolio.sunder.english.global.security.UserDetailsServiceImpl;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
+import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
@@ -33,8 +33,6 @@ import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 public class SecurityConfiguration {
 
     // TODO: 2024-01-14 OAUTH2
-    // TODO: 2024-01-14 onAuthenticationFailure ?
-    // TODO: 2024-01-19 CRS? -> mediate requestMatchers
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -47,11 +45,9 @@ public class SecurityConfiguration {
                         requests
                                 .requestMatchers(
                                         "/api/**",
-                                        "/docs/**",
-                                        "/css/**",
-                                        "/js/**",
-                                        "/image/**"
+                                        "/docs/**"
                                 ).permitAll()
+                                .requestMatchers(PathRequest.toH2Console()).permitAll()
                                 .anyRequest().hasRole("ADMIN") // hasRole, hasAnyRole 은 prefix 를 생략해야 한다.
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -60,6 +56,7 @@ public class SecurityConfiguration {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers.frameOptions(FrameOptionsConfig::sameOrigin))
                 .build();
     }
 
@@ -76,13 +73,6 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/api/**", configuration);
 
         return source;
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "spring.h2.console.enabled", havingValue = "true")
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring()
-                .requestMatchers(PathRequest.toH2Console());
     }
 
     @Bean
