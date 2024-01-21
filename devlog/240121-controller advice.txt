@@ -1,0 +1,75 @@
+Controller Advice는 수많은 포스트에서 그 사용법을 자세히 다루고 있다.
+하지만 항상 비즈니스 로직에 관련된 response 에만 적용되고, 그 외에 발생된 예외는 여전히 스프링의 템플릿으로 응답이 결정된다는 점이 불편했다.
+따라서 이번 목요일부터 토요일까지 스프링의 응답 자체를 변경할 방법을 계속 탐구했고, 그 결과가 이번 로그이다. 그래서인지 18일 ~ 20일까지의 dev log 가 없다.
+
+1. 예외에 의한 스프링의 응답을 바꾸려면 ResponseEntityExceptionHandler 의 메소드를 override 해야 한다.
+스프링이 정한 (스프링의 표현을 따르자면)'상위 mvc 예외'들은 ResponseEntityExceptionHandler 가 제어하여 응답하게 된다. 스프링은 ResponseEntityExceptionHandler 를 상속한 ProblemDetailsExceptionHandler 를 기본 Controller Advice 로 등록해놓았다. 이 클래스를 본인이 커스텀한 Contoller Advice 로 바꾸면 되는 것이다.
+override 해야 할 메소드는 deprecated 인 handleBindException 을 제외하면 19개가 된다. 달리 말하면 스프링이 기본적으로 제어하는 상위 mvc 예외가 19개+ 라는 뜻이 된다.
+
+2. body 는 String 으로 변환해야 한다.
+각 메소드들을 override 하고 테스트를 하는데 어떤 건 내가 의도한 response 가 반환되는 반면, 어떤 건 내부적인 예외가 발생해서 아예 응답 자체가 안 되는 상황이 생겼다.
+일단, 응답 자체가 나오지 않는 건, 내부적인 예외가 발생한 상황에서 spring security 가 관여하여 403 으로 응답하기 때문이다.
+그리고 내부적인 예외의 원인은 ExceptionHandlerExceptionResolver 에서 내부적으로 호출하는 메소드에서 발생한 것이다.
+예외의 원인을 추적하다 보면 AbstractMessageConverterMethodProcessor.writeWithMessageConverters 까지 타고 들어가게 되는데 그 일부 로직은 다음과 같다.
+
+```
+    // For ProblemDetail, fall back on RFC 7807 format
+    if (compatibleMediaTypes.isEmpty() && ProblemDetail.class.isAssignableFrom(valueType)) { // (1)
+        determineCompatibleMediaTypes(this.problemMediaTypes, producibleTypes, compatibleMediaTypes); // (2)
+    }
+
+    if (compatibleMediaTypes.isEmpty()) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("No match for " + acceptableTypes + ", supported: " + producibleTypes);
+        }
+        if (body != null) {
+            throw new HttpMediaTypeNotAcceptableException(producibleTypes); // (2)
+        }
+        return;
+    }
+```
+
+그리고 여기, (3) 부분에서 예외가 발생하는 게 그 원인인데 그 윗줄에 보면 (1) 에 의해 (2) 가 실행되는 게 보일 것이다.
+그리고 ProblemDetail 이라는 것은, 스프링에서 만든 'RFC 7807' 의 표현이라고 되어 있다. 즉, 커스텀되지 않은 기본 응답 JSON 은 예외가 발생한 경우 응답해야 할 RFC 표준이라는 것이다.
+아무튼, 여기가 관련이 있는 부분이라는 점까지는 확인이 된다.
+
+실제로 ResponseEntity 에 ProblemDetail 을 넣어서 응답하면 내부 로직에서 예외가 발생하지 않는다.
+이 코드의 원인을 끝까지 하나 하나 추적하면 좋겠지만, 한편으로는 그럴 필요가 있나 ... 싶어서 코드의 전체적인 그림을 살펴본 결과 찾은 방법이 ResponseEntity 의 body 에 String 을 넘겨주는 것이었다.
+아래 코드도 마찬가지로 AbstractMessageConverterMethodProcessor.writeWithMessageConverters 의 일부인데, 확인해보면 가장 윗줄에 있는 코드임을 확인할 수 있을 것이다.
+```
+    if (value instanceof CharSequence) { (1)
+        body = value.toString();
+        valueType = String.class;
+        targetType = String.class;
+    }
+    else {
+        body = value;
+        valueType = getReturnValueType(body, returnType);
+        targetType = GenericTypeResolver.resolveType(getGenericType(returnType), returnType.getContainingClass());
+    }
+```
+
+위 메소드는 (1) 에서 CharSequence 인지를 확인을 한다. 그렇다면 우리는, spring 의 다른 코드에 문제가 없다면 body 에 문자열을 넘기면 다른 로직들도 문제 없이 통과할 것이라고 추론할 수 있다.
+
+이 상황에서, 해결 방법은 2가지이다.
+
+(1) ResponseEntity 에 String 타입을 넘겨준다.
+(2) ExceptionHandlerExceptionResolver, AbstractMessageConverterMethodProcessor, ... 를 재정의한다.
+
+(1) 의 경우 ResponseEntityExceptionHandler 의 서브 클래스에서 body 를 문자열로 바꾸는 추가 과정이 요구된다. 조금 번거로울 것 같지만 할만 할 것 같다.
+반면에 (2) 의 경우 얼마나 많은 spring 의 기본 설정을 재정의해야 하는지 알 수 없다. 사실 이미 ResponseEntityExceptionHandler 를 재정의하는 것만 해도 spring 의 기본 설정을 변경한다는 부담이 생기고, 실제로 이러한 내부 예외가 발생하는 side effect 가 초래되었는데 다른 설정들을 끝도 없이 건드리면 기존 코드와 연쇄적으로 side effect 가 일어날 지 알 수 없다.
+따라서 내가 구현한 RestResponseEntityExceptionHandler 에서는 (1) 의 방법으로 문제를 해결하여 ExceptionHandlerExceptionResolver 가 String 타입의 body 를 가진 ResponseEntity 를 넘겨주고 있다.
+
+간단하게 전체적으로 테스트한 결과 모두 내가 재정의한 응답이 반환되는 것을 확인했고, 그 중 일부 예외는 거의 발생할 일이 없는 예외인 것도 확인했다.
+그래도 어쨌든 발생할 가능성이 조금이라도 있다면 응답의 일관성이 떨어지니 모두 재정의했고, 그런 예외는 모두 500 에러로 통일했다.
+
+그 외에 web 통신에서 발생하는 예외 중 선제적으로 제어할 예외인 BindEXception, ConstraintViolationException, JacksonException 과 ApiException 은 WebControllerAdvice 라는 클래스를 따로 만들어 제어하고 있다.
+RestResponseEntityExceptionHandler 는 spring 의 기본 예외만 재정의하기로 하고, 이후 제어하지 못 한 예외가 있다면 WebControllerAdvice 나 또 다른 ControllerAdvice 를 만들어 제어할 것이다.
+
+3. 마지막으로 ...
+
+주의해야 할 점은, 위에서 언급한 대로 스프링의 상위 mvc 예외에 대한 응답은 RFC 7807 포맷이라는 점이다.
+ResponseEntityExceptionHandler 에 대한 재정의가 비표준화에 의한 불편함과 외부 클라이언트와의 추가적인 소통 비용을 초래할 수 있음을, 편의성과 환경을 충분히 고려하고 결정하도록 하자.
+
+이렇게 하여 API 에서 발생할 수 있는 대부분의 예외에 대한 응답을 내가 만든 커스텀 응답인 ApiResponse 로 바꾸어 응답하는 걸 마무리했다.
+이후에 다시 시간과 기회가 된다면 ApiResponse 와 강하게 결합된 구조를 개선하여 사용자의 어떠한 커스텀 응답이더라도 유연하게 body 로 응답할 수 있도록 하면 좋을 것 같다.
