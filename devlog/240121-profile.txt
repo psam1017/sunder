@@ -2,8 +2,10 @@
 
 (application.properties)
 ```
-# h2
+# h2 (impossible to run without a specific profile)
 spring.h2.console.enabled=true
+spring.datasource.driver-class-name=xxx
+spring.datasource.url=xxx
 
 # file size
 spring.servlet.multipart.enabled=true
@@ -31,7 +33,7 @@ sunder.security.token.secret-key=a1b20d274c1c447bbdbe08e5a466563cc25f8c7c72dd4a6
 # spring logging
 logging.file.path=./log
 logging.file.name=./log/sunder.log
-logging.logback.rollingpolicy.file-name-pattern=${LOG_FILE}.%d{yyyy-MM-dd}-%i.log
+logging.logback.rollingpolicy.file-name-pattern=${LOG_FILE}.%d{yyyy-MM-dd}-%i.txt
 logging.logback.rollingpolicy.max-file-size=10MB
 logging.logback.rollingpolicy.max-history=8
 logging.logback.rollingpolicy.total-size-cap=50MB
