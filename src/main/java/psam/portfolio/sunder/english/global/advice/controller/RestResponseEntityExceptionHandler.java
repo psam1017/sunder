@@ -48,8 +48,6 @@ import static org.springframework.http.HttpStatus.*;
 @RestControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    // TODO: 2024-01-20 https://www.baeldung.com/exception-handling-for-rest-with-spring#denied
-
     private final ObjectMapper objectMapper;
 
     /**

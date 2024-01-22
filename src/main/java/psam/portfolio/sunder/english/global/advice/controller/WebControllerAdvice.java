@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -27,6 +28,19 @@ public class WebControllerAdvice {
         log.error("[ApiException handle] request uri = {}", request.getRequestURI());
 
         return new ResponseEntity<>(ex.getResponse(), OK);
+    }
+
+    // spring security 에서 @PreAuthorize, @PostAuthorize, and @Secure 등에 의해 권한 부족 예외가 발생한 경우 AccessDeniedException 이 발생한다.
+    // referenced to https://www.baeldung.com/exception-handling-for-rest-with-spring#denied
+    @ExceptionHandler({ AccessDeniedException.class })
+    public ResponseEntity<Object> handleAccessDeniedException(HttpServletRequest request) {
+
+        log.warn("[AccessDeniedException handle] request uri = {}", request.getRequestURI());
+
+        String message = "Your authority is insufficient.";
+        ApiResponse<Object> response = ApiResponse.of(ApiStatus.FORBIDDEN, message);
+
+        return new ResponseEntity<>(response, FORBIDDEN);
     }
 
     @ExceptionHandler(BindException.class)

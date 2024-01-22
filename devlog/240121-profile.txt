@@ -1,3 +1,7 @@
+내가 이전에 쓰던 properties 들을 통합하고 리팩토링하여 정리하였다.
+
+(application.properties)
+```
 # h2 (impossible to run without a specific profile)
 spring.h2.console.enabled=true
 spring.datasource.driver-class-name=xxx
@@ -27,10 +31,30 @@ spring.mvc.throw-exception-if-no-handler-found=true
 sunder.security.token.secret-key=a1b20d274c1c447bbdbe08e5a466563cc25f8c7c72dd4a6da7e5c912b9a6a012070eb6698f254e1580777a9729feb54dd67b8b0a53634902a94d77d0817b2002
 
 # spring logging
-logging.file.path=./logs
-logging.file.name=./logs/sunder.log
+logging.file.path=./log
+logging.file.name=./log/sunder.log
 logging.logback.rollingpolicy.file-name-pattern=${LOG_FILE}.%d{yyyy-MM-dd}-%i.txt
 logging.logback.rollingpolicy.max-file-size=10MB
 logging.logback.rollingpolicy.max-history=8
 logging.logback.rollingpolicy.total-size-cap=50MB
 logging.logback.rollingpolicy.clean-history-on-start=false
+```
+
+위와 같이 기본적인 설정은 "application.properties" 에 두고, 차이가 발생하는 몇몇 인수만 분리하였다.
+그러다보니 차이가 나는 게 어느 정도 정해져 있음을 느꼈다.
+아래와 같이 어느 정도 항상 차이를 두어야 하는 인수들을 공통화하여 쌓아가다 보면 점점 프로필 관리가 좀 더 수월해질 것 같다.
+
+1. aceess : token, access key
+2. database : spring.datasource 와 jpa 의 "spring.jpa.hibernate.ddl-auto"
+3. log : p6spy log, spring log
+
+(추가)
+이전에 test 경로 아래에 application.proerties 를 따로 두겠다고 했는데, 쓰다 보니 충분히 불편한 것 같아서(?) 아래와 같이 테스트 클래스에 @ActiveProfiles 를 추가하여 프로필을 활성화하고, 테스트 프로필 자체는 보기 편하도록 main 아래에 두었다.
+```
+@ActiveProfiles("test")
+@AutoConfigureMockMvc
+@Transactional
+@SpringBootTest
+public class SunderApplicationTests {
+}
+```
