@@ -4,12 +4,14 @@ import lombok.Getter;
 import psam.portfolio.sunder.english.web.student.entity.Student;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
+import java.util.UUID;
+
 @Getter
 public class StudentResponse {
 
     // upw 는 반환하지 않는다.
     // roles 는 반환하지 않는다.
-    private Long id;
+    private UUID uuid;
     private String uid;
     private String name;
     private UserStatus status;
@@ -19,8 +21,8 @@ public class StudentResponse {
 
     public StudentResponse(Student student) {
         if (student != null) {
-            this.id = student.getId();
-            this.uid = student.getUid();
+            this.uuid = student.getUuid();
+            this.uid = student.getLoginId();
             this.name = student.getName();
             this.status = student.getStatus();
             this.grade = student.getGrade();

@@ -8,6 +8,8 @@ import psam.portfolio.sunder.english.web.user.entity.User;
 import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -16,7 +18,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            User findUser = userQueryRepository.getById(Long.parseLong(username));
+            User findUser = userQueryRepository.getById(UUID.fromString(username));
             return new UserDetailsImpl(findUser);
         } catch (NoSuchUserException e) {
             throw new UsernameNotFoundException(e.getMessage());

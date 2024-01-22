@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public enum UserStatus {
 
     TRIAL,
+    TRIAL_END,
     PENDING,
     ACTIVE,
     DORMANT,

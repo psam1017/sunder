@@ -9,6 +9,12 @@ import psam.portfolio.sunder.english.web.user.entity.User;
 import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
 import psam.portfolio.sunder.english.web.user.entity.QUser;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static psam.portfolio.sunder.english.web.user.entity.QUser.*;
+
 @RequiredArgsConstructor
 @Repository
 public class UserQueryRepository {
@@ -16,8 +22,8 @@ public class UserQueryRepository {
     private final JPAQueryFactory query;
     private final EntityManager em;
 
-    public User getById(long id) {
-        User entity = em.find(User.class, id);
+    public User getById(UUID uuid) {
+        User entity = em.find(User.class, uuid);
         if (entity == null) {
             throw new NoSuchUserException();
         }
@@ -26,13 +32,33 @@ public class UserQueryRepository {
 
     public User getOne(BooleanExpression... expressions) {
         User entity = query
-                .select(QUser.user)
-                .from(QUser.user)
+                .select(user)
+                .from(user)
                 .where(expressions)
                 .fetchOne();
         if (entity == null) {
             throw new NoSuchUserException();
         }
         return entity;
+    }
+
+    public Optional<User> findOne(BooleanExpression... expressions) {
+        return Optional.ofNullable(
+                query.select(user)
+                        .from(user)
+                        .where(expressions)
+                        .fetchOne()
+        );
+    }
+
+    public Optional<User> findById(UUID uuid) {
+        return Optional.ofNullable(em.find(User.class, uuid));
+    }
+
+    public List<User> findList(BooleanExpression... expressions) {
+        return query.select(user)
+                .from(user)
+                .where(expressions)
+                .fetch();
     }
 }

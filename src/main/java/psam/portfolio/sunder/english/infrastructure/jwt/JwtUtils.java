@@ -7,10 +7,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import static psam.portfolio.sunder.english.infrastructure.jwt.JwtStatus.*;
@@ -48,19 +45,19 @@ public class JwtUtils {
         return buildToken(extraClaims, subject, refreshExpiration);
     }
 
-    public String generateToken(Long id, long jwtExpiration) {
+    public String generateToken(UUID id, long jwtExpiration) {
         return generateToken(id, jwtExpiration, new HashMap<>());
     }
 
-    public String generateToken(Long id, long jwtExpiration, Map<String, Object> extraClaims) {
+    public String generateToken(UUID id, long jwtExpiration, Map<String, Object> extraClaims) {
         return buildToken(extraClaims, String.valueOf(id), jwtExpiration);
     }
 
-    public String generateRefreshToken(Long id, long refreshExpiration) {
+    public String generateRefreshToken(UUID id, long refreshExpiration) {
         return buildToken(new HashMap<>(), String.valueOf(id), refreshExpiration);
     }
 
-    public String generateRefreshToken(Long id, long refreshExpiration, Map<String, Object> extraClaims) {
+    public String generateRefreshToken(UUID id, long refreshExpiration, Map<String, Object> extraClaims) {
         return buildToken(extraClaims, String.valueOf(id), refreshExpiration);
     }
 
