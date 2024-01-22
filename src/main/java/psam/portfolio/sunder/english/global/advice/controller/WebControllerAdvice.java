@@ -26,6 +26,7 @@ public class WebControllerAdvice {
     public ResponseEntity<Object> handleApiException(ApiException ex, HttpServletRequest request) {
 
         log.error("[ApiException handle] request uri = {}", request.getRequestURI());
+        log.error("[reasons] {}", ex.getResponse().getReasons().toString());
 
         return new ResponseEntity<>(ex.getResponse(), OK);
     }

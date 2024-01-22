@@ -1,5 +1,13 @@
 package psam.portfolio.sunder.english.web.user.exception;
 
-// TODO: 2024-01-14 extends ApiException
-public class NoSuchUserException extends RuntimeException {
+import psam.portfolio.sunder.english.global.api.ApiException;
+import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.global.api.ApiStatus;
+import psam.portfolio.sunder.english.web.user.entity.User;
+
+public class NoSuchUserException extends ApiException {
+    @Override
+    public ApiResponse<?> initialize() {
+        return ApiResponse.error(ApiStatus.NO_SUCH_ELEMENT, User.class, null);
+    }
 }

@@ -7,8 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import psam.portfolio.sunder.english.web.student.entity.Student;
 import psam.portfolio.sunder.english.web.student.entity.QStudent;
+import psam.portfolio.sunder.english.web.student.exception.NoSuchStudentException;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import static psam.portfolio.sunder.english.web.student.entity.QStudent.*;
 
 @RequiredArgsConstructor
 @Repository
@@ -17,17 +22,42 @@ public class StudentQueryRepository {
     private final JPAQueryFactory query;
     private final EntityManager em;
 
-    public Optional<Student> findById(long id) {
-        return Optional.ofNullable(em.find(Student.class, id));
+    public Optional<Student> findById(UUID uuid) {
+        return Optional.ofNullable(em.find(Student.class, uuid));
     }
 
     public Optional<Student> findOne(BooleanExpression... expressions) {
         return Optional.ofNullable(
-                query.select(QStudent.student)
-                        .from(QStudent.student)
+                query.select(student)
+                        .from(student)
                         .where(expressions)
                         .fetchOne()
         );
     }
-    // TODO: 2024-01-13 getById, getOne, findList
+
+    public Student getById(UUID uuid) {
+        Student entity = em.find(Student.class, uuid);
+        if (entity == null) {
+            throw new NoSuchStudentException();
+        }
+        return entity;
+    }
+
+    public Student getOne(BooleanExpression... expressions) {
+        Student entity = query.select(student)
+                .from(student)
+                .where(expressions)
+                .fetchOne();
+        if (entity == null) {
+            throw new NoSuchStudentException();
+        }
+        return entity;
+    }
+
+    public List<Student> findList(BooleanExpression... expressions) {
+        return query.select(student)
+                .from(student)
+                .where(expressions)
+                .fetch();
+    }
 }
