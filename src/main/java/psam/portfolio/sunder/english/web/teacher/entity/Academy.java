@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
 import psam.portfolio.sunder.english.web.lesson.entity.Lesson;
 import psam.portfolio.sunder.english.web.student.entity.Student;
 import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
@@ -35,9 +35,6 @@ public class Academy extends BaseEntity {
 
     @OneToMany(mappedBy = "academy")
     private Set<Student> students;
-
-    @OneToMany(mappedBy = "academy")
-    private Set<Lesson> lessons;
 
     @Builder
     public Academy(String name, String address, String phone, String email, boolean openToPublic, AcademyStatus status) {

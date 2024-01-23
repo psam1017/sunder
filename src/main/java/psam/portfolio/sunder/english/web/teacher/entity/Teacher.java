@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import psam.portfolio.sunder.english.global.entity.embeddable.Address;
 import psam.portfolio.sunder.english.web.lesson.entity.Lesson;
 import psam.portfolio.sunder.english.web.user.entity.User;
 import psam.portfolio.sunder.english.web.user.entity.UserRole;
@@ -30,11 +31,10 @@ public class Teacher extends User {
     private Academy academy;
 
     @Builder
-    public Teacher(String loginId, String loginPw, String name, UserStatus status, Set<UserRole> roles, String email, boolean emailVerified, Set<Lesson> lessons, Academy academy) {
-        super(loginId, loginPw, name, status, roles);
+    public Teacher(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles, String email, boolean emailVerified, Academy academy) {
+        super(loginId, loginPw, name, phone, address, status, roles);
         this.email = email;
         this.emailVerified = emailVerified;
-        this.lessons = lessons;
         this.academy = academy;
     }
 

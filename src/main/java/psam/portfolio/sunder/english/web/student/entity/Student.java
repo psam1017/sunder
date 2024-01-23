@@ -1,16 +1,20 @@
 package psam.portfolio.sunder.english.web.student.entity;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import psam.portfolio.sunder.english.global.entity.embeddable.Address;
+import psam.portfolio.sunder.english.web.lesson.entity.Enrollment;
+import psam.portfolio.sunder.english.web.teacher.entity.Academy;
 import psam.portfolio.sunder.english.web.user.entity.User;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.web.user.entity.UserRole;
 
 import java.util.Set;
+
+import static jakarta.persistence.FetchType.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,11 +30,7 @@ public class Student extends User {
 
     private String school;
 
-    @Builder
-    public Student(String uid, String upw, String name, UserStatus status, Set<UserRole> roles, int grade, int classroom, String school) {
-        super(uid, upw, name, status, roles);
-        this.grade = grade;
-        this.classroom = classroom;
-        this.school = school;
-    }
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "academy_uuid")
+    private Academy academy;
 }
