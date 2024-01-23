@@ -2,11 +2,9 @@ package psam.portfolio.sunder.english.web.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.audit.BaseEntity;
-import psam.portfolio.sunder.english.web.role.entity.Role;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.time.LocalDateTime;
@@ -27,10 +25,8 @@ public abstract class User extends BaseEntity {
     @Column(nullable = false, length = 20, unique = true)
     private String loginId;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String loginPw;
-
-    private LocalDateTime lastPasswordChangeDate;
 
     @Column(nullable = false)
     private String name;
@@ -38,17 +34,18 @@ public abstract class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Role> roles;
+    private LocalDateTime lastPasswordChangeDateTime;
 
-    @Builder
-    public User(String loginId, String loginPw, String name, UserStatus status, Set<Role> roles) {
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRole> roles;
+
+    public User(String loginId, String loginPw, String name, UserStatus status, Set<UserRole> roles) {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.name = name;
         this.status = status;
         this.roles = roles;
-        this.lastPasswordChangeDate = LocalDateTime.now();
+        this.lastPasswordChangeDateTime = LocalDateTime.now();
     }
 
     public boolean isActive() {
@@ -63,10 +60,6 @@ public abstract class User extends BaseEntity {
         return this.status == UserStatus.TRIAL_END;
     }
 
-    public boolean isDormant() {
-        return this.status == UserStatus.DORMANT;
-    }
-
     public boolean isForbidden() {
         return this.status == UserStatus.FORBIDDEN;
     }
@@ -77,10 +70,6 @@ public abstract class User extends BaseEntity {
 
     public void activate() {
         this.status = UserStatus.ACTIVE;
-    }
-
-    public void deactivate() {
-        this.status = UserStatus.DORMANT;
     }
 
     public void forbid() {
@@ -96,14 +85,18 @@ public abstract class User extends BaseEntity {
     }
 
     public void addRole(Role role) {
-        this.roles.add(role);
+        UserRole userRole = UserRole.builder()
+                .user(this)
+                .role(role)
+                .build();
+        this.roles.add(userRole);
     }
 
     public void removeRole(Role role) {
-        this.roles.remove(role);
+        this.roles.removeIf(ur -> ur.getRole().equals(role));
     }
 
     public boolean hasRole(Role role) {
-        return this.roles.contains(role);
+        return this.roles.stream().anyMatch(ur -> ur.getRole().equals(role));
     }
 }

@@ -1,0 +1,40 @@
+copilot shortcut manual 은 아래를 참조하자.
+
+https://docs.github.com/en/copilot/configuring-github-copilot/configuring-github-copilot-in-your-environment#keyboard-shortcuts-for-windows
+
+# 추천 코드 한 단어씩 완성
+Ctrl + [Right]
+
+# 추천 코드 한 줄 완성
+Ctrl + Alt + [Right]
+
+# 추천 코드로 완성
+[Tab]
+
+# 현재 라인에서 추천 코드 off
+[Esc]
+
+# 현재 라인에서 추천 코드 on
+Alt + \
+
+# copilot 이전/다음 추천
+Alt + [
+Alt + ]
+
+# copilot 모든 추천 리스트
+Ctrl + Space
+
+--
+
+copilot chat 이 하루만에 활성화되었다. 그리고 테스트를 해보니 copilot 이 내 프로젝트의 코드를 직접 보고 그것에 대한 피드백을 줄 수 있는 것이 확인됐다.
+
+```
+Q. 내가 지금 연 프로젝트의 psam.portfolio.sunder.english.web.user.entity 패키지에 있는 User 라는 클래스에서 보완할 점은 무엇입니까?
+
+A. `User` 클래스를 살펴보면, 몇 가지 개선할 수 있는 부분이 있습니다:
+1. **비밀번호 보안**: 현재 `loginPw` 필드는 평문으로 저장되고 있습니다. 이는 보안 위험을 초래할 수 있습니다. 비밀번호는 해시와 솔트를 사용하여 암호화해야 합니다.
+2. **롤 관리**: 현재 `User` 클래스는 `Role` 클래스와 직접적인 관계를 가지고 있습니다. 이는 유저와 롤 사이의 관계를 관리하는 별도의 클래스를 만드는 것이 좋습니다. 이렇게 하면 유저와 롤 사이의 관계를 더 유연하게 관리할 수 있습니다.
+(생략)
+```
+
+이와 같이 copilot 에게 내가 직접 소스코드를 보여주지 않아도 알아서 내 코드를 파악할 수 있기 때문에 훨씬 더 빠르고 정확한 피드백이 가능할 것으로 기대된다.

@@ -8,7 +8,6 @@ public enum UserStatus {
     TRIAL_END,
     PENDING,
     ACTIVE,
-    DORMANT,
     FORBIDDEN,
     WITHDRAWN;
 
