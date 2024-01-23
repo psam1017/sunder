@@ -6,9 +6,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.web.role.entity.Role;
 import psam.portfolio.sunder.english.web.user.entity.User;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.web.user.entity.UserRole;
 
 import java.util.Set;
 
@@ -27,7 +27,7 @@ public class Student extends User {
     private String school;
 
     @Builder
-    public Student(String uid, String upw, String name, UserStatus status, Set<Role> roles, int grade, int classroom, String school) {
+    public Student(String uid, String upw, String name, UserStatus status, Set<UserRole> roles, int grade, int classroom, String school) {
         super(uid, upw, name, status, roles);
         this.grade = grade;
         this.classroom = classroom;

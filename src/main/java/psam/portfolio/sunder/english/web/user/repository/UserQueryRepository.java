@@ -5,17 +5,17 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import psam.portfolio.sunder.english.web.user.entity.User;
-import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
+import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.web.user.entity.QUser;
+import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
+import psam.portfolio.sunder.english.web.user.entity.User;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.web.user.entity.QUser.*;
-
 @RequiredArgsConstructor
+@Transactional
 @Repository
 public class UserQueryRepository {
 
@@ -32,8 +32,8 @@ public class UserQueryRepository {
 
     public User getOne(BooleanExpression... expressions) {
         User entity = query
-                .select(user)
-                .from(user)
+                .select(QUser.user)
+                .from(QUser.user)
                 .where(expressions)
                 .fetchOne();
         if (entity == null) {
@@ -44,8 +44,8 @@ public class UserQueryRepository {
 
     public Optional<User> findOne(BooleanExpression... expressions) {
         return Optional.ofNullable(
-                query.select(user)
-                        .from(user)
+                query.select(QUser.user)
+                        .from(QUser.user)
                         .where(expressions)
                         .fetchOne()
         );
@@ -55,9 +55,9 @@ public class UserQueryRepository {
         return Optional.ofNullable(em.find(User.class, uuid));
     }
 
-    public List<User> findList(BooleanExpression... expressions) {
-        return query.select(user)
-                .from(user)
+    public List<User> findAll(BooleanExpression... expressions) {
+        return query.select(QUser.user)
+                .from(QUser.user)
                 .where(expressions)
                 .fetch();
     }

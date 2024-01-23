@@ -5,8 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.web.student.entity.Student;
-import psam.portfolio.sunder.english.web.student.entity.QStudent;
 import psam.portfolio.sunder.english.web.student.exception.NoSuchStudentException;
 
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.UUID;
 import static psam.portfolio.sunder.english.web.student.entity.QStudent.*;
 
 @RequiredArgsConstructor
+@Transactional
 @Repository
 public class StudentQueryRepository {
 
@@ -54,7 +55,7 @@ public class StudentQueryRepository {
         return entity;
     }
 
-    public List<Student> findList(BooleanExpression... expressions) {
+    public List<Student> findAll(BooleanExpression... expressions) {
         return query.select(student)
                 .from(student)
                 .where(expressions)

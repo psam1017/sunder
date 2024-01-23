@@ -1,6 +1,6 @@
-package psam.portfolio.sunder.english.web.role.enumeration;
+package psam.portfolio.sunder.english.web.user.enumeration;
 
-public enum UserRole { // ROLE_XXX(spring security 규칙)
+public enum RoleName { // ROLE_XXX(spring security 규칙)
 
     ROLE_ADMIN,
     ROLE_DIRECTOR,
