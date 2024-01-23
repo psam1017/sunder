@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.entity.embeddable.Address;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,11 @@ public abstract class User extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    private String phone;
+
+    @Embedded
+    private Address address;
+
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
@@ -39,10 +45,12 @@ public abstract class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles;
 
-    public User(String loginId, String loginPw, String name, UserStatus status, Set<UserRole> roles) {
+    public User(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles) {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.name = name;
+        this.phone = phone;
+        this.address = address;
         this.status = status;
         this.roles = roles;
         this.lastPasswordChangeDateTime = LocalDateTime.now();

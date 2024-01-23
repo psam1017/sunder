@@ -4,13 +4,11 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.audit.BaseEntity;
-import psam.portfolio.sunder.english.web.student.entity.Student;
+import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
 import psam.portfolio.sunder.english.web.teacher.entity.Teacher;
 import psam.portfolio.sunder.english.web.lesson.enumeration.LessonStatus;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
