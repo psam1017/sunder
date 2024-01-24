@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.user.entity;
+package psam.portfolio.sunder.english.web.user.model;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,18 +1,11 @@
-package psam.portfolio.sunder.english.web.student.entity;
+package psam.portfolio.sunder.english.web.student.model;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.entity.embeddable.Address;
-import psam.portfolio.sunder.english.web.lesson.entity.Enrollment;
-import psam.portfolio.sunder.english.web.teacher.entity.Academy;
-import psam.portfolio.sunder.english.web.user.entity.User;
-import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.web.user.entity.UserRole;
-
-import java.util.Set;
+import psam.portfolio.sunder.english.web.teacher.model.Academy;
+import psam.portfolio.sunder.english.web.user.model.User;
 
 import static jakarta.persistence.FetchType.*;
 

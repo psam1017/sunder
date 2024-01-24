@@ -1,0 +1,97 @@
+```
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
+
+@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass
+@Getter
+public abstract class BaseEntity {
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDateTime;
+
+    @LastModifiedDate
+    private LocalDateTime modifiedDateTime;
+
+    @CreatedBy
+    @Column(updatable = false)
+    private Long createdBy;
+
+    @LastModifiedBy
+    private Long modifiedBy;
+}
+```
+
+Spring JPA Data 의 Audit 기능을 사용하여 생성일, 수정일, 생성자, 수정자를 자동으로 기록하도록 만들 수 있다.
+
+- @MappedSuperclass
+    - 해당 클래스를 테이블과 매핑하지 않고, 엔티티가 상속할 수 있도록 한다.
+
+- @CreatedDate
+    - 엔티티를 저장할 때 생성일을 저장한다.
+    - LocalDateTime 타입으로 저장된다.
+
+- @LastModifiedDate
+    - 엔티티를 수정할 때 수정일을 저장한다.
+    - LocalDateTime 타입으로 저장된다.
+
+- @CreatedBy
+    - 엔티티를 저장할 때 생성자를 저장한다.
+    - 생성자 기록을 사용하기 위해서는 AuditorAware 를 구현하고 빈으로 등록해야 한다.
+
+- @LastModifiedBy
+    - 엔티티를 수정할 때 수정자를 저장한다.
+    - 수정자 기록을 사용하기 위해서는 AuditorAware 를 구현하고 빈으로 등록해야 한다.
+
+```
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Optional;
+
+@EnableJpaAuditing
+@Configuration
+public class RepositoryConfiguration {
+
+    @Bean
+    public AuditorAware<Long> auditorAware() {
+        return () -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null
+                    && authentication.isAuthenticated()
+                    && authentication.getPrincipal() instanceof UserDetails) {
+
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                return Optional.of(Long.valueOf(userDetails.getUsername()));
+            }
+            return Optional.empty();
+        };
+    }
+}
+```
+
+- @EnableJpaAuditing
+    - Spring Data JPA 의 Audit 기능을 사용하도록 설정한다.
+
+- auditorAware()
+    - AuditorAware 를 구현한 빈을 등록하면 Spring Data JPA 가 엔티티를 저장할 때 AuditorAware 를 사용하여 생성자, 수정자 정보를 저장한다.
+    - Spring Security 를 사용하여 UserDetails 를 가져오고, 해당 정보에서 생성자와 수정자를 기록할 수 있다.
