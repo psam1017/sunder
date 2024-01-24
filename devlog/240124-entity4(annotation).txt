@@ -1,0 +1,33 @@
+(필수 개념)
+ - 1 + n Problem
+ - batch fetch
+ - 연관관계의 주인
+
+(필수 annotation)
+@Entity
+@Id
+@GeneratedValue
+@ManyToOne(fetch = LAZY)
+@JoinColumn
+
+(활용 annotation)
+@Table(name)
+@Column
+@OneToMany(mappedBy)
+@OneToMany(mappedBy, cascade = CascadeType.ALL, orphanRemoval = true)
+@MappedSuperclass
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn
+@DiscriminatorValue(value)
+@Enumerated(EnumType.STRING)
+@Embedded
+@Embeddable
+
+(auditing)
+@EntityListeners(AuditingEntityListener.class)
+@CreatedDate
+@LastModifiedDate
+@CreatedBy
+@LastModifiedBy
+@EnableJpaAuditing
+@Bean -> AuditorAware<T>

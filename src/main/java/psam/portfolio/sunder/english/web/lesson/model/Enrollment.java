@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.lesson.entity;
+package psam.portfolio.sunder.english.web.lesson.model;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
 import psam.portfolio.sunder.english.web.lesson.enumeration.EnrollmentStatus;
 import psam.portfolio.sunder.english.web.lesson.enumeration.Grade;
-import psam.portfolio.sunder.english.web.student.entity.Student;
+import psam.portfolio.sunder.english.web.student.model.Student;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -3,7 +3,7 @@ package psam.portfolio.sunder.english.global.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import psam.portfolio.sunder.english.web.user.entity.User;
+import psam.portfolio.sunder.english.web.user.model.User;
 
 import java.util.Collection;
 import java.util.HashSet;

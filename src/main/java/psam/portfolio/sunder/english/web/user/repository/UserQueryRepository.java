@@ -6,9 +6,9 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.web.user.entity.QUser;
+import psam.portfolio.sunder.english.web.user.model.QUser;
 import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
-import psam.portfolio.sunder.english.web.user.entity.User;
+import psam.portfolio.sunder.english.web.user.model.User;
 
 import java.util.List;
 import java.util.Optional;

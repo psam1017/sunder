@@ -3,7 +3,7 @@ package psam.portfolio.sunder.english.web.user.exception;
 import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
-import psam.portfolio.sunder.english.web.user.entity.User;
+import psam.portfolio.sunder.english.web.user.model.User;
 
 public class NoSuchUserException extends ApiException {
     @Override

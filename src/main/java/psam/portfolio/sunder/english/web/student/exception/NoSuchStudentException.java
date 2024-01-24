@@ -3,7 +3,7 @@ package psam.portfolio.sunder.english.web.student.exception;
 import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
-import psam.portfolio.sunder.english.web.student.entity.Student;
+import psam.portfolio.sunder.english.web.student.model.Student;
 
 public class NoSuchStudentException extends ApiException {
     @Override

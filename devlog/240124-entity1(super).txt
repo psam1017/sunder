@@ -1,0 +1,171 @@
+```
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.entity.embeddable.Address;
+import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.UUID;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DiscriminatorColumn
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "users")
+@Entity
+public abstract class User extends BaseEntity {
+
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID uuid;
+
+    @Column(nullable = false, length = 20, unique = true)
+    private String loginId;
+
+    @Column(nullable = false)
+    private String loginPw;
+
+    @Column(nullable = false)
+    private String name;
+
+    private String phone;
+
+    @Embedded
+    private Address address;
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
+    private LocalDateTime lastPasswordChangeDateTime;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserRole> roles;
+
+    public User(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles) {
+        this.loginId = loginId;
+        this.loginPw = loginPw;
+        this.name = name;
+        this.phone = phone;
+        this.address = address;
+        this.status = status;
+        this.roles = roles;
+        this.lastPasswordChangeDateTime = LocalDateTime.now();
+    }
+```
+위 코드를 예시로 entity 의 개념에 대해 정리한다. Admin, Teacher, Student 의 부모 클래스인 User 이다.
+
+- @Entity
+    - 테이블과 매핑되는 객체임을 명시한다.
+    - 기본적으로 클래스 이름을 테이블 이름으로 매핑한다.
+
+- @Table
+    - 엔티티와 매핑할 테이블을 지정한다.
+    - name 속성을 통해 테이블 이름을 지정할 수 있다.
+    - uniqueConstraints 속성을 통해 유니크 제약 조건을 지정할 수 있다.
+    - indexes 속성을 통해 인덱스를 지정할 수 있다.
+
+- @Id 와 @GeneratedValue
+    - 테이블의 기본키를 매핑한다.
+    - 기본키 생성 전략은 다음과 같다.
+        - AUTO : DB에 맞게 자동으로 생성한다. 기본값으로 사용된다.
+        - IDENTITY : 기본키 생성을 DB에 위임한다. MySQL 등에서 사용한다.
+        - SEQUENCE : DB의 시퀀스를 사용한다. Oracle 등에서 사용한다.
+        - TABLE : 키 생성 전용 테이블을 사용한다. 호환성이 높으나, 성능 저하가 발생할 수 있다. 여러모로 권장되지 않는다.
+        - UUID : UUID를 사용한다. 성능 저하가 발생할 수 있으나, DB에 독립적이고 중복이 사실상 없으며 키가 모자랄 일이 없다.
+
+- @Column
+    - 테이블의 컬럼을 매핑한다.
+    - name 속성을 통해 컬럼 이름을 지정할 수 있다.
+    - columnDefinition 속성을 통해 컬럼 정의를 직접 지정할 수 있다.
+    - columnDefinition 이 아니더라도 nullable, length, unique, insertable, updatable 등으로 컬럼의 속성을 간편하게 지정할 수 있다.
+
+- @Enumerated
+    - enum 타입을 매핑한다.
+    - EnumType.ORDINAL 을 통해 enum 의 순서를 매핑한다. semantic 하지 않으므로 권장되지 않는다.
+    - EnumType.STRING 을 통해 enum 의 이름을 매핑한다.
+
+- @Embedded
+    - 값 타입 매핑을 위한 어노테이션이다. 값 타입으로 쓰이는 클래스를 소위 임베디드 타입이라고 표현한다.
+    - @Embedded 어노테이션을 통해 값 타입을 매핑할 수 있다.
+    - 임베디드 타입은 아래 코드와 같이 @Embeddable 어노테이션이 붙은 클래스로 만들어 사용한다.
+
+```
+import jakarta.persistence.Embeddable;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@Embeddable
+public class Address {
+
+    private String street;
+    private String detail;
+    private String postcode;
+
+    @Builder
+    public Address(String street, String detail, String postcode) {
+        this.street = street;
+        this.detail = detail;
+        this.postcode = postcode;
+    }
+}
+```
+
+- @Inheritance
+    - 상속 관계 매핑을 위한 어노테이션이다.
+    - SINGLE_TABLE 을 통해 단일 테이블 전략을 사용한다.
+    - JOINED 를 통해 조인 전략을 사용한다.
+    - TABLE_PER_CLASS 도 있는데, 권장되지는 않는다.
+    - 해당 클래스를 구현해야 한다는 의미에서 abstract 클래스로 권장되나 필요하다면 추상 클래스로 만들지 않아도 된다.
+
+- @DiscriminatorColumn
+    - 상속 관계 매핑을 위한 어노테이션이다. 관계형 DB 에서는 상속이라는 개념이 없기 때문에 연결된 테이블을 식별하기 위해 필요하다.
+    - 부모 클래스에 붙는다.
+    - name 속성을 통해 구분 컬럼의 이름을 지정할 수 있다.
+
+- @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    - Entity 는 public 또는 protected 기본 생성자가 필수이다.
+    - 외부에서는 기본 생성자를 호출하지 못 하도록 protected 로 설정하자.
+
+- @OneToMany
+    - 240124-entity2(sub).txt 에서 설명한다.
+
+```
+    public boolean isActive() {
+        return this.status == UserStatus.ACTIVE;
+    }
+
+    public void addRole(Role role) {
+        UserRole userRole = UserRole.builder()
+                .user(this)
+                .role(role)
+                .build();
+        this.roles.add(userRole);
+    }
+
+    public boolean hasRole(Role role) {
+        return this.roles.stream().anyMatch(ur -> ur.getRole().equals(role));
+    }
+   // (생략)
+}
+```
+
+위 코드는 User 클래스의 일부이다. Entity 는 자율적인 객체로서 능동적이고 스스로 동작하는 역할을 지닌다. 책임 관점에서 보자면, User 는 자신의 상태를 관리하고, 자신의 상태를 묻는 물음에 답할 수 있다.
+이러한 요청(호출, 물음)에 답하기 위하여 getter 와 hasRole, isActive 와 같은 메소드를 지닌다. 그리고 addRole 과 같이 자신의 정보(필드)를 변경하는 "행위" 메소드를 지닌다. 이러한 행위를 강조하고, 그 의미를 동료 개발자들에게 전달하기 위해 setter 는 사용하지 않는 것이 좋다.
+Entity 는 기본적으로 애플리케이션 외부에 있는 클라이언트에게 노출해선 안 된다. Entity 는 또 다른 Entity 객체나, Entity 에 대한 Operation 을 담당하는 Service 와 협력한다. 클라이언트에게 이러한 Entity 정보를 표현하기 위해서는 이를 DTO, Response, Proxy 등으로 변환해야 한다.
+따라서 presentation layer 에 있는 Controller 는, 클라이언트와 Entity 사이에서 서로의 요청과 응답을 주고 받기 위한 DTO 를 사용한다.
+
+controller 가 직접적으로 Entity 에 의존하는 것은 개발 환경마다 조금씩 차이를 보인다.
+
+(1) Service 에서 Entity 를 직접 반환하고, controller 안에서 이를 Response 로 변환하여 클라이언트에게 반환한다.
+(2) Service 에서 Entity 를 DTO 로 변환하여 반환하고, Controller 는 이를 전달하는 역할만 한다.
+(3) Service 에서 Entity 에 대한 (Service)Response 를 생성하고, Controller 는 Response 의 정보만을 가지고 클라이언트가 요구하는 정보로 한 차례 더 변환한 (Controller)Response 로 응답한다.
+(4) ...
+
+각 방법은 편의성이나 유연성 측면에서 장단점을 지닌다. 자신의 개발환경 및 동료들과 협의하여 일관된 아키텍처를 가져가는 것이 중요하다.
+다만, Entity 그 자체는 클라이언트에게 노출되어서는 안 된다는 것을 명심하자.

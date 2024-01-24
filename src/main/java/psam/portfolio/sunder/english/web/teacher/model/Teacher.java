@@ -1,13 +1,13 @@
-package psam.portfolio.sunder.english.web.teacher.entity;
+package psam.portfolio.sunder.english.web.teacher.model;
 
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.entity.embeddable.Address;
-import psam.portfolio.sunder.english.web.lesson.entity.Lesson;
-import psam.portfolio.sunder.english.web.user.entity.User;
-import psam.portfolio.sunder.english.web.user.entity.UserRole;
+import psam.portfolio.sunder.english.web.lesson.model.Lesson;
+import psam.portfolio.sunder.english.web.user.model.User;
+import psam.portfolio.sunder.english.web.user.model.UserRole;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.util.Set;
@@ -16,9 +16,9 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@DiscriminatorValue("TEACHER")
 @Table(name = "teachers")
 @Entity
-@DiscriminatorValue("TEACHER")
 public class Teacher extends User {
 
     private String email;

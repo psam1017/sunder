@@ -6,15 +6,14 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.web.teacher.entity.Academy;
-import psam.portfolio.sunder.english.web.teacher.entity.QAcademy;
+import psam.portfolio.sunder.english.web.teacher.model.Academy;
 import psam.portfolio.sunder.english.web.teacher.exception.NoSuchAcademyException;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.web.teacher.entity.QAcademy.*;
+import static psam.portfolio.sunder.english.web.teacher.model.QAcademy.*;
 
 @RequiredArgsConstructor
 @Transactional

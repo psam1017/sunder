@@ -29,7 +29,7 @@ Ctrl + Space
 copilot chat 이 하루만에 활성화되었다. 그리고 테스트를 해보니 copilot 이 내 프로젝트의 코드를 직접 보고 그것에 대한 피드백을 줄 수 있는 것이 확인됐다.
 
 ```
-Q. 내가 지금 연 프로젝트의 psam.portfolio.sunder.english.web.user.entity 패키지에 있는 User 라는 클래스에서 보완할 점은 무엇입니까?
+Q. 내가 지금 연 프로젝트의 psam.portfolio.sunder.english.web.user.model 패키지에 있는 User 라는 클래스에서 보완할 점은 무엇입니까?
 
 A. `User` 클래스를 살펴보면, 몇 가지 개선할 수 있는 부분이 있습니다:
 1. **비밀번호 보안**: 현재 `loginPw` 필드는 평문으로 저장되고 있습니다. 이는 보안 위험을 초래할 수 있습니다. 비밀번호는 해시와 솔트를 사용하여 암호화해야 합니다.

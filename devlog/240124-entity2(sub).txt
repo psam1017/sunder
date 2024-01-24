@@ -1,0 +1,106 @@
+```
+import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import psam.portfolio.sunder.english.global.entity.embeddable.Address;
+import psam.portfolio.sunder.english.web.lesson.model.Lesson;
+import psam.portfolio.sunder.english.web.user.model.User;
+import psam.portfolio.sunder.english.web.user.model.UserRole;
+import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+
+import java.util.Set;
+
+import static jakarta.persistence.FetchType.LAZY;
+
+@Getter
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@Table(name = "teachers")
+@Entity
+@DiscriminatorValue("TEACHER")
+public class Teacher extends User {
+
+    private String email;
+    private boolean emailVerified;
+
+    @OneToMany(mappedBy = "teacher")
+    private Set<Lesson> lessons;
+
+    @ManyToOne(fetch = LAZY)
+    private Academy academy;
+
+    @Builder
+    public Teacher(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles, String email, boolean emailVerified, Academy academy) {
+        super(loginId, loginPw, name, phone, address, status, roles);
+        this.email = email;
+        this.emailVerified = emailVerified;
+        this.academy = academy;
+    }
+
+    public void addLesson(Lesson lesson) {
+        this.lessons.add(lesson);
+    }
+
+    public void removeLesson(Lesson lesson) {
+        this.lessons.remove(lesson);
+    }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
+    }
+}
+```
+위 코드를 예시로 entity 의 개념에 대해 정리한다. User 의 자식 클래스인 Teacher 이다.
+
+- @DiscriminatorValue
+    - 엔티티를 저장할 때 구분 컬럼에 입력할 값을 지정한다.
+    - 기본값은 엔티티 이름이다.
+
+- @JoinColumn
+    - 외래 키를 매핑한다.
+    - name 속성을 통해 매핑할 외래 키의 이름을 지정한다. 테이블의 외래 키 컬럼 이름을 입력하도록 하자.
+
+- @ManyToOne
+    - 다대일 관계를 매핑한다.
+    - fetch 속성을 통해 연관된 엔티티를 어떻게 가져올지 지정할 수 있다. *1 + n 문제(1 + n Problem)를 예방하기 위해 무조건 LAZY 로 지정해야 한다.
+
+* "1 + n Problem"이란
+    - 1 + n 현상은 연관된 엔티티를 조회할 때 발생한다.
+    - 예를 들어, Teacher 를 조회할 때 연관된 Lesson 을 함께 조회한다면 Teacher 가 1 이고 Lesson 이 n 이므로 Teacher 를 조회할 때 Lesson 을 조회하는 쿼리가 Teacher 의 수 만큼(n 번) 발생한다.
+    - 이를 해결하기 위해 fetch 속성은 LAZY 로 지정하고, batch size 를 지정한다.
+    - batch size 란 연관된 엔티티를 조회할 때 한 번에 가져올 엔티티의 수를 의미한다. batch size 가 100 일 때 Teacher 10 명과 함께 Lesson 을 조회한다면, 10 명의 Teacher 의 Lesson 을 한 번에 가져온다.
+    - batch 에 의해 연관관계를 가진 Entity 를 조회할 때 쿼리는 `lesson.id in (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)` 와 같이 in 절로 한 번에 조회한다.
+    - batch size 는 성능을 고려했을 때, 100 ~ 1000 정도로 지정하는 것이 좋다. 1개만 조회할 때도 100 개의 파라미터가 날아가서 걱정될 수도 있는데, 성능 상으로는 큰 차이가 없으니 걱정하지 말고 100 으로 지정하자.
+    - spring.jpa.properties.hibernate.default_batch_fetch_size : 기본 batch size 를 지정한다.
+    - spring.jpa.properties.hibernate.query.in_clause_parameter_padding : 주어진 batch size 에 맞춰 in 절의 파라미터 개수를 최적화한다. 예를 들어 batch size 가 100 이므로, 실제로 쿼리가 날아갈 때는 128 개의 파라미터가 전달된다.
+
+```
+# application.properties
+spring.jpa.properties.hibernate.default_batch_fetch_size=100
+spring.jpa.properties.hibernate.query.in_clause_parameter_padding=true
+```
+
+- @OneToMany
+    - 일대다 관계를 매핑한다.
+    - mappedBy 속성을 통해 *연관관계의 주인을 지정한다. mappedBy 의 값은 "연관관계의 주인이 되는 Class 에 선언된 필드 이름"이다. 테이블 이름, 클래스 이름 등이 아니므로 헷갈리지 말자.
+    - @OneToMany 는 연관관계의 주인이 아니기 때문에 필수가 아니라 편의를 위한 것이다. 반대로 @ManyToOne 은 연관관계의 주인이므로 필수이다.
+
+- @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    - cascade 속성을 통해 연관된 엔티티를 함께 저장하거나 삭제할 수 있다.
+        - CascadeType.ALL : 모든 작업을 함께 한다.
+        - CascadeType.PERSIST : 저장할 때만 함께 한다.
+        - CascadeType.MERGE : 병합할 때만 함께 한다.
+        - CascadeType.REMOVE : 삭제할 때만 함께 한다.
+        - CascadeType.REFRESH : REFRESH 할 때만 함께 한다.
+        - CascadeType.DETACH : DETACH 할 때만 함께 한다.
+    - orphanRemoval 속성을 통해 연관된 엔티티를 함께 삭제할 수 있다. 이는 CascadeType.REMOVE 와는 다르게 연관된 엔티티를 삭제할 때만 함께 삭제한다.
+    - 어떤 일대다 관계를 가진 Entity 의 생명주기가 해당 Entity 의 생명주기와 동일하다면 CascadeType.ALL 과 orphanRemoval = true 로 설정하여 사용할 수 있다.
+    - 예를 들어, 사용자(User)와 권한(UserRole)의 관계는 사용자가 삭제될 때 사용자의 권한도 함께 삭제되어도 괜찮다. 생명주기가 같기 때문이다. 이럴 때 CascadeType.REMOVE 와 orphanRemoval = true 로 설정하여 사용할 수 있다.
+    - 물론, cascade 와 orphanRemoval 은 필수가 아니기 때문에 헷갈린다면 사용하지 않아도 된다. 애초에 OneToMany 도 필수가 아니다.
+
+* 연관관계의 주인이란
+    - 연관관계의 주인은 외래 키를 관리하는 엔티티를 의미한다.
+    - 즉, 연관관계의 주인은 외래 키를 소유하고 있는 테이블이라고도 할 수 있다.
+    - 외래 키를 관리하는 엔티티는 @JoinColumn 을 통해 외래 키를 지정한다. 그리고 여기에 @ManyToOne 또는 @OneToOne 을 지정한다.
+    - 연관관계의 주인이 @OneToMany 나 @ManyToMany 를 사용하는 것은 권장되지 않는다.
+    - 외래 키를 관리하지 않는 엔티티는 mappedBy 속성을 통해 연관관계의 주인을 지정한다.
