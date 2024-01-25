@@ -16,7 +16,7 @@ import java.util.UUID;
 import static psam.portfolio.sunder.english.web.student.model.QStudent.*;
 
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Repository
 public class StudentQueryRepository {
 

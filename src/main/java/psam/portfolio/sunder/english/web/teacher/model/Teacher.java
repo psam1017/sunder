@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.entity.embeddable.Address;
+import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.lesson.model.Lesson;
 import psam.portfolio.sunder.english.web.user.model.User;
 import psam.portfolio.sunder.english.web.user.model.UserRole;

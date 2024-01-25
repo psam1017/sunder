@@ -1,0 +1,133 @@
+(QueryRepository)
+```
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
+import psam.portfolio.sunder.english.web.user.model.User;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static psam.portfolio.sunder.english.web.user.model.QUser.user;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Repository
+public class UserQueryRepository {
+
+    private final JPAQueryFactory query;
+    private final EntityManager em;
+
+    public User getById(UUID uuid) {
+        User entity = em.find(User.class, uuid);
+        if (entity == null) {
+            throw new NoSuchUserException();
+        }
+        return entity;
+    }
+
+    public User getOne(BooleanExpression... expressions) {
+        User entity = query
+                .select(user)
+                .from(user)
+                .where(expressions)
+                .fetchOne();
+        if (entity == null) {
+            throw new NoSuchUserException();
+        }
+        return entity;
+    }
+
+    public Optional<User> findOne(BooleanExpression... expressions) {
+        return Optional.ofNullable(
+                query.select(user)
+                        .from(user)
+                        .where(expressions)
+                        .fetchOne()
+        );
+    }
+
+    public Optional<User> findById(UUID uuid) {
+        return Optional.ofNullable(em.find(User.class, uuid));
+    }
+
+    public List<User> findAll(BooleanExpression... expressions) {
+        return query.select(user)
+                .from(user)
+                .where(expressions)
+                .fetch();
+    }
+}
+```
+    - UserQueryRepository 는 직접 정의한 @Repository 클래스이다.
+    - 내부에서 JPAQueryFactory 와 EntityManager 를 주입 받아 사용하고 있다.
+
+    - 기본적으로 JpaQueryFactory 를 사용하지만, 필요에 따라 EntityManager 를 사용하기도 한다.
+    - 예를 들어 User 엔티티의 id 를 통해 조회할 때는 EntityManager 를 사용한다.
+    - findById, getById 를 querydsl 로 ...where(user.id.eq(uuid))... 과 같이 사용하면 Jpa 캐시에서 조회하지 않고, 항상 DB 로 쿼리를 날려 조회하고 merge 하게 된다. 이러한 경우 Jpa 캐시에서 조회하는 성능 최적화 기회를 놓치게 되므로, EntityManager 를 사용하여 조회하도록 하였다.
+    - where 조건에 대한 입력을 필요로 하는 경우는 getOne, findOne 과 같이 호출하는 쪽에서 BooleanExpression 을 가변인자로 전달 받아 조회하고 있다.
+    - getById, getOne 에서는 entity 가 null 이면 NPE 대신 RuntimeException 을 던지고 있다.
+    - 만약 null 에 대한 예외처리를 직접 구현하거나, null 이어도 괜찮은 객체를 원한다면 findById, findOne 을 사용하면 된다.
+
+    - getById, getOne, findById, findOne 처럼 한 개만 조회하는 경우나, 일대다 관계에 있는 Entity 를 batch fetch 로딩하는 경우에는 성능 상으로나 사용 상으로나 별다른 이슈가 발생하지 않는다.
+    - 중요한 것은 (언제나 그렇듯) 목록 조회를 할 때이다.
+    - 위 클래스에서 findAll 메소드는 목록 조회를 위한 최소한의 기능만을 제공하고 있다.
+    - 하지만 일대다 fetch loading 을 여러 번 해야 하거나, join, group by, order by 등을 해야 하는 경우 기존의 findAll 로는 한계가 있다.
+    - 여러 각도로 고민을 해보면서, 호출한 클래스 쪽에 JpaQueryFactory 를 반환하여 노출시키거나, JpaBuilder 를 따로 만들어서 JpaBuilder 가 제공하는 범위 내에서 join, group by, order by 등을 할 수 있게 만드는 등 여러 방법을 떠올렸으나 이들은 여전히 좋은 방법이 아니었다.
+    - 여전히 연구와 숙련이 필요하지만 지금 생각하기에 가장 적절한 방법은 findAllGroupBy, findAllOrderBy 등의 요구사항에 의해 필요한 메소드를 만드는 것이라고 생각한다.
+    - 경험상 하나의 도메인에 대하여 목록으로 조회하는 별개의 API 가 여러 개 요구되는 경우는 잘 없었기에 findAllXxx 메소드를 조금 추가한다고 해서 복잡도가 유의미하게 올라가지 않았다.
+    - 다만 정렬, 검색 등의 요구사항은 자주 있기 때문에 QueryRepository 에서 동적 쿼리 구현을 위한 private method 는 여럿 추가될 것이다. 그런데 그건 그만큼 요구사항 자체가 복잡하다는 뜻이기 때문에 감내해야 할 부분일 것이다.
+
+```
+
+    public List<User> pagingByCond(UserSearchCond cond) {
+        return query
+                .select(user).distinct()
+                .from(user)
+                .orderBy(user.id.desc())
+                .offset(cond.getOffset())
+                .limit(cond.getLimit())
+                .fetch();
+    }
+
+    public Long countByCond(UserSearchCond cond) {
+        return query
+                .select(user.countDistinct())
+                .from(user)
+                .fetchOne();
+    }
+
+    public Long countByCondOptimization(List<?> content, UserSearchCond cond) {
+
+        Integer page = cond.getPage();
+        Integer size = cond.getSize();
+
+        boolean isPaged = page != null && size != null && page > 0 && size > 0;
+        long offset = isPaged ? (page - 1) * size : 0L;
+        long contentSize = content.size();
+
+        if (!isPaged || offset == 0) {
+            if (!isPaged || size > contentSize) {
+                return contentSize;
+            }
+            return this.countByCond(cond);
+        }
+
+        if (contentSize != 0 && size > contentSize) {
+            return offset + contentSize;
+        }
+        return this.countByCond(cond);
+    }
+```
+    - 페이징 처리를 위한 메소드이다. 예제의 단순화를 위해 where 조건절은 생략했다.
+    - pagingByCond 메소드는 페이징 처리를 위한 쿼리를 실행하고, countByCond 메소드는 페이징 처리를 위한 쿼리의 count 를 실행한다.
+    - 이때 countByCondOptimization 메소드는 count 쿼리를 생략할 수 있는 경우에는 생략하도록 하였다. count 쿼리는 은근히 비용이 많이 드는 쿼리이기 때문에, 가능하다면 생략하는 것이 좋다.
+    - count 쿼리를 생략할 수 있는 경우란 (1) 페이지 시작이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때, (2) 마지막 페이지일 때(offset + 컨텐츠 사이즈) 이다.
+    - countByCondOptimization 메소드는 내가 직접 로직을 구성한 건 아니고, Spring Data JPA 의 PageableExecutionUtils.getPage 메소드를 참고한 것이다.
+    - 원래는 Pageable 객체를 사용해야 하는데, Pageable 에 의존하는 걸 피하고자 하니 제공되는 getPage 를 사용할 수 없어서 count 최적화 메소드를 직접 만들어보았다.
+    - 참고로 JPAQuery 의 fetchResult 와 fetchCount 는 deprecated 상태이다. 따라서 fetch 와 count(or countDistinct) 를 위와 같이 직접 정의하여 사용하는 것이 좋을 것이다.
