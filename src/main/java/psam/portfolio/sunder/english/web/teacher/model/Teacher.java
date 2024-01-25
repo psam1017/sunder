@@ -21,20 +21,15 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 public class Teacher extends User {
 
-    private String email;
-    private boolean emailVerified;
+    @ManyToOne(fetch = LAZY)
+    private Academy academy;
 
     @OneToMany(mappedBy = "teacher")
     private Set<Lesson> lessons;
 
-    @ManyToOne(fetch = LAZY)
-    private Academy academy;
-
     @Builder
-    public Teacher(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles, String email, boolean emailVerified, Academy academy) {
-        super(loginId, loginPw, name, phone, address, status, roles);
-        this.email = email;
-        this.emailVerified = emailVerified;
+    public Teacher(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status, Set<UserRole> roles, Academy academy) {
+        super(loginId, loginPw, name, email, emailVerified, phone, address, status, roles);
         this.academy = academy;
     }
 
@@ -44,9 +39,5 @@ public class Teacher extends User {
 
     public void removeLesson(Lesson lesson) {
         this.lessons.remove(lesson);
-    }
-
-    public void verifyEmail() {
-        this.emailVerified = true;
     }
 }

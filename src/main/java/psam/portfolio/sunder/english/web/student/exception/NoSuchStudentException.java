@@ -8,6 +8,6 @@ import psam.portfolio.sunder.english.web.student.model.Student;
 public class NoSuchStudentException extends ApiException {
     @Override
     public ApiResponse<?> initialize() {
-        return ApiResponse.error(ApiStatus.NO_SUCH_ELEMENT, Student.class, null);
+        return ApiResponse.error(ApiStatus.NO_SUCH_ELEMENT, Student.class, "존재하지 않는 학생입니다.");
     }
 }
