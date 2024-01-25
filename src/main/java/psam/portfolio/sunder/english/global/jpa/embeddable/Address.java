@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.entity.embeddable;
+package psam.portfolio.sunder.english.global.jpa.embeddable;
 
 import jakarta.persistence.Embeddable;
 import lombok.Builder;
@@ -12,12 +12,12 @@ public class Address {
 
     private String street;
     private String detail;
-    private String postcode;
+    private String postalCode;
 
     @Builder
-    public Address(String street, String detail, String postcode) {
+    public Address(String street, String detail, String postalCode) {
         this.street = street;
         this.detail = detail;
-        this.postcode = postcode;
+        this.postalCode = postalCode;
     }
 }

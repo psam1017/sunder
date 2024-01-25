@@ -1,0 +1,18 @@
+- CQRS 란
+    - CQRS 는 Command Query Responsibility Segregation 의 약자로, Command 와 Query 를 분리하는 것을 말한다.
+    - 흔히 application 을 구성할 때 Command 쿼리의 비중과 Query 쿼리의 비중은 적어도 2:8 정도로 많이 차이가 발생한다.
+    - 이렇게 Command 와 Query 를 분리함으로써, Command 를 처리하는 부분과 Query 를 처리하는 부분을 분리함으로써, 각각의 부분을 최적화 할 수 있게 된다.
+
+
+    - CQRS 의 적용은 Persistence Layer 에서부터 시작해서 Business Layer 등 다른 계층에도 충분히 적용할 수 있는 개념이다.
+
+    - Persistence Layer 에 적용한다는 것은, 예를 들어, @Repository 를 붙인 클래스를 해당 목적에 맞게 분리하고 최적화하는 것, *Master/Slave DB 구조를 활용하는 것 등을 의미한다.
+        * Master/Slave DB 구조란 두 개의 DBMS 를 운영하면서 한 개의 DBMS 는 저장/수정/삭제를 담당하고, 이때 발생한 변경 내용을 또 다른 DBMS 에 "복제(Replication)"하는 것을 말한다.
+            - 이렇게 하면, Master DB 에서는 Command 를 처리하는데에만 집중할 수 있고, Slave DB 에서는 Query 를 처리하는데에만 집중할 수 있기 때문에, 각각의 부분을 최적화 할 수 있게 된다.
+            - 2개의 DBMS 를 운영하기 때문에 고가용성, 부하 분산, 장애 대응 측면에서 이점을 얻을 수 있다.
+            - MySQL 같이 DB 복제 기능을 기본적으로 제공하는 DBMS 도 있지만, 그렇지 않은 DBMS 를 사용한다면 DB 복제를 직접 구현하거나 별도의 프로그램이 필요하다.
+            - 참고로 이번 프로젝트에서는 CQRS 를 적용하지 않았다.
+    - @Repository 에 적용한 CQRS 는 240125-2-command repository.txt, 240125-3-query repository.txt 에서 확인할 수 있다.
+
+    - Business Layer 에 적용한다는 것은, Command 를 처리하는 부분과 Query 를 처리하는 부분을 분리함을 의미한다.
+    - 예를 들어, @Transactional(readOnly = true) 와 같은 어노테이션을 붙여서 Query 를 처리하는 부분에는 읽기 전용 트랜잭션을 사용할 수 있다. 이렇게 하면 조회 기능을 하는 서비스의 성능을 향상시킬 수 있다.

@@ -6,7 +6,6 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.web.user.model.QUser;
 import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
 import psam.portfolio.sunder.english.web.user.model.User;
 
@@ -14,8 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static psam.portfolio.sunder.english.web.user.model.QUser.user;
+
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Repository
 public class UserQueryRepository {
 
@@ -32,8 +33,8 @@ public class UserQueryRepository {
 
     public User getOne(BooleanExpression... expressions) {
         User entity = query
-                .select(QUser.user)
-                .from(QUser.user)
+                .select(user)
+                .from(user)
                 .where(expressions)
                 .fetchOne();
         if (entity == null) {
@@ -44,8 +45,8 @@ public class UserQueryRepository {
 
     public Optional<User> findOne(BooleanExpression... expressions) {
         return Optional.ofNullable(
-                query.select(QUser.user)
-                        .from(QUser.user)
+                query.select(user)
+                        .from(user)
                         .where(expressions)
                         .fetchOne()
         );
@@ -56,8 +57,8 @@ public class UserQueryRepository {
     }
 
     public List<User> findAll(BooleanExpression... expressions) {
-        return query.select(QUser.user)
-                .from(QUser.user)
+        return query.select(user)
+                .from(user)
                 .where(expressions)
                 .fetch();
     }

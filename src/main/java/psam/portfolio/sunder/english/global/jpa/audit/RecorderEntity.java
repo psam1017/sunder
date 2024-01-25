@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.entity.audit;
+package psam.portfolio.sunder.english.global.jpa.audit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

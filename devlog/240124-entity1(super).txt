@@ -3,8 +3,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
-import psam.portfolio.sunder.english.global.entity.embeddable.Address;
+import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.time.LocalDateTime;

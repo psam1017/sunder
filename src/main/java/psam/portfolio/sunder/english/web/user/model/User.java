@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
-import psam.portfolio.sunder.english.global.entity.embeddable.Address;
+import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.time.LocalDateTime;
@@ -45,7 +45,7 @@ public abstract class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles;
 
-    public User(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles) {
+    protected User(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles) {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.name = name;

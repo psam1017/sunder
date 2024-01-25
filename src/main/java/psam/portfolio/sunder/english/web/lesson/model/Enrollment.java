@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.entity.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import psam.portfolio.sunder.english.web.lesson.enumeration.EnrollmentStatus;
 import psam.portfolio.sunder.english.web.lesson.enumeration.Grade;
 import psam.portfolio.sunder.english.web.student.model.Student;

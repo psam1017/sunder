@@ -15,15 +15,19 @@
 @Column
 @OneToMany(mappedBy)
 @OneToMany(mappedBy, cascade = CascadeType.ALL, orphanRemoval = true)
+
+(상속)
 @MappedSuperclass
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn
 @DiscriminatorValue(value)
+
+(특수타입)
 @Enumerated(EnumType.STRING)
 @Embedded
 @Embeddable
 
-(auditing)
+(감사)
 @EntityListeners(AuditingEntityListener.class)
 @CreatedDate
 @LastModifiedDate

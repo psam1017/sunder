@@ -1,0 +1,64 @@
+(CommandRepository V1)
+```
+import org.springframework.data.jpa.repository.JpaRepository;
+import psam.portfolio.sunder.english.web.user.model.User;
+
+import java.util.UUID;
+
+public interface UserCommandRepositoryV1 extends JpaRepository<User, UUID> {
+}
+
+```
+    - UserCommandRepositoryV1 은 JpaRepository 를 상속받은 interface 이다.
+    - JpaRepository 를 상속 받은 것 외에는 아무 것도 하지 않았다. JpaRepository 의 기본 메소드를 제외하면 아무 것도 사용하지 않겠다는 의도이다.
+    - 이때 의도와 맞지 않는 메소드도 제공이 되긴 한다. 해당 interface 는  CommandRepository 임에도 여전히 findById() 와 같은 메소드를 사용할 수 있다.
+    - 또한 deleteAll() 과 같이 모든 데이터를 삭제할 위험이 있는 메소드도 제공이 된다.
+    - 이러한 의도의 부적합이나 위험성을 제거하기 위해 JpaRepository 를 상속한 interface 를 사용자 정의 Repository 로 추가 구현하거나, 별도로 만든 CommandRepository 에서 빈으로 주입받아 사용할 수 있다.
+    - 아래의 CommandRepository V2 는 JpaRepository 를 상속받은 interface 를 빈으로 주입받아 사용한 예제이다.
+
+(CommandRepository V2)
+```
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import psam.portfolio.sunder.english.web.user.model.User;
+
+import java.util.List;
+import java.util.UUID;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = false)
+@Repository
+public class UserCommandRepositoryV2 {
+
+    private final UserCommandRepositoryV1 repository;
+
+    public User save(User user) {
+        return repository.save(user);
+    }
+
+    public List<User> saveAll(List<User> users) {
+        return repository.saveAll(users);
+    }
+
+    public void delete(User user) {
+        repository.delete(user);
+    }
+
+    public void deleteById(UUID uuid) {
+        repository.deleteById(uuid);
+    }
+
+    public void deleteAll(List<User> users) {
+        repository.deleteAll(users);
+    }
+
+    public void deleteAllById(List<UUID> uuids) {
+        repository.deleteAllById(uuids);
+    }
+}
+```
+    - CommandRepositoryV2 를 만듦으로 의도와 맞지 않는 메소드나 위험성이 있는 메소드를 사용하지 않을 수 있다.
+    - 단, CommandRepositoryV2 와 직접 정의한 메소드를 구현해야 하는 비용이 든다는 단점이 있다.
+    - 따라서 V1 과 V2 를 환경과 비용을 고려하여 적절히 선택할 필요가 있다.
