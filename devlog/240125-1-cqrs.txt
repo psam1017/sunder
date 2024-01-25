@@ -1,8 +1,7 @@
 - CQRS 란
     - CQRS 는 Command Query Responsibility Segregation 의 약자로, Command 와 Query 를 분리하는 것을 말한다.
-    - 흔히 application 을 구성할 때 Command 쿼리의 비중과 Query 쿼리의 비중은 적어도 2:8 정도로 많이 차이가 발생한다.
+    - 흔히 application 을 구성할 때 Command 쿼리의 호출 비중과 Query 쿼리의 호출 비중은 적어도 2:8 정도로 많이 차이가 발생한다.
     - 이렇게 Command 와 Query 를 분리함으로써, Command 를 처리하는 부분과 Query 를 처리하는 부분을 분리함으로써, 각각의 부분을 최적화 할 수 있게 된다.
-
 
     - CQRS 의 적용은 Persistence Layer 에서부터 시작해서 Business Layer 등 다른 계층에도 충분히 적용할 수 있는 개념이다.
 

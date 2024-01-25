@@ -5,9 +5,9 @@ import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
 import psam.portfolio.sunder.english.web.user.model.User;
 
-public class NoSuchUserException extends ApiException {
+public class OneParamToCheckDuplException extends ApiException {
     @Override
     public ApiResponse<?> initialize() {
-        return ApiResponse.error(ApiStatus.NO_SUCH_ELEMENT, User.class, "존재하지 않는 사용자입니다.");
+        return ApiResponse.error(ApiStatus.ILLEGAL_DATA, User.class, "ONE_PARAM_TO_CHECK_DUPL", "uid, email, phone 중 하나만 입력해야 합니다.");
     }
 }

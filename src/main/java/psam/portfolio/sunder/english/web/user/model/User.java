@@ -32,6 +32,10 @@ public abstract class User extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    private String email;
+
+    private boolean emailVerified;
+
     private String phone;
 
     @Embedded
@@ -45,15 +49,21 @@ public abstract class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles;
 
-    protected User(String loginId, String loginPw, String name, String phone, Address address, UserStatus status, Set<UserRole> roles) {
+    protected User(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status, Set<UserRole> roles) {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.name = name;
+        this.email = email;
+        this.emailVerified = emailVerified;
         this.phone = phone;
         this.address = address;
         this.status = status;
         this.roles = roles;
         this.lastPasswordChangeDateTime = LocalDateTime.now();
+    }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
     }
 
     public boolean isActive() {
