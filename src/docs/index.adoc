@@ -1,0 +1,19 @@
+ifndef::snippets[]
+:snippets: ../ ../build/generated-snippets
+endif::[]
+= Sunder Project API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlights
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[Guide]]
+== Guide
+=== https://www.naver.com[가이드 보러 가기]
+
+[[User]]
+== User
+
+include::api/user/checkLoginIdDuple.adoc[]
