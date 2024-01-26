@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.web.user.exception.NoParamToCheckDuplException;
 import psam.portfolio.sunder.english.web.user.exception.OneParamToCheckDuplException;
+import psam.portfolio.sunder.english.web.user.model.User;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
+
+import java.util.Optional;
 
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.PENDING;
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.TRIAL;
@@ -32,31 +34,32 @@ public class UserQueryService {
         boolean hasEmail = StringUtils.hasText(email);
         boolean hasPhone = StringUtils.hasText(phone);
 
-        if (hasLoginId && hasEmail && hasPhone) {
+        if (!hasOnlyOne(hasLoginId, hasEmail, hasPhone)) {
             throw new OneParamToCheckDuplException();
         }
 
+        Optional<User> optUser = Optional.empty();
         if (hasLoginId) {
-            return userQueryRepository.findOne(
+            optUser = userQueryRepository.findOne(
                     user.loginId.eq(loginId),
                     userStatusNotIn(PENDING, TRIAL),
-                    userEmailVerifiedEq(true)
-            ).isEmpty();
+                    userEmailVerifiedEq(true));
         } else if (hasEmail) {
-            return userQueryRepository.findOne(
+            optUser = userQueryRepository.findOne(
                     user.email.eq(email),
                     userStatusNotIn(PENDING, TRIAL),
-                    userEmailVerifiedEq(true)
-            ).isEmpty();
+                    userEmailVerifiedEq(true));
         } else if (hasPhone) {
-            return userQueryRepository.findOne(
+            optUser = userQueryRepository.findOne(
                     user.phone.eq(phone),
                     userStatusNotIn(PENDING, TRIAL),
-                    userEmailVerifiedEq(true)
-            ).isEmpty();
-        } else {
-            throw new NoParamToCheckDuplException();
+                    userEmailVerifiedEq(true));
         }
+        return optUser.isEmpty();
+    }
+
+    private static boolean hasOnlyOne(boolean a, boolean b, boolean c) {
+        return a ^ b ^ c && !(a && b && c);
     }
 
     private static BooleanExpression userStatusNotIn(UserStatus... statuses) {

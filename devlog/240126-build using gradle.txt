@@ -1,0 +1,17 @@
+user 정보를 중복 체크하는 API(GET /api/user/check-dupl) 를 테스트하는 과정에서 아래와 같은 에러가 발생했다.
+
+```
+java.lang.IllegalArgumentException: Name for argument of type [java.lang.String] not specified, and parameter name information not available via reflection. Ensure that the compiler uses the '-parameters' flag.
+```
+
+그 원인은 아래 annotation 들과 관련하여 spring boot 3.2 부터는 매개변수의 이름을 추론하여 value 의 기본값으로 바인딩하지 않기 때문이라고 한다.
+
+```
+@RequestParam, @PathVariable, @Autowired, @ConfigurationProperties
+```
+
+이에 대한 여러 해결방안이 있는데, 아래 링크에서는 Build, Execution, Deployment -> Build Tools -> Gradle 에서 Build and run using 을 Gradle 로 설정하는 방법을 권장하고 있다.
+다른 방법이 필요하다면 아래 링크를 참고하자.
+
+[링크 참고]
+https://docs.google.com/document/d/1j0jcJ9EoXMGzwAA2H0b9TOvRtpwlxI5Dtn3sRtuXQas/edit#heading=h.b1yk4ued1pxo

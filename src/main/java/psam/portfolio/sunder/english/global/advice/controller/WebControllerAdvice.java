@@ -28,7 +28,7 @@ public class WebControllerAdvice {
         log.error("[ApiException handle] request uri = {}", request.getRequestURI());
         log.error("[reasons] {}", ex.getResponse().getReasons().toString());
 
-        return new ResponseEntity<>(ex.getResponse(), OK);
+        return new ResponseEntity<>(ex.getResponse(), BAD_REQUEST);
     }
 
     // spring security 에서 @PreAuthorize, @PostAuthorize, and @Secure 등에 의해 권한 부족 예외가 발생한 경우 AccessDeniedException 이 발생한다.

@@ -118,10 +118,3 @@ clean {
 	delete file(generated)
 }
 // query dsl 추가 끝
-
-// spring boot 3.2.x 부터 @RequestParam, @PathVariables 의 변수명을 이름(name) 으로 쓰지 못 하도록 변경됨.
-// -parameters 옵션 추가 시작
-compileJava {
-	options.compilerArgs << '-parameters'
-}
-// -parameters 옵션 추가 끝
