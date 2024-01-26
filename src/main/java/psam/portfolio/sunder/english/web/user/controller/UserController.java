@@ -18,7 +18,7 @@ public class UserController {
     private final UserQueryService userQueryService;
 
     // TODO: 2024-01-26 Service 문서 정리하고, Controller 로 Docs 만들고, Docs 정리
-    // TODO: 2024-01-26 파라미터 변수명을 필드명으로 사용하기 옵션 
+    // TODO: 2024-01-26 파라미터 변수명을 필드명으로 사용하기 옵션
 
     /**
      * 아이디, 이메일, 연락처 중복 체크 서비스 - 단, PENDING 과 TRIAL 은 중복체크에서 제외

@@ -32,10 +32,12 @@ public abstract class User extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(unique = true)
     private String email;
 
     private boolean emailVerified;
 
+    @Column(unique = true)
     private String phone;
 
     @Embedded
@@ -62,8 +64,8 @@ public abstract class User extends BaseEntity {
         this.lastPasswordChangeDateTime = LocalDateTime.now();
     }
 
-    public void verifyEmail() {
-        this.emailVerified = true;
+    public void verifyEmail(boolean verified) {
+        this.emailVerified = verified;
     }
 
     public boolean isActive() {
