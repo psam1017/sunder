@@ -93,10 +93,10 @@ tasks.named('test') {
 
 tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
+//	configurations 'asciidoctorExt'
 	sources {
 		include('docs/**/*.adoc')
-		exclude('docs/snippets/**/*.adoc')
+		exclude('docs/asciidoc/**/*.adoc')
 	}
 	baseDirFollowsSourceDir()
 	dependsOn test

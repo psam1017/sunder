@@ -15,6 +15,9 @@ import java.util.Map;
 @RestController
 public class UserController {
 
+    // TODO: 2024-01-26 Guide 문서 만들기.
+    // TODO: 2024-01-26 User 중복 검사 API 문서 - email, phone case 만들기
+
     private final UserQueryService userQueryService;
 
     /**
