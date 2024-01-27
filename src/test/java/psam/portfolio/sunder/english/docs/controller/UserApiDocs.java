@@ -16,7 +16,7 @@ public class UserApiDocs extends RestDocsEnvironment {
 
     @DisplayName("user 의 loginId 중복체크를 할 수 있다.")
     @Test
-    void checkLoginIdDuplication() throws Exception {
+    void checkLoginIdDupl() throws Exception {
         // given
         String loginId = "uid";
 
@@ -30,8 +30,7 @@ public class UserApiDocs extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andDo(
-                        restDocs.document(
+                .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("loginId").description("중복체크할 아이디")
                                 ),

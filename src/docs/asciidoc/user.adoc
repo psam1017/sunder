@@ -1,0 +1,23 @@
+ifndef::snippets[]
+:snippets: ../ ../build/generated-snippets
+endif::[]
+= Sunder Project API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlights
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[Index]]
+== link:index.html[Index 로 돌아가기]
+
+[[Guide]]
+== link:guide.html[가이드 보러 가기]
+
+[[User]]
+include::api/user/checkLoginIdDupl.adoc[]
+'''
+include::api/user/checkLoginIdDupl.adoc[]
+'''
+include::api/user/checkLoginIdDupl.adoc[]
