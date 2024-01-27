@@ -16,7 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
-public class WebConfiguration implements WebMvcConfigurer {
+public class WebConfig implements WebMvcConfigurer {
 
     private final JwtUtils jwtUtils;
 

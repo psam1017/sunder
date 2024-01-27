@@ -17,7 +17,7 @@ import java.util.Optional;
 @SuppressWarnings("PatternVariableCanBeUsed")
 @EnableJpaAuditing
 @Configuration
-public class RepositoryConfiguration {
+public class RepositoryConfig {
 
     @Bean
     public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {

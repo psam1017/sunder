@@ -29,7 +29,7 @@ import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 @EnableWebSecurity
-public class SecurityConfiguration {
+public class SecurityConfig {
 
     // TODO: 2024-01-14 OAUTH2
 
