@@ -1,0 +1,164 @@
+```
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
+import psam.portfolio.sunder.english.testbean.TestConfig;
+import psam.portfolio.sunder.english.testbean.UniqueInfoContainer;
+import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.teacher.model.Academy;
+import psam.portfolio.sunder.english.web.teacher.model.Teacher;
+import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
+import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+
+@Import(TestConfig.class)
+@ActiveProfiles("test")
+@AutoConfigureMockMvc
+@Transactional
+@SpringBootTest
+public class SunderApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+	@Autowired
+	protected MockMvc mockMvc;
+
+	@Autowired
+	protected ObjectMapper om;
+
+	@Autowired
+	protected EntityManager em;
+
+	protected String createJson(Object body) {
+		try {
+			return om.writeValueAsString(body);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Autowired
+	private UniqueInfoContainer uic;
+
+
+	@Autowired
+	private TeacherCommandRepository teacherCommandRepository;
+
+	protected Academy registerAcademy(AcademyStatus status) {
+		Academy academy = Academy.builder()
+				.name(uic.getUniqueAcademyName())
+				.address(uic.getAnyAddress())
+				.phone(null)
+				.email(null)
+				.openToPublic(true)
+				.status(status)
+				.build();
+		return em.merge(academy);
+	}
+
+	protected Teacher registerTeacher(UserStatus status, Academy academy) {
+		String uniqueId = uic.getUniqueId();
+		Teacher teacher = Teacher.builder()
+				.loginId(uniqueId)
+				.loginPw("qwe123!@#")
+				.name("사용자" + uniqueId.substring(0, 3))
+				.email(uic.getUniqueEmail())
+				.emailVerified(true)
+				.phone(uic.getUniquePhoneNumber())
+				.status(status)
+				.academy(academy)
+				.build();
+		return teacherCommandRepository.save(teacher);
+	}
+}
+```
+
+-@SpringBootTest
+    - SpringBoot Project 를 처음 생성하면, 해당 애플리케이션의 아티팩트 이름으로부터 테스트 클래스를 하나 제공한다. 나는 처음 프로젝트를 생성할 때, 아티팩트 이름을 "sunder" 라고 지었으므로 SunderApplicationTests 라는 클래스가 하나 생성되었다.
+    - 이 테스트 클래스에는 contextLoads 라는 메소드가 포함되어 있고 @SpringBootTest 라는 annotation 이 추가되어 있는데, Spring Boot Application 이 제대로 실행되고 로딩되는지를 테스트하겠다는 의도이다. @SpringBootTest 를 추가하면 실제 스프링 부트를 띄우는 환경에서 테스트를 할 수 있다.
+    - @SpringBootTest 는 실제로 스프링 서버를 띄우는 작업을 하기 때문에 스프링 컨테이너를 포함한 서버를 띄우는 시간이 소요된다. 현재 Sunder Application 은 JDBC, JPA, secrity 를 사용하고 있고, 심지어 local, test 프로필에서는 table 을 매번 create 하고 있기 때문에 실행하는데 10초 정도 걸리고 있다. 지금 API 가 딱 하나만 있는데도 이 정도 시간이 걸리는 거면 앞으로 설정이 추가되고 코드 양이 많아질 수록 시간은 더 오래 걸릴 것이다.
+    - 만약 모든 클래스마다 스프링 빈 테스트를 위해 @SpringBootTest 를 달아야 한다면 시간이 어마어마하게 소요될 것이다. 따라서 각 클래스마다 이 기본으로 제공되는 클래스를 상속 받아 그 환경을 유지한 채로 각 빈들만 테스트할 것이다. 그렇게 하면 전체 테스트를 실행하는데 단 한 번만 스프링 서버가 실행될 것이다.
+    - 또한, 위 코드들에서 볼 수 있듯이 필요한 편의 메소드, 빈들을 protected 로 선언하여 상속 받은 클래스들이 이를 사용할 수 있게 할 것이다. 예를 들어 registerAcademy, registerTeacher 등은 권한 체크를 위해 거의 대부분의 테스트에서 만들어야 하는 더미 데이터들이다.
+    - 참고로, 개발 중에 가끔 설정 변경에 의해 스프링 서버가 실행되지 않을 때도 종종 있기 때문에 contextLoads 를 사용할 수 있도록 지우지 않았다. 거슬린다면 지우거나, @Disabled 를 사용하면 된다.
+
+- @Sql
+    - @Sql 이란, 테스트 클래스에서 사용할 sql 파일을 지정하는 어노테이션이다. 이 어노테이션을 사용하면 테스트 클래스가 실행되기 전에 해당 sql 파일을 실행시킨다. 하지만 @Sql 을 사용하는 것은 매우 권장하는 않는다.
+    - 만약 작업을 나 혼자 하는 상황이라면 상관 없을지도 모르겠지만, 협업을 하는 상황에서는 이 더미 데이터를 만든 사람이 아니고서는 더미 데이터의 이름, 이메일 등이 무엇인지 sql 파일을 직접 찾아보지 않으면 알 수 없다. 즉, 캡슐화되지 않은 구조에 의해 개발 환경 자체가 객체지향적이지 않다고 할 수 있다.
+    - 또한, 필요에 의해 더미 데이터를 수정해야 하는 상황이 오면 기존 sql 에 영향을 받던 모든 테스트 케이스에 수정이 발생할 수 있다. 이는 OCP 원칙에 위배된다.
+    - 정적인 sql 파일 자체도 개발자들간의 소통 비용을 상당히 초래한다. name 을 뭐라고 지을 것인지? status 는 어떻게 둘 것인지? status 가 각기 다른 user 를 생성한다면 그걸 구분할 convention 을 만들어야 하나? 아니면 개발자 개인이 모든 더미데이터를 숙지한 상태로 개발해야 하나?
+    - 위에서 언급한 단점들은 모두 테스트를 구성하는 여러 시도를 해보면서 겪은 일들만 모아둔 것이다. 나는 절대 @Sql 은 권장하지 않는다.
+
+- 병렬 테스트와 unique 데이터 문제
+    - teacher 의 loginId, email, phone 을 동적으로 새로운 데이터로 만드는 것은 junit 으로 병렬 테스트를 수행하기 때문이다.
+    - 사실 academy, teacher 등은 매번 같은 데이터로 반환할 수도 있다. 실제로 address 는 매번 같은 데이터를 반환하고 있다. 이 차이는 컬럼이 unique 인지 여부에 따라 결정된다.
+    - 일반적으로 테스트를 실행하면 단일 스레드로 순서 상관 없이 아무 테스트나 실행한다. 단일 스레드에서 하나의 테스트를 실행하고 나면 이를 롤백하고 다음 테스트를 수행하기 때문에 DuplicateKeyException 이 발생하지 않는다.
+    - 하지만 나는 지금 JUnit 설정으로 멀티 스레드에서 테스트를 수행하고 있는데, 이렇게 하면 한번에 여러 개의 테스트를 병렬적으로 수행하여 테스트 시간이 상당히 단축된다. 실제로 테스트 케이스가 300~500 개 정도 되는 프로젝트를 진행할 때 단일 스레드에서 전체 테스트를 수행하는 데 1분 이상 시간이 걸렸는데 병렬 테스트에서는 20초 대 이내로 테스트를 수행했다.
+    - 단, 이렇게 테스트를 동시에 수행하기 때문에 unique 해야 하는 컬럼에 중복된 데이터가 저장되는 경우가 발생할 수 있다. 따라서 UniqueInfoContainer 를 통해 unique 한 데이터를 생성하고 이를 테스트 데이터로 사용하도록 하였다.
+    - 추가로 병렬 테스트에 의해 DeadLock, OutOfConnection 등의 문제가 발생할 수 있다. 다만 이는 기본적으로 병렬 수준을 낮춤으로써 제어가 가능하다. 하지만 그럼에도 여전히 문제가 발생한다면 쓰레드풀, 커넥션풀 등 애플리케이션 설정을 변경하거나 테스트 환경 자체를 분리하여 해결할 수도 있다. 하지만 가장 속 편한 방법은 병렬 테스트를 단일 스레드로 되돌리는 것이다.
+
+- @Transactional
+    - @Transactional 은 테스트 메소드가 실행되기 전에 트랜잭션을 시작하고, 테스트 메소드가 종료되면 트랜잭션을 롤백한다. 따라서 테스트 메소드가 실행되고 나면 데이터베이스는 테스트 전 상태로 복원된다.
+    - @Transactional 을 사용하지 않으면 테스트 메소드가 실행되고 나면 데이터베이스에 테스트 데이터가 저장된다. 이렇게 되면 테스트 메소드가 실행될 때마다 데이터베이스에 테스트 데이터가 계속 쌓여 다른 테스트에 영향을 줄 수 있어서 테스트들을 독립적인 상태로 유지하기 어렵다.
+    - 모든 테스트는 다른 것들에 최소한 종속적이지 않게 만들고 독립적으로 실행할 수 있게 만드는 것이 중요하다. 이를 위해 Test Double 이라는 개념도 존재한다. Test Double 은 테스트를 위해 실제 객체를 대체하는 객체를 사용함을 의미하는데, 이 개념으로 각 테스트가 Spring Framework 에조차 종속적이지 않게 만들 수 있다. 대신 그만큼 시간과 비용이 소모됨을 감소해야 하는데, 나는 개인적으로 이 방법은 선호하지 않는다.
+    - 거의 대부분의 개발환경이 항상 Spring 과 JPA 에 종속적이기 때문에 굳이 이를 피하려고 노력할 필요가 없다고 생각하기 때문이다. 만약 새로운 프레임워크가 나온다면 그 이후에 새로운 프레임워크를 도입한 프로젝트에서 마찬가지로 그것에 의존하는 테스트 환경을 만들어도 된다고 생각한다. 추가로 Spring 프로젝트 자체가 치명적인 결함이 생겨서 이를 버려야 하는 상황이 올 거라고는 생각하기 어렵기도 하고.
+    - 아무튼 @Transactional 은 필수라고 생각하고 항상 달도록 하자.
+
+- @AutoConfigureMockMvc
+    - API 를 테스트하기 위해서는 애플리케이션을 실제로 실행하고 postman 등의 프로그램을 사용하여 개발자가 실제로 요청을 하면서 테스트해야 한다. 물론 postman 도 이러한 과정의 자동화를 위해 좋은 기능을 제공하지만 Spring 환경으로부터 완전 독립적이기 때문에 그만큼 테스트 환경을 구성하는데 시간이 소요된다.
+    - 이를 위해 Spring 에서는 MockMvc 라는 클래스를 제공한다. 이 클래스는 Spring MVC 를 테스트하기 위한 주요 클래스로, HTTP 요청을 애플리케이션에 보내고 응답을 테스트할 수 있게 해준다. 따라서 MockMvc 를 사용하면 애플리케이션을 실행하지 않고도 API 를 테스트할 수 있다.
+    - @AutoConfigureMockMvc 은 이러한 MockMvc 를 사용하기 위한 갖가지 설정을 자동으로 해준다. 이 어노테이션을 사용하면 MockMvc 를 편하게 사용할 수 있다.
+
+- @ActiveProfiles("test")
+    - 테스트를 수행할 때 활성화할 프로필을 "test" 로 지정한다.
+
+- @Import(TestConfig.class)
+    - TestConfig 라는 클래스를 현재 애플리케이션 컨텍스트에 가져온다. 이를 통해 TestConfig 클래스에 정의된 빈이나 설정을 사용할 수 있다.
+    - TestConfig 에는 UniqueInfoContainer 라는 클래스가 빈으로 등록되어 있고, 초기 설정을 해당 클래스에서 하고 있다. 이렇게 공통적으로 사용되는 빈들은 @Component 를 사용하는 대신 @Configuration 을 사용한 Config 클래스에 모아 두고 @Bean 을 사용하여 빈으로 등록하면 공통으로 사용되는 빈들의 정보를 한 눈에 볼 수 있어서 좀 더 효율적이기 때문에 권장되는 방법이다.
+
+- @Autowired protected MockMvc mockMvc;
+    - Api 테스트를 사용하기 위해 사용된다.
+
+- @Autowired protected ObjectMapper om;
+    - Api 테스트를 할 때, Request Body 에 요청 객체를 Json String 으로 변환하여 전달하기 위해 사용된다.
+    - 마단 om.writeValueAsString(Object value) 는 항상 예외를 던지는데, 매번 클래스에서 예외처리를 하는 것은 번거로움을 초래하기에 createJson(Object body) 라는 메소드를 만들어 내부적으로 알아서 예외를 처리하도록 하였다.
+```
+protected String createJson(Object body) {
+        try {
+            return om.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+```
+
+- @Autowired protected EntityManager em;
+    - JPA 를 사용하다 보면, 연관관계 맵핑을 제대로 하지 않아 발생하는 문제가 생길 때가 있다. 주로 일대다 방향으로 객체를 조회할 때 발생한다.
+    - 그럴 때마다 em.flush(); em.clear(); 를 사용하여 영속성 컨텍스트를 초기화하고 테스트를 계속 진행하기 위해 전역적으로 선언했다.
+    - 사실 가장 좋은 건 Entity 의 setter 류 메소드에서 양방향 연관관계를 고려하여 객체들을 저장하고 맵핑시켜주는 것이다. 보통은, 김영한 개발자 님의 표현을 빌려서, 이러한 메소드를 "연관관계 편의 메소드" 라고 부른다. 예를 들어 아래와 같이 하면 된다.
+
+```
+    public void setAcademy(Academy academy) {
+        this.academy = academy;
+        academy.getTeachers().add(this);
+    }
+```
+    - 만약 위 코드에서 academy.getTeachers().add(this) 를 생략한다면 이후 academy.getTeachers() 를 호출할 때 해당 teacher 가 포함되지 않는다.
+
+    - 다만 직접 개발할 때는 이렇게 맵핑시켜주는 걸 깜빡할 때가 많기도 하고 번거롭기도 하기 때문에 나름의 절충이 필요할 때도 있다.
+    - 나는 지금은 copilot 을 연결하고 개발을 하고 있기 때문에 이런 연관관계 편의 메소드를 빠르고 간편하게 만들고 있다.
+
+- @Autowired private UniqueInfoContainer uic;
+    - 테스트를 위해 고유한 데이터를 생성하기 위해 사용된다. 이는 위에서 언급한 병렬 테스트와 unique 데이터 문제를 해결하기 위해 사용된다.
+
+- protected Teacher registerTeacher(UserStatus status, Academy academy) { ... }
+    - 테스트를 위해 더미 데이터를 생성하기 위해 사용된다. address 같은 정보는 unique 컬럼이 아니기 때문에 매번 같은 데이터를 반환한다.
+    - 하지만 loginId, email, phone 같은 정보는 unique 컬럼이기 때문에 매번 다른 데이터를 반환한다.

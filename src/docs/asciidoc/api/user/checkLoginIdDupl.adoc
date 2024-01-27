@@ -1,12 +1,12 @@
 == 로그인 아이디 중복 검사하기
 
 === HTTP Request
-include::{snippets}/user-api-docs/check-login-id-dupl/http-request.adoc[]
-include::{snippets}/user-api-docs/check-login-id-dupl/query-parameters.adoc[]
+include::{snippets}/user-docs-test/check-login-id-dupl/http-request.adoc[]
+include::{snippets}/user-docs-test/check-login-id-dupl/query-parameters.adoc[]
 
 === HTTP Response
-include::{snippets}/user-api-docs/check-login-id-dupl/http-response.adoc[]
-include::{snippets}/user-api-docs/check-login-id-dupl/response-fields.adoc[]
+include::{snippets}/user-docs-test/check-login-id-dupl/http-response.adoc[]
+include::{snippets}/user-docs-test/check-login-id-dupl/response-fields.adoc[]
 
 === Api Reasons
 
