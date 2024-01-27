@@ -92,14 +92,23 @@ tasks.named('test') {
 }
 
 tasks.named('asciidoctor') {
+
 	inputs.dir snippetsDir
-//	configurations 'asciidoctorExt'
+	configurations 'asciidoctorExt'
+
 	sources {
-		include('docs/**/*.adoc')
-		exclude('docs/asciidoc/**/*.adoc')
+		exclude ('**/guide/**', '**/api/**')
 	}
-	baseDirFollowsSourceDir()
+
+	baseDirFollowsSourceDir() // 다른 adoc 파일을 include 할 때 경로를 baseDir로 맞춘다.
 	dependsOn test
+}
+
+bootJar {
+	dependsOn asciidoctor
+	from("${asciidoctor.outputDir}") {
+		into 'static/docs'
+	}
 }
 // rest docs 추가 끝
 

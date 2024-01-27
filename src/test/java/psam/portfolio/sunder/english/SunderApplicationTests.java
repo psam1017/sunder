@@ -20,20 +20,16 @@ import psam.portfolio.sunder.english.web.teacher.model.Teacher;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
+@Import(TestConfig.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @Transactional
 @SpringBootTest
-@Import(TestConfig.class)
 public class SunderApplicationTests {
 
 	@Test
 	void contextLoads() {
 	}
-
-	@Autowired
-	private UniqueInfoContainer uic;
-
 	@Autowired
 	protected MockMvc mockMvc;
 
@@ -50,6 +46,10 @@ public class SunderApplicationTests {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Autowired
+	private UniqueInfoContainer uic;
+
 
 	@Autowired
 	private TeacherCommandRepository teacherCommandRepository;

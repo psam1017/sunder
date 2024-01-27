@@ -9,11 +9,6 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
-[[Guide]]
-== Guide
-=== https://www.naver.com[가이드 보러 가기]
-
-[[User]]
-== User
-
-include::api/user/checkLoginIdDuple.adoc[]
+[[Index]]
+== Index
+=== link:index.html[Index 로 돌아가기]
