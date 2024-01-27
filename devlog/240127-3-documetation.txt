@@ -1,0 +1,231 @@
+API 문서화 라이브러리로 Spring 진영에서는 Swagger 또는 Spring REST Docs를 많이 사용한다.
+나는 기본적으로 Spring REST Docs를 사용하고 있고, 그에 대한 레퍼런스도 인터넷에서 많이 참고하여 작업환경을 구축했다.
+특히, 지난 번 devlog 에서 언급한 inflearn 강의에서도 REST Docs 사용을 위한 튜토리얼을 제공하니 참고하면 좋을 것 같다.
+
+다만 REST Docs 를 써본 소감으로는, 이것도 완전 만능은 아니라서 문서의 일부는 내가 직접 손수 작성해야 한다.
+그래도 많은 부분은 검증과 함께 문서화하다 보니 내가 모두 손수 작성하는 것보다는 훨씬 낫다. 예전에 회사에서 postman 으로 API 문서를 만들던 때보다는 훨씬 낫다...
+
+아무튼 이번에는 조금 간단하게, 내가 설정한 구성들과 사용 예시 하나씩만 들고 마무리할 것이다. 자세한 usage 는 공식 문서를 참고하자.
+- Spring REST Docs 공식 문서 링크: spring.io/projects/spring-restdocs
+
+* 참고로 아래에 설정된 example 에서 커스텀하지 않는 게 좋을 것이다. 실제로 몇몇 경로나 용어를 변경해서 테스트해보니 제대로 작동하지 않는 경우가 대부분이었다.
+
+(build.gradle - 관련 내용만 발췌했으니 자세한 내용은 원본을 참고하자)
+```
+plugins {
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+}
+
+configurations {
+	asciidoctorExt
+}
+
+dependencies {
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+}
+
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+tasks.named('test') {
+	outputs.dir snippetsDir
+	useJUnitPlatform()
+}
+
+tasks.named('asciidoctor') {
+
+	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+
+	sources {
+		exclude ('**/guide/**', '**/api/**')
+	}
+
+	baseDirFollowsSourceDir() // 다른 adoc 파일을 include 할 때 경로를 baseDir로 맞춘다.
+	dependsOn test
+}
+
+bootJar {
+	dependsOn asciidoctor
+	from("${asciidoctor.outputDir}") {
+		into 'static/docs'
+	}
+}
+```
+
+(RestDocsConfig.java)
+```
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+
+@TestConfiguration
+public class RestDocsConfig {
+
+    @Bean
+    public RestDocumentationResultHandler write(){
+        return MockMvcRestDocumentation.document(
+                "{class-name}/{method-name}",
+                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+        );
+    }
+}
+```
+
+(RestDocsEnvironment.java)
+```
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
+import psam.portfolio.sunder.english.SunderApplicationTests;
+
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+
+@Import(RestDocsConfig.class)
+@ExtendWith(RestDocumentationExtension.class)
+public class RestDocsEnvironment extends SunderApplicationTests {
+
+    @Autowired
+    protected RestDocumentationResultHandler restDocs;
+
+    @BeforeEach
+    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(documentationConfiguration(provider))
+                .alwaysDo(MockMvcResultHandlers.print())
+                .alwaysDo(restDocs)
+                .addFilters(new CharacterEncodingFilter("UTF-8", true))
+                .build();
+    }
+}
+```
+
+(예시 - UserApiDocs.java)
+```
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.web.servlet.ResultActions;
+import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+public class UserApiDocs extends RestDocsEnvironment {
+
+    @DisplayName("user 의 loginId 중복체크를 할 수 있다.")
+    @Test
+    void checkLoginIdDupl() throws Exception {
+        // given
+        String loginId = "uid";
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/user/check-dupl")
+                        .contentType(APPLICATION_JSON)
+                        .param("loginId", loginId)
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                                queryParameters(
+                                        parameterWithName("loginId").description("중복체크할 아이디")
+                                ),
+                                relaxedResponseFields(
+                                        fieldWithPath("data.isOk")
+                                                .type(BOOLEAN)
+                                                .description("중복 검사 결과")
+                                )
+                        )
+                );
+    }
+}
+```
+
+(index.adoc)
+* "src/docs/asciidoc/index.adoc" 에서 다른 경로로 바꾸니까 문서가 생기지 않았다.
+```
+ifndef::snippets[]
+:snippets: ../ ../build/generated-snippets
+endif::[]
+= Sunder Project API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlights
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[Guide]]
+== Guide
+=== link:guide.html[가이드 보러 가기]
+
+[[User]]
+== link:user.html[User API 문서 보러가기]
+```
+
+(user.adoc)
+```
+ifndef::snippets[]
+:snippets: ../ ../build/generated-snippets
+endif::[]
+= Sunder Project API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlights
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[Index]]
+== link:index.html[Index 로 돌아가기]
+
+[[Guide]]
+== link:guide.html[가이드 보러 가기]
+
+[[User]]
+include::api/user/checkLoginIdDupl.adoc[]
+'''
+include::api/user/checkEmailDupl.adoc[]
+'''
+include::api/user/checkPhoneDupl.adoc[]
+```
+
+(checkLoginIdDupl.adoc)
+```
+== 로그인 아이디 중복 검사하기
+
+=== HTTP Request
+include::{snippets}/user-docs-test/check-login-id-dupl/http-request.adoc[]
+include::{snippets}/user-docs-test/check-login-id-dupl/query-parameters.adoc[]
+
+=== HTTP Response
+include::{snippets}/user-docs-test/check-login-id-dupl/http-response.adoc[]
+include::{snippets}/user-docs-test/check-login-id-dupl/response-fields.adoc[]
+
+=== Api Reasons
+
+|===
+| 코드 | 이유
+
+| IllegalData.User.ONE_PARAM_TO_CHECK_DUPL |
+|===
+```

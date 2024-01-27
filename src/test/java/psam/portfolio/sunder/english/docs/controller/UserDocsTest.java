@@ -12,7 +12,9 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class UserApiDocs extends RestDocsEnvironment {
+public class UserDocsTest extends RestDocsEnvironment {
+
+    // TODO: 2024-01-27 checkEmailDupl, checkPhoneDupl
 
     @DisplayName("user 의 loginId 중복체크를 할 수 있다.")
     @Test
