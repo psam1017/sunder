@@ -14,8 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class UserDocsTest extends RestDocsEnvironment {
 
-    // TODO: 2024-01-27 checkEmailDupl, checkPhoneDupl
-
     @DisplayName("user 의 loginId 중복체크를 할 수 있다.")
     @Test
     void checkLoginIdDupl() throws Exception {
@@ -35,6 +33,64 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("loginId").description("중복체크할 아이디")
+                                ),
+                                relaxedResponseFields(
+                                        fieldWithPath("data.isOk")
+                                                .type(BOOLEAN)
+                                                .description("중복 검사 결과")
+                                )
+                        )
+                );
+    }
+
+    @DisplayName("user 의 email 중복체크를 할 수 있다.")
+    @Test
+    void checkEmailDupl() throws Exception {
+        // given
+        String email = "example@sunder.net";
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/user/check-dupl")
+                        .contentType(APPLICATION_JSON)
+                        .param("email", email)
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                                queryParameters(
+                                        parameterWithName("email").description("중복체크할 이메일")
+                                ),
+                                relaxedResponseFields(
+                                        fieldWithPath("data.isOk")
+                                                .type(BOOLEAN)
+                                                .description("중복 검사 결과")
+                                )
+                        )
+                );
+    }
+
+    @DisplayName("user 의 phone 중복체크를 할 수 있다.")
+    @Test
+    void checkPhoneDupl() throws Exception {
+        // given
+        String phone = "010121345678";
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/user/check-dupl")
+                        .contentType(APPLICATION_JSON)
+                        .param("phone", phone)
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                                queryParameters(
+                                        parameterWithName("phone").description("중복체크할 연락처")
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.isOk")

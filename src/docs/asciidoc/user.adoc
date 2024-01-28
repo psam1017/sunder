@@ -16,8 +16,7 @@ endif::[]
 == link:guide.html[가이드 보러 가기]
 
 [[User]]
+== User API
 include::api/user/checkLoginIdDupl.adoc[]
-'''
-include::api/user/checkLoginIdDupl.adoc[]
-'''
-include::api/user/checkLoginIdDupl.adoc[]
+include::api/user/checkEmailDupl.adoc[]
+include::api/user/checkPhoneDupl.adoc[]

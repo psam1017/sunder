@@ -19,6 +19,7 @@ public class TeacherCommandService {
     private final TeacherQueryRepository teacherQueryRepository;
 
     /*
+    todo
     POST /api/teacher/new
     선생님 가입 서비스 - EmailUtils, PasswordUtils 필요. academy uuid 를 알고 있으므로 이미 director 로부터 academy 정보를 전달 받은 인증된 사용자라는 것으로 간주한다.
 

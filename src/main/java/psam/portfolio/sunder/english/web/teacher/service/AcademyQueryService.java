@@ -13,6 +13,7 @@ public class AcademyQueryService {
     private final AcademyQueryRepository academyQueryRepository;
 
     /*
+    todo
     GET /api/academy/check-dupl?name={name}
     학원 이름 중복 체크 서비스
 

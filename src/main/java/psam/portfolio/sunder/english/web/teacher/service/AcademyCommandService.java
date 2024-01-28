@@ -15,6 +15,7 @@ public class AcademyCommandService {
     private final AcademyQueryRepository academyQueryRepository;
 
     /*
+    todo
     POST /api/academy/new
     학원 및 원장 생성 서비스 - EmailUtils, PasswordUtils 필요. Teacher 와 Academy 를 같이 활성화
 

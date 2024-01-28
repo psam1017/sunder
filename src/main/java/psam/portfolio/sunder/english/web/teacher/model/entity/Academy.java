@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.teacher.model;
+package psam.portfolio.sunder.english.web.teacher.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;

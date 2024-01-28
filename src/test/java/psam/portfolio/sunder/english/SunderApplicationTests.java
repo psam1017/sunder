@@ -11,12 +11,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.testbean.TestConfig;
 import psam.portfolio.sunder.english.testbean.UniqueInfoContainer;
 import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.model.Academy;
-import psam.portfolio.sunder.english.web.teacher.model.Teacher;
+import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
