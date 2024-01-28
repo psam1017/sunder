@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum UserStatus {
 
+    PENDING,
     TRIAL,
     TRIAL_END,
-    PENDING,
     ACTIVE,
     FORBIDDEN,
     WITHDRAWN;
