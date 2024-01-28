@@ -13,6 +13,7 @@ public class TeacherQueryService {
     private final TeacherQueryRepository teacherQueryRepository;
 
     /*
+    todo
     GET /api/teacher/detail?teacherUuid={teacherUuid}&select={lesson}
     선생님 상세 정보 조회 서비스
 

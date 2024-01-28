@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
-import psam.portfolio.sunder.english.web.teacher.model.Teacher;
+import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.lesson.enumeration.LessonStatus;
 
 import java.time.LocalDate;

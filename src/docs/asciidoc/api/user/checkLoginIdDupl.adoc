@@ -1,17 +1,17 @@
-== 로그인 아이디 중복 검사하기
+=== 로그인 아이디 중복 검사하기
 
-=== HTTP Request
+==== HTTP Request
 include::{snippets}/user-docs-test/check-login-id-dupl/http-request.adoc[]
 include::{snippets}/user-docs-test/check-login-id-dupl/query-parameters.adoc[]
 
-=== HTTP Response
+==== HTTP Response
 include::{snippets}/user-docs-test/check-login-id-dupl/http-response.adoc[]
 include::{snippets}/user-docs-test/check-login-id-dupl/response-fields.adoc[]
 
-=== Api Reasons
+==== Api Reasons
 
 |===
 | 코드 | 이유
 
-| IllegalData.User.ONE_PARAM_TO_CHECK_DUPL |
+| IllegalData.User.ONE_PARAM_TO_CHECK_DUPL | loginId, email, phone 중 하나만 입력해야 합니다.
 |===

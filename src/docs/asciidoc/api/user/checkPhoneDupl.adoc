@@ -1,0 +1,17 @@
+=== 휴대폰 번호 중복 검사하기
+
+==== HTTP Request
+include::{snippets}/user-docs-test/check-phone-dupl/http-request.adoc[]
+include::{snippets}/user-docs-test/check-phone-dupl/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/user-docs-test/check-phone-dupl/http-response.adoc[]
+include::{snippets}/user-docs-test/check-phone-dupl/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+| IllegalData.User.ONE_PARAM_TO_CHECK_DUPL | loginId, email, phone 중 하나만 입력해야 합니다.
+|===
