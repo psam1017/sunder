@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.web.teacher.model.QTeacher.teacher;
+import static psam.portfolio.sunder.english.web.teacher.model.entity.QTeacher.teacher;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
