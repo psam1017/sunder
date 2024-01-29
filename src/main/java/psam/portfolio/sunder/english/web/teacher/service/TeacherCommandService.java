@@ -3,16 +3,21 @@ package psam.portfolio.sunder.english.web.teacher.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
+import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 @Service
 public class TeacherCommandService {
 
-    // TODO: 2024-01-23 EmailUtils -> 학원에서 추가한 선생님이 등록 이후 추가로 이메일을 인증
-    // TODO: 2024-01-23 PasswordUtils -> 학원에서 추가한 선생님이 이후 비밀번호를 변경, 임시 발급
+    private final TemplateEngine templateEngine;
+    private final MailUtils mailUtils;
+    private final PasswordUtils passwordUtils;
 
     private final TeacherCommandRepository teacherCommandRepository;
     private final TeacherQueryRepository teacherQueryRepository;
@@ -39,4 +44,10 @@ public class TeacherCommandService {
     PUT /api/teacher/withdraw
     선생님 탈퇴 서비스
      */
+
+    private String setTempPasswordMailText(String tempPassword) {
+        Context context = new Context();
+        context.setVariable("tempPassword", tempPassword);
+        return templateEngine.process("mail-temp-password", context);
+    }
 }

@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.configuration;
+package psam.portfolio.sunder.english.global.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

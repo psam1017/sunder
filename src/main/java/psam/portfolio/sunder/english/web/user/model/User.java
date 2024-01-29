@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ public abstract class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles;
 
-    protected User(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status, Set<UserRole> roles) {
+    protected User(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status) {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.name = name;
@@ -60,7 +61,6 @@ public abstract class User extends BaseEntity {
         this.phone = phone;
         this.address = address;
         this.status = status;
-        this.roles = roles;
         this.lastPasswordChangeDateTime = LocalDateTime.now();
     }
 
@@ -104,19 +104,7 @@ public abstract class User extends BaseEntity {
         this.status = UserStatus.TRIAL_END;
     }
 
-    public void addRole(Role role) {
-        UserRole userRole = UserRole.builder()
-                .user(this)
-                .role(role)
-                .build();
-        this.roles.add(userRole);
-    }
-
-    public void removeRole(Role role) {
-        this.roles.removeIf(ur -> ur.getRole().equals(role));
-    }
-
-    public boolean hasRole(Role role) {
-        return this.roles.stream().anyMatch(ur -> ur.getRole().equals(role));
+    public void removeRole(RoleName roleName) {
+        this.roles.removeIf(userRole -> userRole.getRoleName() == roleName);
     }
 }

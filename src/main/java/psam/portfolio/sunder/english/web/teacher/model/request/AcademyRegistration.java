@@ -45,7 +45,7 @@ public class AcademyRegistration {
                         .detail(detail)
                         .postalCode(postalCode)
                         .build())
-                .status(AcademyStatus.USING)
+                .status(AcademyStatus.PENDING)
                 .build();
     }
 }

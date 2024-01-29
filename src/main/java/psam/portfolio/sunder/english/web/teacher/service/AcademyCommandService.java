@@ -1,16 +1,29 @@
 package psam.portfolio.sunder.english.web.teacher.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
+import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
+import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.web.teacher.exception.DuplicateAcademyException;
+import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyRegistration;
 import psam.portfolio.sunder.english.web.teacher.model.request.DirectorRegistration;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.exception.DuplicateUserInfoException;
+import psam.portfolio.sunder.english.web.user.model.UserRole;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
+import psam.portfolio.sunder.english.web.user.repository.UserRoleCommandRepository;
+
+import java.util.Locale;
 
 import static psam.portfolio.sunder.english.web.teacher.model.entity.QAcademy.academy;
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.PENDING;
@@ -18,43 +31,49 @@ import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.TRIA
 import static psam.portfolio.sunder.english.web.user.model.QUser.user;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 @Service
 public class AcademyCommandService {
+
+    private final TemplateEngine templateEngine;
+    private final MessageSource messageSource;
+    private final MailUtils mailUtils;
+    private final PasswordUtils passwordUtils;
 
     private final AcademyCommandRepository academyCommandRepository;
     private final AcademyQueryRepository academyQueryRepository;
     private final TeacherCommandRepository teacherCommandRepository;
     private final UserQueryRepository userQueryRepository;
+    private final UserRoleCommandRepository userRoleCommandRepository;
 
     /*
     todo 학원의 name, phone, email 중복 체크하는 서비스
      */
 
     /*
-    todo
+    todo test, 주석 정리, 메모 추가
     POST /api/academy/new
     ROLE_DIRECTOR 권한을 가진 사용자가 학원을 생성하는 서비스 - EmailUtils, PasswordUtils 필요.
     학원 및 원장 생성 서비스 - EmailUtils, PasswordUtils 필요. Teacher 와 Academy 를 같이 활성화
      */
-    public Long registerDirectorWithAcademy(
-        AcademyRegistration acReg,
-        DirectorRegistration drReg
+    public String registerDirectorWithAcademy(
+        AcademyRegistration registerAcademy,
+        DirectorRegistration registerDirector
     ) {
         // 우선 academy name, phone, email 에서 중복 체크. 상태는 상관 없음
         academyQueryRepository.findOne(
-                academy.name.eq(acReg.getName())
-                .or(academy.phone.eq(acReg.getPhone()))
-                .or(academy.email.eq(acReg.getEmail()))
+                academy.name.eq(registerAcademy.getName())
+                .or(academy.phone.eq(registerAcademy.getPhone()))
+                .or(academy.email.eq(registerAcademy.getEmail()))
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
         });
 
         // teacher 의 loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING, TRIAL), userEmailVerifiedEq(true)
         userQueryRepository.findOne(
-                user.loginId.eq(drReg.getLoginId())
-                .or(user.email.eq(drReg.getEmail()))
-                .or(user.phone.eq(drReg.getPhone())),
+                user.loginId.eq(registerDirector.getLoginId())
+                .or(user.email.eq(registerDirector.getEmail()))
+                .or(user.phone.eq(registerDirector.getPhone())),
                 user.status.notIn(PENDING, TRIAL),
                 user.emailVerified.eq(true)
         ).ifPresent(user -> {
@@ -62,15 +81,33 @@ public class AcademyCommandService {
         });
 
         // academy 생성
+        Academy saveAcademy = academyCommandRepository.save(registerAcademy.toEntity());
 
         // passwordUtils 로 loginPw 암호화
-        // teacher 생성
-        // UserRole 에 ROLE_DIRECTOR 로 생성
-        // email 에 uuid 를 해싱하여 링크를 보내기. -> 이후 인증하면 PENDING -> TRIAL 로 변경
-        // return teacher.uuid;
-        return null;
-    }
+        String encodeLoginPw = passwordUtils.encode(registerDirector.getLoginPw());
 
+        // teacher 생성
+        Teacher saveDirector = registerDirector.toEntity(saveAcademy, encodeLoginPw);
+
+        // UserRole 에 ROLE_DIRECTOR 로 생성
+        UserRole buildUserRole = UserRole.builder()
+                .user(saveDirector)
+                .roleName(RoleName.ROLE_TRIAL_DIRECTOR)
+                .build();
+        userRoleCommandRepository.save(buildUserRole);
+
+        // mailUtils 로 verification mail 발송
+        boolean mailResult = mailUtils.sendMail(
+                saveDirector.getEmail(),
+                messageSource.getMessage("mail.verification.academy.subject", null, Locale.getDefault()),
+                setVerificationMailText(saveAcademy)
+        );
+        if (!mailResult) {
+            throw new MailFailException();
+        }
+
+        return saveDirector.getUuid().toString();
+    }
 
     /*
     POST /api/academy/teacher/new - @Secured("ROLE_DIRECTOR")
@@ -82,6 +119,15 @@ public class AcademyCommandService {
     PUT /api/academy/info - @Secured("ROLE_DIRECTOR")
     학원 정보 수정 서비스
      */
+
+    // uuid from Academy
+    private String setVerificationMailText(Academy academy) {
+        String url = messageSource.getMessage("api.url.verification.academy", new Object[]{academy.getUuid()}, Locale.getDefault());
+
+        Context context = new Context();
+        context.setVariable("url", url);
+        return templateEngine.process("mail-verification", context);
+    }
 }
 
 /*

@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 
 import java.time.LocalDateTime;
 
@@ -17,20 +18,17 @@ public class UserRole {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private RoleName roleName;
+    private LocalDateTime assignedDateTime;
+
     @ManyToOne
     @JoinColumn(name = "user_uuid")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
-
-    private LocalDateTime assignedDateTime;
-
     @Builder
-    public UserRole(User user, Role role) {
+    public UserRole(User user, RoleName roleName) {
         this.user = user;
-        this.role = role;
+        this.roleName = roleName;
         this.assignedDateTime = LocalDateTime.now();
     }
 }
