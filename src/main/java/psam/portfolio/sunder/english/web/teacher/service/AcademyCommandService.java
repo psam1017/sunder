@@ -109,6 +109,15 @@ public class AcademyCommandService {
         return saveDirector.getUuid().toString();
     }
 
+    // uuid from Academy
+    private String setVerificationMailText(Academy academy) {
+        String url = messageSource.getMessage("mail.verification.academy.url", new Object[]{academy.getUuid()}, Locale.getDefault());
+
+        Context context = new Context();
+        context.setVariable("url", url);
+        return templateEngine.process("mail-verification", context);
+    }
+
     /*
     POST /api/academy/teacher/new - @Secured("ROLE_DIRECTOR")
     학원에서 선생님을 바로 등록하는 서비스
@@ -119,15 +128,6 @@ public class AcademyCommandService {
     PUT /api/academy/info - @Secured("ROLE_DIRECTOR")
     학원 정보 수정 서비스
      */
-
-    // uuid from Academy
-    private String setVerificationMailText(Academy academy) {
-        String url = messageSource.getMessage("api.url.verification.academy", new Object[]{academy.getUuid()}, Locale.getDefault());
-
-        Context context = new Context();
-        context.setVariable("url", url);
-        return templateEngine.process("mail-verification", context);
-    }
 }
 
 /*
