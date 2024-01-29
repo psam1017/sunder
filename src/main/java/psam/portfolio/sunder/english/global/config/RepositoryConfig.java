@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.configuration;
+package psam.portfolio.sunder.english.global.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

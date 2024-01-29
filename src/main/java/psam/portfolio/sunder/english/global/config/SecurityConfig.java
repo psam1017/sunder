@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.configuration;
+package psam.portfolio.sunder.english.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;

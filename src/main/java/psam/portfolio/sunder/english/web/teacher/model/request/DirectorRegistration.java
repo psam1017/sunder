@@ -46,10 +46,10 @@ public class DirectorRegistration {
     @Pattern(regexp = "^[0-9]{5}$")
     private String postalCode;
 
-    public Teacher toEntity(Academy academy) {
+    public Teacher toEntity(Academy academy, String encodeLoginPw) {
         return Teacher.builder()
                 .loginId(loginId)
-                .loginPw(loginPw)
+                .loginPw(encodeLoginPw)
                 .name(name)
                 .email(email)
                 .emailVerified(false)
