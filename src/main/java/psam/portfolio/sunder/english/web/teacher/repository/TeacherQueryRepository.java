@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.exception.NoSuchTeacherException;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.web.user.model.QUserRole;
 
 import java.util.List;
 import java.util.Optional;

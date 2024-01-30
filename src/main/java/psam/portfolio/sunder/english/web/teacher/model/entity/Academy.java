@@ -53,4 +53,20 @@ public class Academy extends BaseEntity {
         this.openToPublic = openToPublic;
         this.status = status;
     }
+
+    public void verify() {
+        this.status = AcademyStatus.VERIFIED;
+    }
+
+    public boolean isPending() {
+        return this.status == AcademyStatus.PENDING;
+    }
+
+    public boolean isVerified() {
+        return this.status == AcademyStatus.VERIFIED;
+    }
+
+    public boolean isSuspended() {
+        return this.status == AcademyStatus.SUSPENDED;
+    }
 }
