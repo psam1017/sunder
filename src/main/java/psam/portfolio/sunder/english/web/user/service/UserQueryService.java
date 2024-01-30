@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.web.user.exception.OneParamToCheckDuplException;
+import psam.portfolio.sunder.english.web.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.web.user.model.User;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 
@@ -35,7 +35,7 @@ public class UserQueryService {
         boolean hasPhone = StringUtils.hasText(phone);
 
         if (!hasOnlyOne(hasLoginId, hasEmail, hasPhone)) {
-            throw new OneParamToCheckDuplException();
+            throw new OneParamToCheckUserDuplException();
         }
 
         Optional<User> optUser = Optional.empty();

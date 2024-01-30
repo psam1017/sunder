@@ -88,6 +88,10 @@ public abstract class User extends BaseEntity {
         return this.status == UserStatus.WITHDRAWN;
     }
 
+    public void startTrial() {
+        this.status = UserStatus.TRIAL;
+    }
+
     public void activate() {
         this.status = UserStatus.ACTIVE;
     }
@@ -100,7 +104,7 @@ public abstract class User extends BaseEntity {
         this.status = UserStatus.WITHDRAWN;
     }
 
-    public void trialEnd() {
+    public void endTrial() {
         this.status = UserStatus.TRIAL_END;
     }
 

@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
+import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.web.teacher.exception.DuplicateAcademyException;
+import psam.portfolio.sunder.english.web.teacher.exception.OneParamToCheckAcademyDuplException;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyRegistration;
@@ -18,12 +21,14 @@ import psam.portfolio.sunder.english.web.teacher.repository.AcademyCommandReposi
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
-import psam.portfolio.sunder.english.web.user.exception.DuplicateUserInfoException;
+import psam.portfolio.sunder.english.web.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.web.user.model.UserRole;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.web.user.repository.UserRoleCommandRepository;
 
 import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 
 import static psam.portfolio.sunder.english.web.teacher.model.entity.QAcademy.academy;
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.PENDING;
@@ -34,6 +39,9 @@ import static psam.portfolio.sunder.english.web.user.model.QUser.user;
 @Transactional(readOnly = false)
 @Service
 public class AcademyCommandService {
+
+    // TODO: 2024-01-30 api 만들고, docs
+    // TODO: 2024-01-30 security - UserDetailsImpl 에서 boolean = false 가 나오면 이를 어떻게 제어하지? redirect 등
 
     private final TemplateEngine templateEngine;
     private final MessageSource messageSource;
@@ -46,15 +54,51 @@ public class AcademyCommandService {
     private final UserQueryRepository userQueryRepository;
     private final UserRoleCommandRepository userRoleCommandRepository;
 
-    /*
-    todo 학원의 name, phone, email 중복 체크하는 서비스
+    /**
+     * 학원 등록 시 중복 체크 서비스
+     * @param name 학원 이름
+     * @param phone 학원 전화번호
+     * @param email 학원 이메일
+     * @return 중복 여부
      */
+    public boolean checkDuplication(String name, String phone, String email) {
+        boolean hasName = StringUtils.hasText(name);
+        boolean hasPhone = StringUtils.hasText(phone);
+        boolean hasEmail = StringUtils.hasText(email);
 
-    /*
-    todo test, 주석 정리, 메모 추가
-    POST /api/academy/new
-    ROLE_DIRECTOR 권한을 가진 사용자가 학원을 생성하는 서비스 - EmailUtils, PasswordUtils 필요.
-    학원 및 원장 생성 서비스 - EmailUtils, PasswordUtils 필요. Teacher 와 Academy 를 같이 활성화
+        if (!hasOnlyOne(hasName, hasPhone, hasEmail)) {
+            throw new OneParamToCheckAcademyDuplException();
+        }
+
+        Optional<Academy> optAcademy = Optional.empty();
+        if (hasName) {
+            optAcademy = academyQueryRepository.findOne(
+                    academy.name.eq(name),
+                    academy.status.ne(AcademyStatus.PENDING)
+            );
+        } else if (hasPhone) {
+            optAcademy = academyQueryRepository.findOne(
+                    academy.phone.eq(phone),
+                    academy.status.ne(AcademyStatus.PENDING)
+            );
+        } else if (hasEmail) {
+            optAcademy = academyQueryRepository.findOne(
+                    academy.email.eq(email),
+                    academy.status.ne(AcademyStatus.PENDING)
+            );
+        }
+        return optAcademy.isEmpty();
+    }
+
+    private static boolean hasOnlyOne(boolean a, boolean b, boolean c) {
+        return a ^ b ^ c && !(a && b && c);
+    }
+
+    /**
+     * 학원을 등록하는 서비스
+     * @param registerAcademy 학원 등록 정보
+     * @param registerDirector 학원장 등록 정보
+     * @return 학원장의 uuid
      */
     public String registerDirectorWithAcademy(
         AcademyRegistration registerAcademy,
@@ -64,7 +108,8 @@ public class AcademyCommandService {
         academyQueryRepository.findOne(
                 academy.name.eq(registerAcademy.getName())
                 .or(academy.phone.eq(registerAcademy.getPhone()))
-                .or(academy.email.eq(registerAcademy.getEmail()))
+                .or(academy.email.eq(registerAcademy.getEmail())),
+                academy.status.ne(AcademyStatus.PENDING)
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
         });
@@ -77,7 +122,7 @@ public class AcademyCommandService {
                 user.status.notIn(PENDING, TRIAL),
                 user.emailVerified.eq(true)
         ).ifPresent(user -> {
-            throw new DuplicateUserInfoException();
+            throw new DuplicateUserException();
         });
 
         // academy 생성
@@ -87,7 +132,7 @@ public class AcademyCommandService {
         String encodeLoginPw = passwordUtils.encode(registerDirector.getLoginPw());
 
         // teacher 생성
-        Teacher saveDirector = registerDirector.toEntity(saveAcademy, encodeLoginPw);
+        Teacher saveDirector = teacherCommandRepository.save(registerDirector.toEntity(saveAcademy, encodeLoginPw));
 
         // UserRole 에 ROLE_DIRECTOR 로 생성
         UserRole buildUserRole = UserRole.builder()
@@ -109,13 +154,36 @@ public class AcademyCommandService {
         return saveDirector.getUuid().toString();
     }
 
-    // uuid from Academy
+    // UUID from Academy
     private String setVerificationMailText(Academy academy) {
         String url = messageSource.getMessage("mail.verification.academy.url", new Object[]{academy.getUuid()}, Locale.getDefault());
 
         Context context = new Context();
         context.setVariable("url", url);
         return templateEngine.process("mail-verification", context);
+    }
+
+    /**
+     * 학원 인증 서비스
+     * @param academyUuid 학원 uuid
+     * @return 인증 성공 여부
+     */
+    public boolean verifyAcademy(UUID academyUuid) {
+        Academy getAcademy = academyQueryRepository.getById(academyUuid);
+
+        // 학원 인증은 최초 한 번만 가능
+        if (getAcademy.isVerified()) {
+            return false;
+        }
+        getAcademy.verify();
+
+        // 인증 시점에는 모든 선생(=학원장)의 상태를 인증함으로 변경한다.
+        getAcademy.getTeachers().forEach(teacher -> {
+            teacher.startTrial();
+            teacher.verifyEmail(true);
+        });
+
+        return true;
     }
 
     /*
@@ -250,4 +318,55 @@ public class AcademyRegistration {
     }
 }
 
+ */
+
+/*
+
+
+    private final UserQueryRepository userQueryRepository;
+
+     * GET /api/user/check-dupl?loginId={loginId}&email={email}&phone={phone}
+     * 아이디, 이메일, 연락처 중복 체크 서비스
+     * - 단, PENDING 과 TRIAL 은 중복체크에서 제외
+     * - 아직 email 인증을 하지 않은 경우도 중복체크에서 제외
+public boolean checkDuplication(String loginId, String email, String phone) {
+    boolean hasLoginId = StringUtils.hasText(loginId);
+    boolean hasEmail = StringUtils.hasText(email);
+    boolean hasPhone = StringUtils.hasText(phone);
+
+    if (!hasOnlyOne(hasLoginId, hasEmail, hasPhone)) {
+        throw new OneParamToCheckDuplException();
+    }
+
+    Optional<User> optUser = Optional.empty();
+    if (hasLoginId) {
+        optUser = userQueryRepository.findOne(
+                user.loginId.eq(loginId),
+                userStatusNotIn(PENDING, TRIAL),
+                userEmailVerifiedEq(true));
+    } else if (hasEmail) {
+        optUser = userQueryRepository.findOne(
+                user.email.eq(email),
+                userStatusNotIn(PENDING, TRIAL),
+                userEmailVerifiedEq(true));
+    } else if (hasPhone) {
+        optUser = userQueryRepository.findOne(
+                user.phone.eq(phone),
+                userStatusNotIn(PENDING, TRIAL),
+                userEmailVerifiedEq(true));
+    }
+    return optUser.isEmpty();
+}
+
+    private static boolean hasOnlyOne(boolean a, boolean b, boolean c) {
+        return a ^ b ^ c && !(a && b && c);
+    }
+
+    private static BooleanExpression userStatusNotIn(UserStatus... statuses) {
+        return user.status.notIn(statuses);
+    }
+
+    private static BooleanExpression userEmailVerifiedEq(boolean verified) {
+        return user.emailVerified.eq(verified);
+    }
  */

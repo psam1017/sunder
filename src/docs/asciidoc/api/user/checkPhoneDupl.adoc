@@ -13,5 +13,5 @@ include::{snippets}/user-docs-test/check-phone-dupl/response-fields.adoc[]
 |===
 | 코드 | 이유
 
-| IllegalData.User.ONE_PARAM_TO_CHECK_DUPL | loginId, email, phone 중 하나만 입력해야 합니다.
+| IllegalData.User.ONE_PARAM_TO_CHECK_USER_DUPL | loginId, email, phone 중 하나만 입력해야 합니다.
 |===

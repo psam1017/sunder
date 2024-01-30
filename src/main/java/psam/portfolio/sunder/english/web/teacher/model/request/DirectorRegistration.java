@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -19,7 +20,6 @@ import psam.portfolio.sunder.english.web.user.model.UserRole;
 import java.util.Set;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class DirectorRegistration {
 
@@ -62,5 +62,17 @@ public class DirectorRegistration {
                 .status(UserStatus.PENDING)
                 .academy(academy)
                 .build();
+    }
+
+    @Builder
+    public DirectorRegistration(String loginId, String loginPw, String name, String email, String phone, String street, String detail, String postalCode) {
+        this.loginId = loginId;
+        this.loginPw = loginPw;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.street = street;
+        this.detail = detail;
+        this.postalCode = postalCode;
     }
 }

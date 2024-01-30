@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
@@ -12,7 +13,6 @@ import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class AcademyRegistration {
 
@@ -47,5 +47,16 @@ public class AcademyRegistration {
                         .build())
                 .status(AcademyStatus.PENDING)
                 .build();
+    }
+
+    @Builder
+    public AcademyRegistration(String name, String phone, String email, String street, String detail, String postalCode, Boolean openToPublic) {
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.street = street;
+        this.detail = detail;
+        this.postalCode = postalCode;
+        this.openToPublic = openToPublic;
     }
 }
