@@ -7,14 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.web.user.exception.OneParamToCheckUserDuplException;
-import psam.portfolio.sunder.english.web.user.model.User;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 
 import java.util.Optional;
 
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.PENDING;
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.TRIAL;
-import static psam.portfolio.sunder.english.web.user.model.QUser.user;
+import static psam.portfolio.sunder.english.web.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

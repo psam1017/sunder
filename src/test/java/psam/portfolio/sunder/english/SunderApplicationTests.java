@@ -2,7 +2,6 @@ package psam.portfolio.sunder.english;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.docs.RestDocsConfig;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
+import psam.portfolio.sunder.english.testbean.ConcurrentUniqueInfoContainer;
 import psam.portfolio.sunder.english.testbean.TestConfig;
 import psam.portfolio.sunder.english.testbean.UniqueInfoContainer;
 import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
@@ -29,8 +29,6 @@ import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandReposi
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.util.function.Supplier;
-
-import static org.mockito.BDDMockito.*;
 
 @Slf4j
 @ExtendWith(RestDocumentationExtension.class)

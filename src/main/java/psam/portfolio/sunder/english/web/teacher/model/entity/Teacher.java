@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.web.user.model.User;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
 
 import static jakarta.persistence.FetchType.LAZY;
 

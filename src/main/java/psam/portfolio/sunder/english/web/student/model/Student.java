@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
-import psam.portfolio.sunder.english.web.user.model.User;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
 
 import static jakarta.persistence.FetchType.*;
 

@@ -8,11 +8,11 @@ public class TestConfig {
 
     @Bean
     public UniqueInfoContainer uniqueInfoContainer() {
-        return UniqueInfoContainer.builder()
-                .numVal(100)
-                .userNameLen(8)
-                .userEmailLen(8)
-                .emailDom("sunder.net")
+        return StandaloneUniqueInfoContainer.builder()
+                .numVal(23)
+                .loginIdLen(8)
+                .emailLen(8)
+                .emailDomain("sunder.net")
                 .academyNameMinLen(2)
                 .academyNameMaxLen(8)
                 .build();
