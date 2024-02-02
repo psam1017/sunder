@@ -50,19 +50,19 @@ public class AcademyCommandService {
 
     /**
      * 학원을 등록하는 서비스
-     * @param registerAcademy 학원 등록 정보
-     * @param registerDirector 학원장 등록 정보
+     * @param academyPOST 학원 등록 정보
+     * @param directorPOST 학원장 등록 정보
      * @return 학원장의 uuid
      */
     public String registerDirectorWithAcademy(
-        AcademyPOST registerAcademy,
-        DirectorPOST registerDirector
+        AcademyPOST academyPOST,
+        DirectorPOST directorPOST
     ) {
         // 우선 academy name, phone, email 에서 중복 체크. 상태는 상관 없음
         academyQueryRepository.findOne(
-                academy.name.eq(registerAcademy.getName())
-                .or(academy.phone.eq(registerAcademy.getPhone()))
-                .or(academy.email.eq(registerAcademy.getEmail())),
+                academy.name.eq(academyPOST.getName())
+                .or(academy.phone.eq(academyPOST.getPhone()))
+                .or(academy.email.eq(academyPOST.getEmail())),
                 academy.status.ne(AcademyStatus.PENDING)
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
@@ -70,9 +70,9 @@ public class AcademyCommandService {
 
         // teacher 의 loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING, TRIAL), userEmailVerifiedEq(true)
         userQueryRepository.findOne(
-                user.loginId.eq(registerDirector.getLoginId())
-                .or(user.email.eq(registerDirector.getEmail()))
-                .or(user.phone.eq(registerDirector.getPhone())),
+                user.loginId.eq(directorPOST.getLoginId())
+                .or(user.email.eq(directorPOST.getEmail()))
+                .or(user.phone.eq(directorPOST.getPhone())),
                 user.status.notIn(PENDING, TRIAL),
                 user.emailVerified.eq(true)
         ).ifPresent(user -> {
@@ -80,13 +80,13 @@ public class AcademyCommandService {
         });
 
         // academy 생성
-        Academy saveAcademy = academyCommandRepository.save(registerAcademy.toEntity());
+        Academy saveAcademy = academyCommandRepository.save(academyPOST.toEntity());
 
         // passwordUtils 로 loginPw 암호화
-        String encodeLoginPw = passwordUtils.encode(registerDirector.getLoginPw());
+        String encodeLoginPw = passwordUtils.encode(directorPOST.getLoginPw());
 
         // teacher 생성
-        Teacher saveDirector = teacherCommandRepository.save(registerDirector.toEntity(saveAcademy, encodeLoginPw));
+        Teacher saveDirector = teacherCommandRepository.save(directorPOST.toEntity(saveAcademy, encodeLoginPw));
 
         // UserRole 에 ROLE_DIRECTOR 로 생성
         UserRole buildUserRole = UserRole.builder()

@@ -1,4 +1,4 @@
-=== 로그인 아이디 중복 검사하기
+=== 사용자 로그인 아이디 중복 검사하기
 
 ==== HTTP Request
 include::{snippets}/user-docs-test/check-login-id-dupl/http-request.adoc[]

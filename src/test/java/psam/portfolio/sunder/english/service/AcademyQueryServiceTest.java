@@ -27,7 +27,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
 
         // when
         // then
-        assertThatThrownBy(() -> runWithRefresh(() -> sut.checkDuplication(name, phone, email)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(name, phone, email)))
                 .isInstanceOf(OneParamToCheckAcademyDuplException.class);
     }
 
@@ -41,7 +41,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
 
         // when
         // then
-        assertThatThrownBy(() -> runWithRefresh(() -> sut.checkDuplication(name, phone, email)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(name, phone, email)))
                 .isInstanceOf(OneParamToCheckAcademyDuplException.class);
     }
 
@@ -56,7 +56,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         String email = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
 
         // then
         assertThat(isOk).isFalse();
@@ -73,7 +73,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         String email = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
 
         // then
         assertThat(isOk).isFalse();
@@ -90,7 +90,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         String email = registerAcademy.getEmail();
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
 
         // then
         assertThat(isOk).isFalse();
@@ -107,7 +107,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         String phone = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
 
         // then
         assertThat(isOk).isTrue();

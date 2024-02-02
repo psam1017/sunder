@@ -1,4 +1,4 @@
-=== 이메일 중복 검사하기
+=== 사용자 이메일 중복 검사하기
 
 ==== HTTP Request
 include::{snippets}/user-docs-test/check-email-dupl/http-request.adoc[]

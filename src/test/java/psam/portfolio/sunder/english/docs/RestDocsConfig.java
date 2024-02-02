@@ -10,7 +10,7 @@ import org.springframework.restdocs.operation.preprocess.Preprocessors;
 public class RestDocsConfig {
 
     @Bean
-    public RestDocumentationResultHandler write(){
+    public RestDocumentationResultHandler restDocumentationResultHandler(){
         return MockMvcRestDocumentation.document(
                 "{class-name}/{method-name}",
                 Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),

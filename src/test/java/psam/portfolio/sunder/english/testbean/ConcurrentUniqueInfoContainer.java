@@ -23,7 +23,7 @@ public class ConcurrentUniqueInfoContainer implements UniqueInfoContainer {
     }
 
     @Override
-    public String getUniqueId() {
+    public String getUniqueLoginId() {
         String id = uniqueIdIterator.next();
         uniqueIdIterator.remove();
         return id;

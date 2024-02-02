@@ -1,0 +1,17 @@
+=== 학원 및 학원장 신규 등록하기
+
+==== HTTP Request
+include::{snippets}/academy-docs-test/register-academy/http-request.adoc[]
+include::{snippets}/academy-docs-test/register-academy/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-docs-test/register-academy/http-response.adoc[]
+include::{snippets}/academy-docs-test/register-academy/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+|  |
+|===

@@ -18,6 +18,13 @@ public class AcademyController {
     private final AcademyCommandService academyCommandService;
     private final AcademyQueryService academyQueryService;
 
+    /**
+     * 학원 이름 중복 체크 서비스
+     * @param name 학원 이름
+     * @param phone 학원 전화번호
+     * @param email 학원 이메일
+     * @return 중복 여부
+     */
     @GetMapping("/check-dupl")
     public ApiResponse<Map<String, Boolean>> checkDuplication(@RequestParam(required = false) String name,
                                                               @RequestParam(required = false) String phone,
@@ -26,16 +33,26 @@ public class AcademyController {
         return ApiResponse.ok(Map.of("isOk", result));
     }
 
+    /**
+     * 학원과 학원장을 등록하는 서비스
+     * @param post 학원과 학원장 정보
+     * @return 학원장 uuid
+     */
     @PostMapping("/new")
-    public ApiResponse<Map<String, String>> registerAcademy(@RequestBody AcademyDirectorPOST request) {
-        String teacherUuid = academyCommandService.registerDirectorWithAcademy(request.getAcademyPOST(), request.getDirectorPOST());
-        return ApiResponse.ok(Map.of("teacherUuid", teacherUuid));
+    public ApiResponse<Map<String, String>> registerAcademy(@RequestBody AcademyDirectorPOST post) {
+        String directorUuid = academyCommandService.registerDirectorWithAcademy(post.getAcademy(), post.getDirector());
+        return ApiResponse.ok(Map.of("directorUuid", directorUuid));
     }
 
-    @PostMapping("verification")
-    public ApiResponse<Map<String, Boolean>> verifyAcademy(@RequestParam String uuid) {
-        boolean result = academyCommandService.verifyAcademy(UUID.fromString(uuid));
-        return ApiResponse.ok(Map.of("academyUuid", result));
+    /**
+     * 학원 검증 및 승인 서비스
+     * @param uuid 학원 uuid
+     * @return 학원 승인 여부
+     */
+    @GetMapping("/verify/{academyUuid}")
+    public ApiResponse<Map<String, Boolean>> verifyAcademy(@PathVariable String academyUuid) {
+        boolean result = academyCommandService.verifyAcademy(UUID.fromString(academyUuid));
+        return ApiResponse.ok(Map.of("verified", result));
     }
 
     /*

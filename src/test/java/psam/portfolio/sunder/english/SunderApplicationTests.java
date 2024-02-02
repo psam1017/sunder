@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.docs.RestDocsConfig;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
-import psam.portfolio.sunder.english.testbean.ConcurrentUniqueInfoContainer;
 import psam.portfolio.sunder.english.testbean.TestConfig;
 import psam.portfolio.sunder.english.testbean.UniqueInfoContainer;
 import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
@@ -76,7 +75,7 @@ public class SunderApplicationTests {
 		}
 	}
 
-	public <T> T runWithRefresh(Supplier<T> action) {
+	public <T> T refreshAnd(Supplier<T> action) {
 		log.info("========== Flush and Clear before Action ==========");
 		em.flush();
 		em.clear();
@@ -100,7 +99,7 @@ public class SunderApplicationTests {
 	}
 
 	protected Teacher registerTeacher(UserStatus status, Academy academy) {
-		String uniqueId = uic.getUniqueId();
+		String uniqueId = uic.getUniqueLoginId();
 		Teacher teacher = Teacher.builder()
 				.loginId(uniqueId)
 				.loginPw(passwordUtils.encode("qwe123!@#"))
