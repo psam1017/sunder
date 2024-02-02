@@ -11,7 +11,7 @@ import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandReposi
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = false)
+@Transactional
 @Service
 public class TeacherCommandService {
 

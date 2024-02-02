@@ -36,12 +36,11 @@ import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.TRIA
 import static psam.portfolio.sunder.english.web.user.model.QUser.user;
 
 @RequiredArgsConstructor
-@Transactional(readOnly = false)
+@Transactional
 @Service
 public class AcademyCommandService {
 
     // TODO: 2024-01-30 api 만들고, docs
-    // TODO: 2024-01-30 security - UserDetailsImpl 에서 boolean = false 가 나오면 이를 어떻게 제어하지? redirect 등
 
     private final TemplateEngine templateEngine;
     private final MessageSource messageSource;
