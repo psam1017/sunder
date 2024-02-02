@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.lesson.model.Lesson;
-import psam.portfolio.sunder.english.web.user.model.User;
-import psam.portfolio.sunder.english.web.user.model.UserRole;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
+import psam.portfolio.sunder.english.web.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 import java.util.Set;

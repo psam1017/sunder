@@ -7,13 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
-import psam.portfolio.sunder.english.web.user.model.User;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.web.user.model.QUser.user;
+import static psam.portfolio.sunder.english.web.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

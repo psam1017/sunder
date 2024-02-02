@@ -13,7 +13,6 @@ public class MailUtils {
     private final JavaMailSender javaMailSender;
 
     // TODO: 2024-01-29 mail username, password 설정
-    // TODO: 2024-01-29 mockbean
 
     public boolean sendMail(String recipient, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();

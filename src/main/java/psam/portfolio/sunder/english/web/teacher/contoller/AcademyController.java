@@ -1,18 +1,44 @@
 package psam.portfolio.sunder.english.web.teacher.contoller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
+import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
+import psam.portfolio.sunder.english.web.teacher.service.AcademyQueryService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/academy")
 @RestController
 public class AcademyController {
 
+    private final AcademyCommandService academyCommandService;
+    private final AcademyQueryService academyQueryService;
+
+    @GetMapping("/check-dupl")
+    public ApiResponse<Map<String, Boolean>> checkDuplication(@RequestParam(required = false) String name,
+                                                              @RequestParam(required = false) String phone,
+                                                              @RequestParam(required = false) String email) {
+        boolean result = academyQueryService.checkDuplication(name, phone, email);
+        return ApiResponse.ok(Map.of("isOk", result));
+    }
+
+    @PostMapping("/new")
+    public ApiResponse<Map<String, String>> registerAcademy(@RequestBody AcademyDirectorPOST request) {
+        String teacherUuid = academyCommandService.registerDirectorWithAcademy(request.getAcademyPOST(), request.getDirectorPOST());
+        return ApiResponse.ok(Map.of("teacherUuid", teacherUuid));
+    }
+
+    @PostMapping("verification")
+    public ApiResponse<Map<String, Boolean>> verifyAcademy(@RequestParam String uuid) {
+        boolean result = academyCommandService.verifyAcademy(UUID.fromString(uuid));
+        return ApiResponse.ok(Map.of("academyUuid", result));
+    }
 
     /*
-    POST /api/academy/new
-    학원 및 원장 생성 서비스 - EmailUtils, PasswordUtils 필요. Teacher 와 Academy 를 같이 활성화
 
     POST /api/academy/teacher/new - @Secured("ROLE_DIRECTOR")
     학원에서 선생님을 등록하는 서비스
