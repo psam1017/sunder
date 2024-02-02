@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.advice.controller;
+package psam.portfolio.sunder.english.global.advice.exception;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartException;
 import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
+import psam.portfolio.sunder.english.web.user.model.User;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -39,7 +40,7 @@ public class WebControllerAdvice {
         log.warn("[AccessDeniedException handle] request uri = {}", request.getRequestURI());
 
         String message = "Your authority is insufficient.";
-        ApiResponse<Object> response = ApiResponse.of(ApiStatus.FORBIDDEN, message);
+        ApiResponse<Object> response = ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "AUTHORITY", message);
 
         return new ResponseEntity<>(response, FORBIDDEN);
     }
