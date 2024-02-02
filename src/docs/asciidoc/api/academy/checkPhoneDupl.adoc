@@ -1,0 +1,17 @@
+=== 학원 연락처 중복 검사하기
+
+==== HTTP Request
+include::{snippets}/academy-docs-test/check-phone-dupl/http-request.adoc[]
+include::{snippets}/academy-docs-test/check-phone-dupl/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-docs-test/check-phone-dupl/http-response.adoc[]
+include::{snippets}/academy-docs-test/check-phone-dupl/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+|  | 
+|===

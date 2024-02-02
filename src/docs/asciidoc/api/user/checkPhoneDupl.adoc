@@ -1,4 +1,4 @@
-=== 휴대폰 번호 중복 검사하기
+=== 사용자 휴대폰 번호 중복 검사하기
 
 ==== HTTP Request
 include::{snippets}/user-docs-test/check-phone-dupl/http-request.adoc[]

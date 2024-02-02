@@ -32,7 +32,7 @@ public class StandaloneUniqueInfoContainer implements UniqueInfoContainer {
     }
 
     @Override
-    public String getUniqueId() {
+    public String getUniqueLoginId() {
         return uniqueIdList.get(idIndex++ % size);
     }
 

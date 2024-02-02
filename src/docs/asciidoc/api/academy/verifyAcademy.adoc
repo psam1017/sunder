@@ -1,0 +1,17 @@
+=== 학원장 이메일 검증하고 학원 승인하기
+
+==== HTTP Request
+include::{snippets}/academy-docs-test/verify-academy/http-request.adoc[]
+include::{snippets}/academy-docs-test/verify-academy/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-docs-test/verify-academy/http-response.adoc[]
+include::{snippets}/academy-docs-test/verify-academy/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+|  |
+|===

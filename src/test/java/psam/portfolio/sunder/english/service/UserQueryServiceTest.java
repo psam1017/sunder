@@ -34,7 +34,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
 
         // when
         // then
-        assertThatThrownBy(() -> runWithRefresh(() -> sut.checkDuplication(loginId, email, phone)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(loginId, email, phone)))
                 .isInstanceOf(OneParamToCheckUserDuplException.class);
     }
 
@@ -48,7 +48,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
 
         // when
         // then
-        assertThatThrownBy(() -> runWithRefresh(() -> sut.checkDuplication(loginId, email, phone)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(loginId, email, phone)))
                 .isInstanceOf(OneParamToCheckUserDuplException.class);
     }
 
@@ -64,7 +64,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
         String phone = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
 
         // then
         assertThat(isOk).isFalse();
@@ -82,7 +82,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
         String phone = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
 
         // then
         assertThat(isOk).isFalse();
@@ -100,7 +100,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
         String phone = teacher.getPhone();
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
 
         // then
         assertThat(isOk).isFalse();
@@ -118,7 +118,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
         String phone = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
 
         // then
         assertThat(isOk).isTrue();
@@ -136,7 +136,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
         String phone = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
 
         // then
         assertThat(isOk).isTrue();
@@ -155,7 +155,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
         String phone = null;
 
         // when
-        boolean isOk = runWithRefresh(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
 
         // then
         assertThat(isOk).isTrue();

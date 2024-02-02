@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +17,14 @@ import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class AcademyDirectorPOST {
 
     @Valid
-    private AcademyPOST academyPOST;
+    private AcademyPOST academy;
 
     @Valid
-    private DirectorPOST directorPOST;
+    private DirectorPOST director;
 
     @Getter
     @NoArgsConstructor
@@ -89,6 +91,7 @@ public class AcademyDirectorPOST {
         @Pattern(regexp = "^[가-힣]{2,10}$")
         private String name;
 
+        @NotBlank
         @Email
         private String email;
 
@@ -96,7 +99,7 @@ public class AcademyDirectorPOST {
         private String phone;
 
         private String street;
-        private String detail;
+        private String addressDetail;
         @Pattern(regexp = "^[0-9]{5}$")
         private String postalCode;
 
@@ -110,7 +113,7 @@ public class AcademyDirectorPOST {
                     .phone(phone)
                     .address(Address.builder()
                             .street(street)
-                            .detail(detail)
+                            .detail(addressDetail)
                             .postalCode(postalCode)
                             .build())
                     .status(UserStatus.PENDING)
@@ -119,14 +122,14 @@ public class AcademyDirectorPOST {
         }
 
         @Builder
-        public DirectorPOST(String loginId, String loginPw, String name, String email, String phone, String street, String detail, String postalCode) {
+        public DirectorPOST(String loginId, String loginPw, String name, String email, String phone, String street, String addressDetail, String postalCode) {
             this.loginId = loginId;
             this.loginPw = loginPw;
             this.name = name;
             this.email = email;
             this.phone = phone;
             this.street = street;
-            this.detail = detail;
+            this.addressDetail = addressDetail;
             this.postalCode = postalCode;
         }
     }
