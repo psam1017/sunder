@@ -60,19 +60,19 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueId())
+                .loginId(uic.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
                 .email(uic.getUniqueEmail())
                 .phone(uic.getUniquePhoneNumber())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .build();
 
         // when
         // then
-        assertThatThrownBy(() -> runWithRefresh(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST)))
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
@@ -104,13 +104,13 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .email(uic.getUniqueEmail())
                 .phone(uic.getUniquePhoneNumber())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .build();
 
         // when
         // then
-        assertThatThrownBy(() -> runWithRefresh(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST)))
                 .isInstanceOf(DuplicateUserException.class);
     }
 
@@ -133,18 +133,18 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueId())
+                .loginId(uic.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
                 .email(uic.getUniqueEmail())
                 .phone(uic.getUniquePhoneNumber())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .build();
 
         // when
-        String teacherUuid = runWithRefresh(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
+        String teacherUuid = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
 
         // then
         Teacher getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
@@ -170,18 +170,18 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueId())
+                .loginId(uic.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
                 .email(uic.getUniqueEmail())
                 .phone(uic.getUniquePhoneNumber())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .build();
 
         // when
-        String teacherUuid = runWithRefresh(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
+        String teacherUuid = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
 
         // then
         Teacher getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
@@ -210,13 +210,13 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueId())
+                .loginId(uic.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
                 .email(uic.getUniqueEmail())
                 .phone(uic.getUniquePhoneNumber())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .build();
 
@@ -225,7 +225,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         UUID academyUuid = getTeacher.getAcademy().getUuid();
 
         // when
-        Boolean result = runWithRefresh(() -> sut.verifyAcademy(academyUuid));
+        Boolean result = refreshAnd(() -> sut.verifyAcademy(academyUuid));
 
         // then
         assertThat(result).isTrue();
@@ -256,23 +256,23 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueId())
+                .loginId(uic.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
                 .email(uic.getUniqueEmail())
                 .phone(uic.getUniquePhoneNumber())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .build();
 
         String teacherUuid = sut.registerDirectorWithAcademy(academyPOST, directorPOST);
         Teacher getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
         UUID academyUuid = getTeacher.getAcademy().getUuid();
-        runWithRefresh(() -> sut.verifyAcademy(academyUuid));
+        refreshAnd(() -> sut.verifyAcademy(academyUuid));
 
         // when
-        Boolean result = runWithRefresh(() -> sut.verifyAcademy(academyUuid));
+        Boolean result = refreshAnd(() -> sut.verifyAcademy(academyUuid));
 
         // then
         assertThat(result).isFalse();

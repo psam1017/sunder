@@ -4,7 +4,7 @@ import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 public interface UniqueInfoContainer {
 
-    String getUniqueId();
+    String getUniqueLoginId();
     String getUniqueEmail();
     String getUniquePhoneNumber();
     String getUniqueAcademyName();

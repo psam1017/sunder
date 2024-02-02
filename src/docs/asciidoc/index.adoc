@@ -16,3 +16,7 @@ endif::[]
 [[User]]
 == User
 === link:user.html[User API 문서 보러가기]
+
+[[Academy]]
+== Academy
+=== link:academy.html[Academy API 문서 보러가기]
