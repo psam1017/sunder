@@ -84,31 +84,11 @@ public abstract class User extends BaseEntity {
         return this.status == UserStatus.FORBIDDEN;
     }
 
-    public boolean isWithdrawn() {
-        return this.status == UserStatus.WITHDRAWN;
-    }
-
     public void startTrial() {
         this.status = UserStatus.TRIAL;
     }
 
-    public void activate() {
-        this.status = UserStatus.ACTIVE;
-    }
-
-    public void forbid() {
-        this.status = UserStatus.FORBIDDEN;
-    }
-
-    public void withdraw() {
-        this.status = UserStatus.WITHDRAWN;
-    }
-
-    public void endTrial() {
-        this.status = UserStatus.TRIAL_END;
-    }
-
-    public void removeRole(RoleName roleName) {
-        this.roles.removeIf(userRole -> userRole.getRoleName() == roleName);
+    public boolean isPasswordExpired() {
+        return this.lastPasswordChangeDateTime.plusMonths(3).isBefore(LocalDateTime.now());
     }
 }

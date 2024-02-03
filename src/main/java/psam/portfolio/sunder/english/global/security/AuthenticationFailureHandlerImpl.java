@@ -33,7 +33,7 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 
-        // password not match
+        // bad credentials
         if(exception instanceof BadCredentialsException) {
             sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "BAD_CREDENTIALS", "The user's credentials are incorrect."));
 

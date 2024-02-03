@@ -23,6 +23,7 @@ public enum ApiStatus {
     CREATED("201", "Created"),
     ACCEPTED("202", "Accepted"),
     NO_CONTENT("204", "NoContent"),
+
     /**
      * redirect with changing method to GET. respond with Location Header.
      */
@@ -40,6 +41,7 @@ public enum ApiStatus {
      * api was changed permanently. so, it wouldn't be rolled back. respond with Location Header.
      */
     PERMANENT_REDIRECT("308", "PermanentRedirect"),
+
     BAD_REQUEST("400", "BadRequest"),
     UNAUTHORIZED("401", "Unauthorized"),
     FORBIDDEN("403", "Forbidden"),

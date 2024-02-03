@@ -20,7 +20,7 @@ import psam.portfolio.sunder.english.web.user.model.entity.User;
 import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
-@RestControllerAdvice(basePackages = "psam.portfolio.sunder.english.web")
+@RestControllerAdvice
 public class WebControllerAdvice {
 
     @ExceptionHandler(ApiException.class)
@@ -34,7 +34,7 @@ public class WebControllerAdvice {
 
     // spring security 에서 @PreAuthorize, @PostAuthorize, and @Secure 등에 의해 권한 부족 예외가 발생한 경우 AccessDeniedException 이 발생한다.
     // referenced to https://www.baeldung.com/exception-handling-for-rest-with-spring#denied
-    @ExceptionHandler({ AccessDeniedException.class })
+    @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handleAccessDeniedException(HttpServletRequest request) {
 
         log.warn("[AccessDeniedException handle] request uri = {}", request.getRequestURI());

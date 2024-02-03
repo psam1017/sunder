@@ -9,14 +9,16 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
-[[Guide]]
-== Guide
-=== link:guide.html[가이드 보러 가기]
-
 [[User]]
-== User
-=== link:user.html[User API 문서 보러가기]
+== link:user.html[User API]
 
 [[Academy]]
-== Academy
-=== link:academy.html[Academy API 문서 보러가기]
+== link:academy.html[Academy API]
+
+[[Guide]]
+== API Guide
+
+include::guide/api.adoc[]
+include::guide/enumeration.adoc[]
+include::guide/validation.adoc[]
+include::guide/account.adoc[]
