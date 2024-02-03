@@ -13,7 +13,6 @@ import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 import java.util.Optional;
 
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.PENDING;
-import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.TRIAL;
 import static psam.portfolio.sunder.english.web.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor
@@ -42,17 +41,17 @@ public class UserQueryService {
         if (hasLoginId) {
             optUser = userQueryRepository.findOne(
                     user.loginId.eq(loginId),
-                    userStatusNotIn(PENDING, TRIAL),
+                    userStatusNe(PENDING),
                     userEmailVerifiedEq(true));
         } else if (hasEmail) {
             optUser = userQueryRepository.findOne(
                     user.email.eq(email),
-                    userStatusNotIn(PENDING, TRIAL),
+                    userStatusNe(PENDING),
                     userEmailVerifiedEq(true));
         } else if (hasPhone) {
             optUser = userQueryRepository.findOne(
                     user.phone.eq(phone),
-                    userStatusNotIn(PENDING, TRIAL),
+                    userStatusNe(PENDING),
                     userEmailVerifiedEq(true));
         }
         return optUser.isEmpty();
@@ -62,8 +61,8 @@ public class UserQueryService {
         return a ^ b ^ c && !(a && b && c);
     }
 
-    private static BooleanExpression userStatusNotIn(UserStatus... statuses) {
-        return user.status.notIn(statuses);
+    private static BooleanExpression userStatusNe(UserStatus userStatus) {
+        return user.status.ne(userStatus);
     }
 
     private static BooleanExpression userEmailVerifiedEq(boolean verified) {

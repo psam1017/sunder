@@ -61,7 +61,7 @@ public class AcademyQueryService {
     }
 
 
-    /*
+    /* todo
     GET /api/academy/detail?academyUuid={academyUuid}&select={teachers,students,lessons}
     학원 상세 정보 조회 서비스
      */

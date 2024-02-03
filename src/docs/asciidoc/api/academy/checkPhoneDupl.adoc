@@ -13,5 +13,5 @@ include::{snippets}/academy-docs-test/check-phone-dupl/response-fields.adoc[]
 |===
 | 코드 | 이유
 
-|  | 
+| IllegalData.Academy.ONE_PARAM_TO_CHECK_ACADEMY_DUPL | name, email, phone 중 하나만 입력해야 합니다.
 |===

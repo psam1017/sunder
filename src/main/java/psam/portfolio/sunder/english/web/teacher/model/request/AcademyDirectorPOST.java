@@ -21,9 +21,11 @@ import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 public class AcademyDirectorPOST {
 
     @Valid
+    @NotNull
     private AcademyPOST academy;
 
     @Valid
+    @NotNull
     private DirectorPOST director;
 
     @Getter
