@@ -13,5 +13,5 @@ include::{snippets}/academy-docs-test/verify-academy/response-fields.adoc[]
 |===
 | 코드 | 이유
 
-|  |
+| NoSuchElement.Academy |
 |===

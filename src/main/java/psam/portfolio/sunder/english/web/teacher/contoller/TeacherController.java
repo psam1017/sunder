@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TeacherController {
 
-    /*
+    /* todo
     POST /api/teacher/new
     선생님 가입 서비스
 

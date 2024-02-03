@@ -68,12 +68,12 @@ public class AcademyCommandService {
             throw new DuplicateAcademyException();
         });
 
-        // teacher 의 loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING, TRIAL), userEmailVerifiedEq(true)
+        // teacher 의 loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING), userEmailVerifiedEq(true)
         userQueryRepository.findOne(
                 user.loginId.eq(directorPOST.getLoginId())
                 .or(user.email.eq(directorPOST.getEmail()))
                 .or(user.phone.eq(directorPOST.getPhone())),
-                user.status.notIn(PENDING, TRIAL),
+                user.status.ne(PENDING),
                 user.emailVerified.eq(true)
         ).ifPresent(user -> {
             throw new DuplicateUserException();
@@ -140,7 +140,7 @@ public class AcademyCommandService {
         return true;
     }
 
-    /*
+    /* todo
     POST /api/academy/teacher/new - @Secured("ROLE_DIRECTOR")
     학원에서 선생님을 바로 등록하는 서비스
 

@@ -13,5 +13,28 @@ include::{snippets}/academy-docs-test/register-academy/response-fields.adoc[]
 |===
 | 코드 | 이유
 
-|  |
+| NotNull.academy |
+| NotNull.director |
+
+| NotBlank.academy.name |
+| Pattern.academy.name | regexp = [가-힣]{2,30}$
+| Pattern.academy.phone | regexp = ^010[0-9]{8}$
+| Email.academy.email |
+| Pattern.academy.postalCode | regexp = ^[0-9]{5}$
+| NotNull.academy.openToPublic |
+
+| NotBlank.director.loginId |
+| Pattern.director.loginId | regexp = ^[a-zA-Z0-9]{4,20}$
+| NotBlank.director.loginPw |
+| Pattern.director.loginPw | regexp = +^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$+
+| NotBlank.director.name |
+| Pattern.director.name | regexp = ^[가-힣]{2,10}$
+| NotBlank.director.email |
+| Email.director.email |
+| Pattern.director.phone | regexp = ^010[0-9]{8}$
+| Pattern.director.postalCode | regexp = ^[0-9]{5}$
+
+| DuplicateKey.Academy |
+| DuplicateKey.User |
+| InternalServerError.MailUtils | 메일을 발송하는데 실패했습니다.
 |===

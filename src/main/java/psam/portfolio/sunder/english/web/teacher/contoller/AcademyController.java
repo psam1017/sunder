@@ -1,5 +1,6 @@
 package psam.portfolio.sunder.english.web.teacher.contoller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
@@ -39,7 +40,7 @@ public class AcademyController {
      * @return 학원장 uuid
      */
     @PostMapping("/new")
-    public ApiResponse<Map<String, String>> registerAcademy(@RequestBody AcademyDirectorPOST post) {
+    public ApiResponse<Map<String, String>> registerAcademy(@RequestBody @Valid AcademyDirectorPOST post) {
         String directorUuid = academyCommandService.registerDirectorWithAcademy(post.getAcademy(), post.getDirector());
         return ApiResponse.ok(Map.of("directorUuid", directorUuid));
     }
@@ -56,19 +57,14 @@ public class AcademyController {
     }
 
     /*
-
+    todo
     POST /api/academy/teacher/new - @Secured("ROLE_DIRECTOR")
     학원에서 선생님을 등록하는 서비스
 
     PUT /api/academy/info - @Secured("ROLE_DIRECTOR")
     학원 정보 수정 서비스
-     */
 
-    /*
-    GET /api/academy/check-dupl?name={name}
-    학원 이름 중복 체크 서비스
-
-    GET /api/academy/detail?academyUuid={academyUuid}&select={teachers,students,lessons}
+    GET /api/academy/detail?academyUuid={academyUuid}&select={teachers,students}
     학원 상세 정보 조회 서비스
      */
 }
