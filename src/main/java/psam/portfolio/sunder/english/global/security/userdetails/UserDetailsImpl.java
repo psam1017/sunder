@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.security;
+package psam.portfolio.sunder.english.global.security.userdetails;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

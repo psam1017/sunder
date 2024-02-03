@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.security;
+package psam.portfolio.sunder.english.global.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -33,7 +33,7 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 
-        // bad credentials
+        // Bad credentials
         if(exception instanceof BadCredentialsException) {
             sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "BAD_CREDENTIALS", "The user's credentials are incorrect."));
 
@@ -53,17 +53,17 @@ public class AuthenticationFailureHandlerImpl implements AuthenticationFailureHa
         } else if(exception instanceof CredentialsExpiredException) {
             sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "CREDENTIALS_EXPIRED", "The user's credentials have expired."));
 
-        // The user does not exist in the database, or there may be an illegal token request.
+        // An userDetailsService implementation cannot locate a User by its username
         } else if (exception instanceof UsernameNotFoundException) {
             log.error("[UsernameNotFoundException] {}", exception.getMessage());
             sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "NOT_FOUND", "The user does not exist."));
 
-        // There may be a structural problem with the AuthenticationService
+        // An authentication request could not be processed due to a system problem
         } else if (exception instanceof AuthenticationServiceException) {
             log.error("[AuthenticationServiceException] {}", exception.getMessage());
             sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "SERVICE", "An error occurred in the authentication service."));
 
-        // other exception
+        // Other exception
         } else {
             log.error("[AuthenticationException] {}", exception.getMessage());
             sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "UNKNOWN", "An unknown error occurred."));
