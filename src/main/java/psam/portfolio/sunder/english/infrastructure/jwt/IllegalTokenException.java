@@ -7,6 +7,6 @@ import psam.portfolio.sunder.english.global.api.ApiStatus;
 public class IllegalTokenException extends ApiException {
     @Override
     public ApiResponse<?> initialize() {
-        return ApiResponse.error(ApiStatus.ILLEGAL_STATUS, JwtStatus.class, null);
+        return ApiResponse.error(ApiStatus.FORBIDDEN, JwtStatus.class, null);
     }
 }

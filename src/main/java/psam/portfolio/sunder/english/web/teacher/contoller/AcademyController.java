@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.web.teacher.contoller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
@@ -47,7 +48,7 @@ public class AcademyController {
 
     /**
      * 학원 검증 및 승인 서비스
-     * @param uuid 학원 uuid
+     * @param academyUuid 학원 uuid
      * @return 학원 승인 여부
      */
     @GetMapping("/verify/{academyUuid}")

@@ -32,19 +32,6 @@ public class WebControllerAdvice {
         return new ResponseEntity<>(ex.getResponse(), BAD_REQUEST);
     }
 
-    // spring security 에서 @PreAuthorize, @PostAuthorize, and @Secure 등에 의해 권한 부족 예외가 발생한 경우 AccessDeniedException 이 발생한다.
-    // referenced to https://www.baeldung.com/exception-handling-for-rest-with-spring#denied
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(HttpServletRequest request) {
-
-        log.warn("[AccessDeniedException handle] request uri = {}", request.getRequestURI());
-
-        String message = "Your authority is insufficient.";
-        ApiResponse<Object> response = ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "AUTHORITY", message);
-
-        return new ResponseEntity<>(response, FORBIDDEN);
-    }
-
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Object> handleBindException(BindException ex, HttpServletRequest request) {
 

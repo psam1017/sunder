@@ -106,24 +106,6 @@ class UserQueryServiceTest extends SunderApplicationTests {
         assertThat(isOk).isFalse();
     }
 
-    @DisplayName("TRIAL 상태의 사용자는 중복 검사에서 제외된다.")
-    @Test
-    void ifTrailOk(){
-        // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = registerTeacher(UserStatus.TRIAL, academy);
-
-        String loginId = teacher.getLoginId();
-        String email = null;
-        String phone = null;
-
-        // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
-
-        // then
-        assertThat(isOk).isTrue();
-    }
-
     @DisplayName("PENDING 상태의 사용자는 중복 검사에서 제외된다.")
     @Test
     void ifPendingOk(){

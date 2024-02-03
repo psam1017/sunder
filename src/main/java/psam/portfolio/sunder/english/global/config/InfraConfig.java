@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -22,24 +21,20 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
-
-    private final JwtUtils jwtUtils;
+public class InfraConfig {
 
     @Bean
-    public EnumPatternValidator enumPatternValidator() {
-        return new EnumPatternValidator();
+    public JwtUtils jwtUtils(@Value("${sunder.security.token.secret-key}") String secretKey) {
+        return new JwtUtils(secretKey);
     }
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true); // 필요한 경우 프론트엔드와 협의.
+    public PasswordUtils passwordUtils(PasswordEncoder passwordEncoder) {
+        return new PasswordUtils(passwordEncoder);
     }
 
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new UserIdArgumentResolver(jwtUtils));
+    @Bean
+    public MailUtils mailUtils(JavaMailSender javaMailSender) {
+        return new MailUtils(javaMailSender);
     }
 }
