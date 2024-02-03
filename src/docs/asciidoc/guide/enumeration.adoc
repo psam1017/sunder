@@ -1,0 +1,11 @@
+=== Enumeration
+
+==== CRUDCommand
+|===
+| 필드 | 설명
+
+| CREATE | 서버에 생성을 요청합니다.
+| READ | 서버에 조회를 요청합니다.
+| UPDATE | 서버에 수정을 요청합니다.
+| DELETE | 서버에 삭제를 요청합니다.
+|===

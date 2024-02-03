@@ -31,26 +31,27 @@ public class UserDetailsImpl implements UserDetails {
         return user.getLoginPw();
     }
 
-    // 계정 활성화 여부. 예를 들어 약관 위반에 의한 정지, 탈퇴 후 n 개월 이내(정보 보관 기간), 1년 간 사용하지 않은 휴면 계정 등.
+    // 계정 활성화 여부. 예를 들어 약관 위반에 의한 정지
     @Override
     public boolean isEnabled() {
         return user.isActive() || user.isTrial();
     }
 
+    // 계정 만료 여부
     @Override
     public boolean isAccountNonExpired() {
         return !user.isTrialEnd();
     }
 
-    // check on login api manually
+    // 인증 정보(credentials) 만료 여부
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return user.isPasswordExpired();
     }
 
-    // check on login api manually
+    // 계정 잠김 여부
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !user.isForbidden();
     }
 }

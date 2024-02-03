@@ -12,9 +12,6 @@ endif::[]
 [[Index]]
 == link:index.html[Index 로 돌아가기]
 
-[[Guide]]
-== link:guide.html[가이드 보러 가기]
-
 [[Academy]]
 == Academy API
 include::api/academy/checkNameDupl.adoc[]

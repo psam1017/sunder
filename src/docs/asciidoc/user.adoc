@@ -12,9 +12,6 @@ endif::[]
 [[Index]]
 == link:index.html[Index 로 돌아가기]
 
-[[Guide]]
-== link:guide.html[가이드 보러 가기]
-
 [[User]]
 == User API
 include::api/user/checkLoginIdDupl.adoc[]
