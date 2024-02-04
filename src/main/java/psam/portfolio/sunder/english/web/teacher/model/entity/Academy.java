@@ -6,9 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
-import psam.portfolio.sunder.english.web.student.model.Student;
+import psam.portfolio.sunder.english.web.student.model.entity.Student;
 import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,16 +23,16 @@ public class Academy extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
 
     @Embedded
     private Address address;
 
-    @Column(unique = true)
+    @Column
     private String phone;
 
-    @Column(unique = true)
+    @Column
     private String email;
 
     private boolean openToPublic;
@@ -68,5 +70,29 @@ public class Academy extends BaseEntity {
 
     public boolean isSuspended() {
         return this.status == AcademyStatus.SUSPENDED;
+    }
+
+    public boolean hasTeacher(User user) {
+        return this.teachers.stream().anyMatch(teacher -> Objects.equals(teacher.getUuid(), user.getUuid()));
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setOpenToPublic(Boolean openToPublic) {
+        this.openToPublic = openToPublic;
     }
 }

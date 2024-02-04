@@ -1,5 +1,6 @@
 package psam.portfolio.sunder.english.service;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +115,44 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .isInstanceOf(DuplicateUserException.class);
     }
 
+    @DisplayName("중복 검사 대상에서 PENDING 상태는 제외된다.")
+    @Test
+    void excludePending(){
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.PENDING);
+        Teacher registerTeacher = registerTeacher(UserStatus.PENDING, registerAcademy);
+
+        AcademyPOST academyPOST = AcademyPOST.builder()
+                .name(registerAcademy.getName()) // PENDING 상태인 학원의 이름
+                .phone(null) // null
+                .email(null) // null
+                .street("street")
+                .detail("detail")
+                .postalCode("00000")
+                .openToPublic(true)
+                .build();
+
+        DirectorPOST directorPOST = DirectorPOST.builder()
+                .loginId(registerTeacher.getLoginId())
+                .loginPw("P@ssw0rd!")
+                .name("name")
+                .email(registerTeacher.getEmail())
+                .phone(null)
+                .street("street")
+                .addressDetail("detail")
+                .postalCode("00000")
+                .build();
+
+        // when
+        // then
+        Assertions.assertThatCode(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST))
+                .doesNotThrowAnyException();
+    }
+
     @DisplayName("등록된 학원장의 비밀번호는 암호화되어 있다.")
     @Test
     void encodeLoginPw(){
@@ -144,10 +183,10 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         // when
-        String teacherUuid = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
+        UUID teacherId = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
 
         // then
-        Teacher getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         assertThat(passwordUtils.matches("loginPw", getTeacher.getLoginPw())).isTrue();
     }
 
@@ -181,10 +220,10 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         // when
-        String teacherUuid = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
+        UUID teacherId = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
 
         // then
-        Teacher getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         assertThat(getTeacher.isEmailVerified()).isFalse();
 
         Academy getAcademy = academyQueryRepository.getById(getTeacher.getAcademy().getUuid());
@@ -220,20 +259,20 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .postalCode("00000")
                 .build();
 
-        String teacherUuid = sut.registerDirectorWithAcademy(academyPOST, directorPOST);
-        Teacher getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
-        UUID academyUuid = getTeacher.getAcademy().getUuid();
+        UUID teacherId = sut.registerDirectorWithAcademy(academyPOST, directorPOST);
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        UUID academyId = getTeacher.getAcademy().getUuid();
 
         // when
-        Boolean result = refreshAnd(() -> sut.verifyAcademy(academyUuid));
+        Boolean result = refreshAnd(() -> sut.verify(academyId));
 
         // then
         assertThat(result).isTrue();
 
-        getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
+        getTeacher = teacherQueryRepository.getById(teacherId);
         assertThat(getTeacher.isEmailVerified()).isTrue();
 
-        Academy getAcademy = academyQueryRepository.getById(academyUuid);
+        Academy getAcademy = academyQueryRepository.getById(academyId);
         assertThat(getAcademy.isVerified()).isTrue();
     }
 
@@ -266,13 +305,13 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .postalCode("00000")
                 .build();
 
-        String teacherUuid = sut.registerDirectorWithAcademy(academyPOST, directorPOST);
-        Teacher getTeacher = teacherQueryRepository.getById(UUID.fromString(teacherUuid));
-        UUID academyUuid = getTeacher.getAcademy().getUuid();
-        refreshAnd(() -> sut.verifyAcademy(academyUuid));
+        UUID teacherId = sut.registerDirectorWithAcademy(academyPOST, directorPOST);
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        UUID academyId = getTeacher.getAcademy().getUuid();
+        refreshAnd(() -> sut.verify(academyId));
 
         // when
-        Boolean result = refreshAnd(() -> sut.verifyAcademy(academyUuid));
+        Boolean result = refreshAnd(() -> sut.verify(academyId));
 
         // then
         assertThat(result).isFalse();

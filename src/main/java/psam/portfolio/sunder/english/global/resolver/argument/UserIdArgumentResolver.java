@@ -11,6 +11,8 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import psam.portfolio.sunder.english.infrastructure.jwt.IllegalTokenException;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
+import java.util.UUID;
+
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
@@ -23,8 +25,8 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
     public boolean supportsParameter(MethodParameter parameter) {
 
         boolean hasTokenAnnotation = parameter.hasParameterAnnotation(UserId.class);
-        boolean hasLongType = Long.class.isAssignableFrom(parameter.getParameterType());
-        return hasTokenAnnotation && hasLongType;
+        boolean hasUUIDType = UUID.class.isAssignableFrom(parameter.getParameterType());
+        return hasTokenAnnotation && hasUUIDType;
     }
 
     @Override
@@ -38,6 +40,6 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
             log.error("error occured at UserIdArgumentResolver. authorization = {}, status = {}", authorization, js.name());
             throw new IllegalTokenException();
         });
-        return jwtUtils.extractSubject(token);
+        return UUID.fromString(jwtUtils.extractSubject(token));
     }
 }

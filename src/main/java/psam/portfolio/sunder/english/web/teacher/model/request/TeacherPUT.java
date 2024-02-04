@@ -1,4 +1,4 @@
 package psam.portfolio.sunder.english.web.teacher.model.request;
 
-public class AcademyPATCH {
+public class TeacherPUT {
 }

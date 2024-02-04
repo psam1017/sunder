@@ -6,14 +6,14 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.web.student.model.Student;
+import psam.portfolio.sunder.english.web.student.model.entity.Student;
 import psam.portfolio.sunder.english.web.student.exception.NoSuchStudentException;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.web.student.model.QStudent.*;
+import static psam.portfolio.sunder.english.web.student.model.entity.QStudent.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

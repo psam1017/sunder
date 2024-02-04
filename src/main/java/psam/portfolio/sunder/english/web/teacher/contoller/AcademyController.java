@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPUT;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPublicSearchCond;
 import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
 import psam.portfolio.sunder.english.web.teacher.service.AcademyQueryService;
 
@@ -22,7 +25,8 @@ public class AcademyController {
 
     /**
      * 학원 이름 중복 체크 서비스
-     * @param name 학원 이름
+     *
+     * @param name  학원 이름
      * @param phone 학원 전화번호
      * @param email 학원 이메일
      * @return 중복 여부
@@ -37,35 +41,82 @@ public class AcademyController {
 
     /**
      * 학원과 학원장을 등록하는 서비스
+     *
      * @param post 학원과 학원장 정보
      * @return 학원장 uuid
      */
-    @PostMapping("/new")
-    public ApiResponse<Map<String, String>> registerAcademy(@RequestBody @Valid AcademyDirectorPOST post) {
-        String directorUuid = academyCommandService.registerDirectorWithAcademy(post.getAcademy(), post.getDirector());
-        return ApiResponse.ok(Map.of("directorUuid", directorUuid));
+    @PostMapping("")
+    public ApiResponse<Map<String, UUID>> register(@RequestBody @Valid AcademyDirectorPOST post) {
+        UUID directorId = academyCommandService.registerDirectorWithAcademy(post.getAcademy(), post.getDirector());
+        return ApiResponse.ok(Map.of("directorId", directorId));
     }
 
     /**
      * 학원 검증 및 승인 서비스
-     * @param academyUuid 학원 uuid
+     *
+     * @param academyId 학원 아이디
      * @return 학원 승인 여부
      */
-    @GetMapping("/verify/{academyUuid}")
-    public ApiResponse<Map<String, Boolean>> verifyAcademy(@PathVariable String academyUuid) {
-        boolean result = academyCommandService.verifyAcademy(UUID.fromString(academyUuid));
+    @PostMapping("/{academyId}/verify")
+    public ApiResponse<Map<String, Boolean>> verify(@PathVariable String academyId) {
+        boolean result = academyCommandService.verify(UUID.fromString(academyId));
         return ApiResponse.ok(Map.of("verified", result));
     }
 
-    /*
-    todo
-    POST /api/academy/teacher/new - @Secured("ROLE_DIRECTOR")
-    학원에서 선생님을 등록하는 서비스
-
-    PUT /api/academy/info - @Secured("ROLE_DIRECTOR")
-    학원 정보 수정 서비스
-
-    GET /api/academy/detail?academyUuid={academyUuid}&select={teachers,students}
-    학원 상세 정보 조회 서비스
+    /**
+     * 학원 상세 정보 조회 서비스. 자기 학원의 정보만 조회할 수 있다.
+     *
+     * @param teacherId 선생 아이디
+     * @param select    같이 조회할 정보 = {teacher}
+     * @return 학원 상세 정보 + (선생 목록)
      */
+    @GetMapping("")
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
+    public ApiResponse<Map<String, Object>> getDetail(@UserId UUID teacherId,
+                                                      @RequestParam(required = false) String select) {
+        Map<String, Object> responseData = academyQueryService.getDetail(teacherId, select);
+        return ApiResponse.ok(responseData);
+    }
+
+    /**
+     * 학원 정보 수정 서비스. 본인의 학원만 수정할 수 있다.
+     *
+     * @param directorId 학원장 아이디
+     * @param put        수정할 정보
+     * @return 수정을 완료한 학원 아이디
+     */
+    @Secured("ROLE_DIRECTOR")
+    @PutMapping("")
+    public ApiResponse<Map<String, UUID>> updateInfo(@UserId UUID directorId,
+                                                     @RequestBody @Valid AcademyPUT put) {
+        UUID academyId = academyCommandService.updateInfo(directorId, put);
+        return ApiResponse.ok(Map.of("academyId", academyId));
+    }
+
+    /**
+     * openToPublic = true 인 공개 학원 목록 조회 서비스
+     *
+     * @param page 페이지 번호
+     * @param size 페이지 크기
+     * @param prop 정렬 기준
+     * @param dir  정렬 방향
+     * @return 학원 목록
+     */
+    @GetMapping("/list")
+    public ApiResponse<Map<String, Object>> getPublicList(@RequestParam(required = false) Integer page,
+                                                          @RequestParam(required = false) Integer size,
+                                                          @RequestParam(required = false) String prop,
+                                                          @RequestParam(required = false) String dir,
+                                                          @RequestParam(required = false) String academyName) {
+        AcademyPublicSearchCond buildCond = AcademyPublicSearchCond.builder()
+                .page(page)
+                .size(size)
+                .prop(prop)
+                .order(dir)
+                .academyName(academyName)
+                .build();
+
+        Map<String, Object> response = academyQueryService.getPublicList(buildCond);
+        return ApiResponse.ok(response);
+    }
 }

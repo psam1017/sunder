@@ -14,10 +14,10 @@ public class TeacherQueryService {
 
     /*
     todo
-    GET /api/teacher/detail?teacherUuid={teacherUuid}&select={lesson}
+    GET /api/teacher/detail?teacherUuid={teacherUuid}
     선생님 상세 정보 조회 서비스
 
-    GET /api/teacher/list?academyUuid={academyUuid}&status={status}&lessonDay={lessonDay}&lessonTime={lessonTime}&studentName={studentName}&sort={status|lessonDay|lessonTime|grade|teacherName}
+    GET /api/teacher/list?academyUuid={academyUuid}&status={status}&studentName={studentName}&sort={status|teacherName}
     선생님 목록 조회 서비스
      */
 }

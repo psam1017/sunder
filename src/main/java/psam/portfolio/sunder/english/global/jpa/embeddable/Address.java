@@ -5,8 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static lombok.AccessLevel.PROTECTED;
+
 @Getter
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Embeddable
 public class Address {
 

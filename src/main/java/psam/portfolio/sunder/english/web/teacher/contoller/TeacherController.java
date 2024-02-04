@@ -1,13 +1,43 @@
 package psam.portfolio.sunder.english.web.teacher.contoller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.global.resolver.argument.UserId;
+import psam.portfolio.sunder.english.web.teacher.model.request.TeacherPOST;
+import psam.portfolio.sunder.english.web.teacher.service.TeacherCommandService;
+import psam.portfolio.sunder.english.web.teacher.service.TeacherQueryService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/teacher")
 @RestController
 public class TeacherController {
+
+    private final TeacherCommandService teacherCommandService;
+    private final TeacherQueryService teacherQueryService;
+
+    /**
+     * 선생 등록 서비스
+     *
+     * @param teacherId 학원에 등록할 선생의 아이디
+     * @param post 등록할 선생 정보
+     * @return 선생 아이디
+     */
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
+    @PostMapping("")
+    public ApiResponse<Map<String, UUID>> registerTeacher(@UserId UUID teacherId,
+                                                          @RequestBody @Valid TeacherPOST post) {
+        UUID newTeacherId = teacherCommandService.register(teacherId, post);
+        return ApiResponse.ok(Map.of("teacherId", newTeacherId));
+    }
 
     /* todo
     POST /api/teacher/new
@@ -31,10 +61,10 @@ public class TeacherController {
     PUT /api/teacher/withdraw
     선생님 탈퇴 서비스
 
-    GET /api/teacher/detail?teacherUuid={teacherUuid}&select={lesson}
+    GET /api/teacher/detail?teacherUuid={teacherUuid}
     선생님 상세 정보 조회 서비스
 
-    GET /api/teacher/list?academyUuid={academyUuid}&status={status}&lessonDay={lessonDay}&lessonTime={lessonTime}&studentName={studentName}&sort={status|lessonDay|lessonTime|grade|teacherName}
+    GET /api/teacher/list?academyUuid={academyUuid}&status={status}&studentName={studentName}&sort={status|teacherName}
     선생님 목록 조회 서비스
      */
 }
