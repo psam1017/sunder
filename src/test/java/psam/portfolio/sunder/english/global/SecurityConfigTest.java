@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.config;
+package psam.portfolio.sunder.english.global;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

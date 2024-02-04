@@ -155,7 +155,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/academy/new")
+                post("/api/academy")
                         .contentType(APPLICATION_JSON)
                         .content(createJson(post))
         );
@@ -235,9 +235,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         .description("학원장 우편번호")
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("data.directorUuid")
+                                fieldWithPath("data.directorId")
                                         .type(STRING)
-                                        .description("등록된 학원장의 uuid")
+                                        .description("등록된 학원장의 아이디")
                         )
                 ));
     }
@@ -274,13 +274,13 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .postalCode(anyAddress.getPostalCode())
                 .build();
 
-        String directorUuid = refreshAnd(() -> academyCommandService.registerDirectorWithAcademy(buildAcademyPOST, buildDirectorPOST));
-        Teacher getDirector = teacherQueryRepository.getById(UUID.fromString(directorUuid));
-        UUID academyUuid = getDirector.getAcademy().getUuid();
+        UUID directorId = refreshAnd(() -> academyCommandService.registerDirectorWithAcademy(buildAcademyPOST, buildDirectorPOST));
+        Teacher getDirector = teacherQueryRepository.getById(directorId);
+        UUID academyId = getDirector.getAcademy().getUuid();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/academy/verify/{academyUuid}", academyUuid.toString())
+                RestDocumentationRequestBuilders.post("/api/academy/{academyId}/verify", academyId.toString())
                         .contentType(APPLICATION_JSON)
         );
 
@@ -289,7 +289,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         pathParameters(
-                                parameterWithName("academyUuid").description("학원 uuid")
+                                parameterWithName("academyId").description("학원 아이디")
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.verified")

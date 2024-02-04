@@ -45,22 +45,6 @@ public class JwtUtils {
         return buildToken(extraClaims, subject, refreshExpiration);
     }
 
-    public String generateToken(UUID id, long jwtExpiration) {
-        return generateToken(id, jwtExpiration, new HashMap<>());
-    }
-
-    public String generateToken(UUID id, long jwtExpiration, Map<String, Object> extraClaims) {
-        return buildToken(extraClaims, String.valueOf(id), jwtExpiration);
-    }
-
-    public String generateRefreshToken(UUID id, long refreshExpiration) {
-        return buildToken(new HashMap<>(), String.valueOf(id), refreshExpiration);
-    }
-
-    public String generateRefreshToken(UUID id, long refreshExpiration, Map<String, Object> extraClaims) {
-        return buildToken(extraClaims, String.valueOf(id), refreshExpiration);
-    }
-
     private String buildToken(Map<String, Object> extraClaims, String subject, long expiration) {
         return Jwts
                 .builder()

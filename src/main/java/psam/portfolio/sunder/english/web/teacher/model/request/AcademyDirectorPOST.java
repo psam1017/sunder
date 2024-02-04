@@ -90,7 +90,7 @@ public class AcademyDirectorPOST {
         private String loginPw;
 
         @NotBlank
-        @Pattern(regexp = "^[가-힣]{2,10}$")
+        @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$")
         private String name;
 
         @NotBlank

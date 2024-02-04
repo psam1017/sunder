@@ -21,10 +21,12 @@ import java.util.UUID;
 @Entity
 public abstract class User extends BaseEntity {
 
+    // 탈퇴일도 추가하면 좋을 듯. 하지만 지금은 modifiedDateTime 으로 대체.
+
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
-    @Column(nullable = false, length = 20, unique = true)
+    @Column(nullable = false, length = 20)
     private String loginId;
 
     @Column(nullable = false)
@@ -33,12 +35,12 @@ public abstract class User extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column
     private String email;
 
     private boolean emailVerified;
 
-    @Column(unique = true)
+    @Column
     private String phone;
 
     @Embedded
@@ -90,5 +92,9 @@ public abstract class User extends BaseEntity {
 
     public boolean isPasswordExpired() {
         return this.lastPasswordChangeDateTime.plusMonths(3).isBefore(LocalDateTime.now());
+    }
+
+    public boolean isAdmin() {
+        return this.roles.stream().anyMatch(userRole -> userRole.getRoleName() == RoleName.ROLE_ADMIN);
     }
 }

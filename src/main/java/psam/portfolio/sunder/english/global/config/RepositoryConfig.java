@@ -13,6 +13,7 @@ import psam.portfolio.sunder.english.global.p6spy.P6SpyEventListener;
 import psam.portfolio.sunder.english.global.p6spy.P6SpyFormatter;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @SuppressWarnings("PatternVariableCanBeUsed")
 @EnableJpaAuditing
@@ -35,7 +36,7 @@ public class RepositoryConfig {
     }
 
     @Bean
-    public AuditorAware<Long> auditorAware() {
+    public AuditorAware<UUID> auditorAware() {
         return () -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -44,7 +45,7 @@ public class RepositoryConfig {
                     && authentication.getPrincipal() instanceof UserDetails) {
 
                 UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                return Optional.of(Long.valueOf(userDetails.getUsername()));
+                return Optional.of(UUID.fromString(userDetails.getUsername()));
             }
             return Optional.empty();
         };

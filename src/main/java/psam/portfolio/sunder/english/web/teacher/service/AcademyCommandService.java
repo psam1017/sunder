@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
@@ -15,21 +16,22 @@ import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.DirectorPOST;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPUT;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
+import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.web.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.web.user.repository.UserRoleCommandRepository;
 
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 import static psam.portfolio.sunder.english.web.teacher.model.entity.QAcademy.academy;
+import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.*;
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.PENDING;
-import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.TRIAL;
 import static psam.portfolio.sunder.english.web.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor
@@ -45,34 +47,36 @@ public class AcademyCommandService {
     private final AcademyCommandRepository academyCommandRepository;
     private final AcademyQueryRepository academyQueryRepository;
     private final TeacherCommandRepository teacherCommandRepository;
+    private final TeacherQueryRepository teacherQueryRepository;
     private final UserQueryRepository userQueryRepository;
     private final UserRoleCommandRepository userRoleCommandRepository;
 
     /**
      * 학원을 등록하는 서비스
-     * @param academyPOST 학원 등록 정보
+     *
+     * @param academyPOST  학원 등록 정보
      * @param directorPOST 학원장 등록 정보
      * @return 학원장의 uuid
      */
-    public String registerDirectorWithAcademy(
-        AcademyPOST academyPOST,
-        DirectorPOST directorPOST
+    public UUID registerDirectorWithAcademy(
+            AcademyPOST academyPOST,
+            DirectorPOST directorPOST
     ) {
-        // 우선 academy name, phone, email 에서 중복 체크. 상태는 상관 없음
+        // academy name, phone, email 에서 중복 체크
         academyQueryRepository.findOne(
-                academy.name.eq(academyPOST.getName())
-                .or(academy.phone.eq(academyPOST.getPhone()))
-                .or(academy.email.eq(academyPOST.getEmail())),
+                academy.name.eq(academyPOST.getName()) // NotNull
+                        .or(academyPOST.getPhone() != null ? academy.phone.eq(academyPOST.getPhone()) : null) // nullable
+                        .or(academyPOST.getEmail() != null ? academy.email.eq(academyPOST.getEmail()) : null), // nullable
                 academy.status.ne(AcademyStatus.PENDING)
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
         });
 
-        // teacher 의 loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING), userEmailVerifiedEq(true)
+        // user loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING), userEmailVerifiedEq(true)
         userQueryRepository.findOne(
-                user.loginId.eq(directorPOST.getLoginId())
-                .or(user.email.eq(directorPOST.getEmail()))
-                .or(user.phone.eq(directorPOST.getPhone())),
+                user.loginId.eq(directorPOST.getLoginId()) // NotNull
+                        .or(user.email.eq(directorPOST.getEmail())) // NutNull
+                        .or(directorPOST.getPhone() != null ? user.phone.eq(directorPOST.getPhone()) : null), // nullable
                 user.status.ne(PENDING),
                 user.emailVerified.eq(true)
         ).ifPresent(user -> {
@@ -88,12 +92,13 @@ public class AcademyCommandService {
         // teacher 생성
         Teacher saveDirector = teacherCommandRepository.save(directorPOST.toEntity(saveAcademy, encodeLoginPw));
 
-        // UserRole 에 ROLE_DIRECTOR 로 생성
-        UserRole buildUserRole = UserRole.builder()
-                .user(saveDirector)
-                .roleName(RoleName.ROLE_TRIAL_DIRECTOR)
-                .build();
-        userRoleCommandRepository.save(buildUserRole);
+        // 원장은 원장, 선생, 학생 권한 모두 취득
+        List<UserRole> userRoles = new ArrayList<>();
+        userRoles.add(buildUserRole(saveDirector, ROLE_DIRECTOR));
+        userRoles.add(buildUserRole(saveDirector, ROLE_TEACHER));
+        userRoles.add(buildUserRole(saveDirector, ROLE_STUDENT));
+
+        userRoleCommandRepository.saveAll(userRoles);
 
         // mailUtils 로 verification mail 발송
         boolean mailResult = mailUtils.sendMail(
@@ -105,7 +110,14 @@ public class AcademyCommandService {
             throw new MailFailException();
         }
 
-        return saveDirector.getUuid().toString();
+        return saveDirector.getUuid();
+    }
+
+    private static UserRole buildUserRole(Teacher saveDirector, RoleName roleName) {
+        return UserRole.builder()
+                .user(saveDirector)
+                .roleName(roleName)
+                .build();
     }
 
     // UUID from Academy
@@ -119,11 +131,12 @@ public class AcademyCommandService {
 
     /**
      * 학원 인증 서비스
-     * @param academyUuid 학원 uuid
+     *
+     * @param academyId 학원 아이디
      * @return 인증 성공 여부
      */
-    public boolean verifyAcademy(UUID academyUuid) {
-        Academy getAcademy = academyQueryRepository.getById(academyUuid);
+    public boolean verify(UUID academyId) {
+        Academy getAcademy = academyQueryRepository.getById(academyId);
 
         // 학원 인증은 최초 한 번만 가능
         if (getAcademy.isVerified()) {
@@ -140,14 +153,36 @@ public class AcademyCommandService {
         return true;
     }
 
-    /* todo
-    POST /api/academy/teacher/new - @Secured("ROLE_DIRECTOR")
-    학원에서 선생님을 바로 등록하는 서비스
-
-    PUT /api/academy/teacher/roles
-    선생님 권한 변경 서비스
-
-    PUT /api/academy/info - @Secured("ROLE_DIRECTOR")
-    학원 정보 수정 서비스
+    /**
+     * 학원 정보 수정 서비스
+     *
+     * @param directorId 학원장 아이디
+     * @param academyPUT 학원의 수정할 정보
+     * @return 수정을 완료한 학원 아이디
      */
+    public UUID updateInfo(UUID directorId, AcademyPUT academyPUT) {
+        Teacher getDirector = teacherQueryRepository.getById(directorId);
+        Academy getAcademy = getDirector.getAcademy();
+
+        // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생, 단, 자기 학원은 제외하며 PENDING 상태도 제외.
+        academyQueryRepository.findOne(
+                academy.name.eq(academyPUT.getName())
+                        .or(academyPUT.getPhone() != null ? academy.phone.eq(academyPUT.getPhone()) : null)
+                        .or(academyPUT.getEmail() != null ? academy.email.eq(academyPUT.getEmail()) : null),
+                academy.status.ne(AcademyStatus.PENDING),
+                academy.uuid.ne(getAcademy.getUuid())
+        ).ifPresent(academy -> {
+            throw new DuplicateAcademyException();
+        });
+
+        // 이메일 인증은 본인인증을 위한 것.
+        // 학원의 이메일은 변경해도 조치를 취하지 않는다.
+        getAcademy.setName(academyPUT.getName());
+        getAcademy.setAddress(academyPUT.getAddress());
+        getAcademy.setPhone(academyPUT.getPhone());
+        getAcademy.setEmail(academyPUT.getEmail());
+        getAcademy.setOpenToPublic(academyPUT.getOpenToPublic());
+
+        return getAcademy.getUuid();
+    }
 }

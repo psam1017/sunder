@@ -21,8 +21,8 @@ public class UserController {
      * 아이디, 이메일, 연락처 중복 체크 서비스 - 단, PENDING 과 TRIAL 은 중복체크에서 제외
      *
      * @param loginId 아이디
-     * @param email 이메일
-     * @param phone 연락처
+     * @param email   이메일
+     * @param phone   연락처
      * @return 중복 여부 - 가능 = true, 중복 = false
      */
     @GetMapping("/check-dupl")
