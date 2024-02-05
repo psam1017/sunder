@@ -16,6 +16,9 @@ public class ParentResponse {
     private String phone;
 
     public static ParentResponse from(Parent parent) {
+        if (parent == null) {
+            return new ParentResponse(null, null);
+        }
         return ParentResponse.builder()
                 .name(parent.getParentName())
                 .phone(parent.getParentPhone())

@@ -2,7 +2,6 @@ package psam.portfolio.sunder.english.global.pagination;
 
 import lombok.Getter;
 
-@Getter
 public class PageInfo {
 
     protected final int page;
@@ -28,5 +27,37 @@ public class PageInfo {
         }
         this.hasPrev = start != 1;
         this.hasNext = end < lastPage;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public long getTotal() {
+        return total;
+    }
+
+    public int getLastPage() {
+        return lastPage;
+    }
+
+    public int getStart() {
+        return start;
+    }
+
+    public int getEnd() {
+        return end;
+    }
+
+    public boolean hasPrev() {
+        return hasPrev;
+    }
+
+    public boolean hasNext() {
+        return hasNext;
     }
 }

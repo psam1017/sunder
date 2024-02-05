@@ -17,6 +17,9 @@ public class AddressResponse {
     private String postalCode;
 
     public static AddressResponse from(Address address) {
+        if (address == null) {
+            return new AddressResponse(null, null, null);
+        }
         return AddressResponse.builder()
                 .street(address.getStreet())
                 .detail(address.getDetail())

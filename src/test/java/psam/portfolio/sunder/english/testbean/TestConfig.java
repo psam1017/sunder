@@ -9,7 +9,7 @@ public class TestConfig {
     @Bean
     public UniqueInfoContainer uniqueInfoContainer() {
         return StandaloneUniqueInfoContainer.builder()
-                .numVal(23)
+                .numVal(30)
                 .loginIdLen(8)
                 .emailLen(8)
                 .emailDomain("sunder.net")
