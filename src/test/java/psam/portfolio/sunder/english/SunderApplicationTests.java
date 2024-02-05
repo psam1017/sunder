@@ -25,8 +25,14 @@ import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
+import psam.portfolio.sunder.english.web.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.web.user.repository.UserRoleCommandRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -65,6 +71,9 @@ public class SunderApplicationTests {
 	private AcademyCommandRepository academyCommandRepository;
 
 	@Autowired
+	private UserRoleCommandRepository userRoleCommandRepository;
+
+	@Autowired
 	private PasswordUtils passwordUtils;
 
 	protected String createJson(Object body) {
@@ -98,6 +107,18 @@ public class SunderApplicationTests {
 		return academyCommandRepository.save(academy);
 	}
 
+	protected Academy registerAcademy(boolean openToPublic, AcademyStatus status) {
+		Academy academy = Academy.builder()
+				.name(uic.getUniqueAcademyName())
+				.address(uic.getAnyAddress())
+				.phone(uic.getUniquePhoneNumber())
+				.email(uic.getUniqueEmail())
+				.openToPublic(openToPublic)
+				.status(status)
+				.build();
+		return academyCommandRepository.save(academy);
+	}
+
 	protected Teacher registerTeacher(UserStatus status, Academy academy) {
 		String uniqueId = uic.getUniqueLoginId();
 		Teacher teacher = Teacher.builder()
@@ -107,9 +128,35 @@ public class SunderApplicationTests {
 				.email(uic.getUniqueEmail())
 				.emailVerified(true)
 				.phone(uic.getUniquePhoneNumber())
+				.address(uic.getAnyAddress())
 				.status(status)
 				.academy(academy)
 				.build();
 		return teacherCommandRepository.save(teacher);
+	}
+
+	protected Teacher registerTeacher(String name, UserStatus status, Academy academy) {
+		String uniqueId = uic.getUniqueLoginId();
+		Teacher teacher = Teacher.builder()
+				.loginId(uniqueId)
+				.loginPw(passwordUtils.encode("qwe123!@#"))
+				.name(name)
+				.email(uic.getUniqueEmail())
+				.emailVerified(true)
+				.phone(uic.getUniquePhoneNumber())
+				.address(uic.getAnyAddress())
+				.status(status)
+				.academy(academy)
+				.build();
+		return teacherCommandRepository.save(teacher);
+	}
+
+	protected List<UserRole> createRole(User user, RoleName... roleNames) {
+		List<UserRole> userRoles = new ArrayList<>();
+		for (RoleName rn : roleNames) {
+			UserRole userRole = UserRole.builder().user(user).roleName(rn).build();
+			userRoles.add(userRole);
+		}
+		return userRoleCommandRepository.saveAll(userRoles);
 	}
 }

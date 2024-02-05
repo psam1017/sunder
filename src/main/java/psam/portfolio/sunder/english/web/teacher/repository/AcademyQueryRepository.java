@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.exception.NoSuchAcademyException;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPublicSearchCond;
@@ -68,26 +69,17 @@ public class AcademyQueryRepository {
     }
 
     public List<Academy> pageBySearchCond(AcademyPublicSearchCond cond) {
-        query.selectDistinct(academy)
+        return query.selectDistinct(academy)
                 .from(academy)
                 .where(
-                        openToPublicEq(cond.getOpenToPublic()),
-                        academyNameEq(cond.getAcademyName())
+                        academyNameEq(cond.getAcademyName()),
+                        openToPublicEq(true),
+                        academyStatusEq(AcademyStatus.VERIFIED)
                 )
                 .orderBy(specifyOrder(cond))
                 .offset(cond.getOffset())
                 .limit(cond.getLimit())
                 .fetch();
-
-        return null;
-    }
-
-    private static BooleanExpression openToPublicEq(Boolean openToPublic) {
-        return openToPublic != null ? academy.openToPublic.eq(openToPublic) : null;
-    }
-
-    private BooleanExpression academyNameEq(String academyName) {
-        return StringUtils.hasText(academyName) ? academy.name.containsIgnoreCase(academyName) : null;
     }
 
     private OrderSpecifier<?> specifyOrder(AcademyPublicSearchCond cond) {
@@ -132,10 +124,23 @@ public class AcademyQueryRepository {
         Long count = query.select(academy.countDistinct())
                 .from(academy)
                 .where(
-                        openToPublicEq(cond.getOpenToPublic()),
-                        academyNameEq(cond.getAcademyName())
+                        academyNameEq(cond.getAcademyName()),
+                        openToPublicEq(true),
+                        academyStatusEq(AcademyStatus.VERIFIED)
                 )
                 .fetchOne();
         return count == null ? 0L : count;
+    }
+
+    private static BooleanExpression academyStatusEq(AcademyStatus status) {
+        return academy.status.eq(status);
+    }
+
+    private static BooleanExpression openToPublicEq(Boolean openToPublic) {
+        return openToPublic != null ? academy.openToPublic.eq(openToPublic) : null;
+    }
+
+    private BooleanExpression academyNameEq(String academyName) {
+        return StringUtils.hasText(academyName) ? academy.name.containsIgnoreCase(academyName) : null;
     }
 }

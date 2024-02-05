@@ -17,6 +17,9 @@ public class SchoolResponse {
     private Integer grade;
 
     public static SchoolResponse from(School school) {
+        if (school == null) {
+            return new SchoolResponse(null, null);
+        }
         return SchoolResponse.builder()
                 .name(school.getSchoolName())
                 .grade(school.getGrade())
