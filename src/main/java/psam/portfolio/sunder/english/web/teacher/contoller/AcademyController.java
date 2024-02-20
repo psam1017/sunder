@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPUT;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPublicSearchCond;
 import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
 import psam.portfolio.sunder.english.web.teacher.service.AcademyQueryService;
@@ -81,15 +81,15 @@ public class AcademyController {
     /**
      * 학원 정보 수정 서비스. 본인의 학원만 수정할 수 있다.
      *
-     * @param directorId 학원장 아이디
-     * @param put        수정할 정보
+     * @param directorId   학원장 아이디
+     * @param academyPATCH 학원의 수정할 정보
      * @return 수정을 완료한 학원 아이디
      */
     @Secured("ROLE_DIRECTOR")
-    @PutMapping("")
+    @PatchMapping("")
     public ApiResponse<Map<String, UUID>> updateInfo(@UserId UUID directorId,
-                                                     @RequestBody @Valid AcademyPUT put) {
-        UUID academyId = academyCommandService.updateInfo(directorId, put);
+                                                     @RequestBody @Valid AcademyPATCH academyPATCH) {
+        UUID academyId = academyCommandService.updateInfo(directorId, academyPATCH);
         return ApiResponse.ok(Map.of("academyId", academyId));
     }
 

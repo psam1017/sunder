@@ -43,7 +43,7 @@ public class AcademyDirectorPOST {
         private String email;
 
         private String street;
-        private String detail;
+        private String addressDetail;
         @Pattern(regexp = "^[0-9]{5}$")
         private String postalCode;
 
@@ -58,7 +58,7 @@ public class AcademyDirectorPOST {
                     .openToPublic(openToPublic)
                     .address(Address.builder()
                             .street(street)
-                            .detail(detail)
+                            .detail(addressDetail)
                             .postalCode(postalCode)
                             .build())
                     .status(AcademyStatus.PENDING)
@@ -66,12 +66,12 @@ public class AcademyDirectorPOST {
         }
 
         @Builder
-        public AcademyPOST(String name, String phone, String email, String street, String detail, String postalCode, Boolean openToPublic) {
+        public AcademyPOST(String name, String phone, String email, String street, String addressDetail, String postalCode, Boolean openToPublic) {
             this.name = name;
             this.phone = phone;
             this.email = email;
             this.street = street;
-            this.detail = detail;
+            this.addressDetail = addressDetail;
             this.postalCode = postalCode;
             this.openToPublic = openToPublic;
         }

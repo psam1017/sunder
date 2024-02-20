@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
@@ -16,7 +15,7 @@ import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.DirectorPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPUT;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
@@ -157,18 +156,18 @@ public class AcademyCommandService {
      * 학원 정보 수정 서비스
      *
      * @param directorId 학원장 아이디
-     * @param academyPUT 학원의 수정할 정보
+     * @param academyPATCH 학원의 수정할 정보
      * @return 수정을 완료한 학원 아이디
      */
-    public UUID updateInfo(UUID directorId, AcademyPUT academyPUT) {
+    public UUID updateInfo(UUID directorId, AcademyPATCH academyPATCH) {
         Teacher getDirector = teacherQueryRepository.getById(directorId);
         Academy getAcademy = getDirector.getAcademy();
 
         // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생, 단, 자기 학원은 제외하며 PENDING 상태도 제외.
         academyQueryRepository.findOne(
-                academy.name.eq(academyPUT.getName())
-                        .or(academyPUT.getPhone() != null ? academy.phone.eq(academyPUT.getPhone()) : null)
-                        .or(academyPUT.getEmail() != null ? academy.email.eq(academyPUT.getEmail()) : null),
+                academy.name.eq(academyPATCH.getName())
+                        .or(academyPATCH.getPhone() != null ? academy.phone.eq(academyPATCH.getPhone()) : null)
+                        .or(academyPATCH.getEmail() != null ? academy.email.eq(academyPATCH.getEmail()) : null),
                 academy.status.ne(AcademyStatus.PENDING),
                 academy.uuid.ne(getAcademy.getUuid())
         ).ifPresent(academy -> {
@@ -177,11 +176,11 @@ public class AcademyCommandService {
 
         // 이메일 인증은 본인인증을 위한 것.
         // 학원의 이메일은 변경해도 조치를 취하지 않는다.
-        getAcademy.setName(academyPUT.getName());
-        getAcademy.setAddress(academyPUT.getAddress());
-        getAcademy.setPhone(academyPUT.getPhone());
-        getAcademy.setEmail(academyPUT.getEmail());
-        getAcademy.setOpenToPublic(academyPUT.getOpenToPublic());
+        getAcademy.setName(academyPATCH.getName());
+        getAcademy.setAddress(academyPATCH.getAddress());
+        getAcademy.setPhone(academyPATCH.getPhone());
+        getAcademy.setEmail(academyPATCH.getEmail());
+        getAcademy.setOpenToPublic(academyPATCH.getOpenToPublic());
 
         return getAcademy.getUuid();
     }

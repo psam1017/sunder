@@ -135,7 +135,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street(anyAddress.getStreet())
-                .detail(anyAddress.getDetail())
+                .addressDetail(anyAddress.getDetail())
                 .postalCode(anyAddress.getPostalCode())
                 .openToPublic(true)
                 .build();
@@ -184,7 +184,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         .optional()
                                         .description("학원 주소"),
 
-                                fieldWithPath("academy.detail")
+                                fieldWithPath("academy.addressDetail")
                                         .type(STRING)
                                         .optional()
                                         .description("학원 상세주소"),
@@ -258,7 +258,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street(anyAddress.getStreet())
-                .detail(anyAddress.getDetail())
+                .addressDetail(anyAddress.getDetail())
                 .postalCode(anyAddress.getPostalCode())
                 .openToPublic(true)
                 .build();
