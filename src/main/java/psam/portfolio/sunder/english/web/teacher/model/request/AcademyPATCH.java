@@ -14,7 +14,7 @@ import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class AcademyPUT {
+public class AcademyPATCH {
 
     @NotBlank
     @Pattern(regexp = "^[가-힣]{2,30}$")
@@ -27,7 +27,7 @@ public class AcademyPUT {
     private String email;
 
     private String street;
-    private String detail;
+    private String addressDetail;
     @Pattern(regexp = "^[0-9]{5}$")
     private String postalCode;
 
@@ -37,7 +37,7 @@ public class AcademyPUT {
     public Address getAddress() {
         return Address.builder()
                 .street(street)
-                .detail(detail)
+                .detail(addressDetail)
                 .postalCode(postalCode)
                 .build();
     }

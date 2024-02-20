@@ -12,6 +12,7 @@ import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.DirectorPOST;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.AcademyPOST;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.web.teacher.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
@@ -20,8 +21,7 @@ import psam.portfolio.sunder.english.web.user.exception.DuplicateUserException;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.given;
 
@@ -55,7 +55,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .openToPublic(true)
                 .build();
@@ -93,7 +93,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .openToPublic(true)
                 .build();
@@ -131,7 +131,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .phone(null) // null
                 .email(null) // null
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .openToPublic(true)
                 .build();
@@ -166,7 +166,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .openToPublic(true)
                 .build();
@@ -203,7 +203,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .openToPublic(true)
                 .build();
@@ -243,7 +243,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .openToPublic(true)
                 .build();
@@ -289,7 +289,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .phone(uic.getUniquePhoneNumber())
                 .email(uic.getUniqueEmail())
                 .street("street")
-                .detail("detail")
+                .addressDetail("detail")
                 .postalCode("00000")
                 .openToPublic(true)
                 .build();
@@ -315,5 +315,164 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
 
         // then
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("학원장은 자기 학원의 정보를 수정할 수 있다.")
+    @Test
+    void updateInfo() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+
+        String uniqueAcademyName = uic.getUniqueAcademyName();
+        String uniquePhoneNumber = uic.getUniquePhoneNumber();
+        String uniqueEmail = uic.getUniqueEmail();
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name(uniqueAcademyName)
+                .phone(uniquePhoneNumber)
+                .email(uniqueEmail)
+                .street("new street")
+                .addressDetail("new detail")
+                .postalCode("11111")
+                .openToPublic(false)
+                .build();
+
+        // when
+        UUID academyId = refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH));
+
+        // then
+        Academy getAcademy = academyQueryRepository.getById(academyId);
+        assertThat(getAcademy.getName()).isEqualTo(uniqueAcademyName);
+        assertThat(getAcademy.getPhone()).isEqualTo(uniquePhoneNumber);
+        assertThat(getAcademy.getEmail()).isEqualTo(uniqueEmail);
+        assertThat(getAcademy.getAddress().getStreet()).isEqualTo("new street");
+        assertThat(getAcademy.getAddress().getDetail()).isEqualTo("new detail");
+        assertThat(getAcademy.getAddress().getPostalCode()).isEqualTo("11111");
+        assertThat(getAcademy.isOpenToPublic()).isFalse();
+    }
+
+    @DisplayName("다른 학원과 이름이 중복되면 수정할 수 없다.")
+    @Test
+    void updateInfoWithDuplicateName() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+
+        Academy anotherAcademy = registerAcademy(AcademyStatus.VERIFIED);
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name(anotherAcademy.getName())
+                .phone(uic.getUniquePhoneNumber())
+                .email(uic.getUniqueEmail())
+                .street("new street")
+                .addressDetail("new detail")
+                .postalCode("11111")
+                .openToPublic(false)
+                .build();
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+                .isInstanceOf(DuplicateAcademyException.class);
+    }
+
+    @DisplayName("다른 학원과 전화번호가 중복되면 수정할 수 없다.")
+    @Test
+    void updateInfoWithDuplicatePhone() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+
+        Academy anotherAcademy = registerAcademy(AcademyStatus.VERIFIED);
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name(uic.getUniqueAcademyName())
+                .phone(anotherAcademy.getPhone())
+                .email(uic.getUniqueEmail())
+                .street("new street")
+                .addressDetail("new detail")
+                .postalCode("11111")
+                .openToPublic(false)
+                .build();
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+                .isInstanceOf(DuplicateAcademyException.class);
+    }
+
+    @DisplayName("다른 학원과 이메일이 중복되면 수정할 수 없다.")
+    @Test
+    void updateInfoWithDuplicateEmail() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+
+        Academy anotherAcademy = registerAcademy(AcademyStatus.VERIFIED);
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name(uic.getUniqueAcademyName())
+                .phone(uic.getUniquePhoneNumber())
+                .email(anotherAcademy.getEmail())
+                .street("new street")
+                .addressDetail("new detail")
+                .postalCode("11111")
+                .openToPublic(false)
+                .build();
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+                .isInstanceOf(DuplicateAcademyException.class);
+    }
+
+    @DisplayName("다른 학원과 정보가 중복되더라도 PENDING 상태는 제외한다.")
+    @Test
+    void updateInfoWithPending() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+
+        Academy anotherAcademy = registerAcademy(AcademyStatus.PENDING);
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name(anotherAcademy.getName())
+                .phone(anotherAcademy.getPhone())
+                .email(anotherAcademy.getEmail())
+                .street("new street")
+                .addressDetail("new detail")
+                .postalCode("11111")
+                .openToPublic(false)
+                .build();
+
+        // when
+        // then
+        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+                .doesNotThrowAnyException();
+    }
+
+    // 테스트 6. 학원 정보 수정 시 자기 학원의 이름은 중복 검사에서 제외된다.
+    @DisplayName("자기 학원의 이름은 중복 검사에서 제외된다.")
+    @Test
+    void updateInfoWithSelf() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name(registerAcademy.getName())
+                .phone(uic.getUniquePhoneNumber())
+                .email(uic.getUniqueEmail())
+                .street("new street")
+                .addressDetail("new detail")
+                .postalCode("11111")
+                .openToPublic(false)
+                .build();
+
+        // when
+        // then
+        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+                .doesNotThrowAnyException();
     }
 }

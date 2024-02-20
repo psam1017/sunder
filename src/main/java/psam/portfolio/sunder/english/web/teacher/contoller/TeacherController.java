@@ -46,19 +46,19 @@ public class TeacherController {
     POST /api/teacher/verify?token={token}
     이메일로 보낸 인증토큰이 포함된 링크를 클릭하여 인증하는 서비스
 
-    PUT /api/teacher/status
+    PATCH /api/teacher/status
     선생님 상태 변경 서비스
 
-    PUT /api/teacher/info
+    PATCH /api/teacher/info
     선생님 정보 수정 서비스
 
-    PUT /api/teacher/password
+    PATCH /api/teacher/password
     선생님 비밀번호 변경 서비스
 
     POST /api/teacher/password/temporary
     선생님 임시 비밀번호 발급 서비스
 
-    PUT /api/teacher/withdraw
+    PATCH /api/teacher/withdraw
     선생님 탈퇴 서비스
 
     GET /api/teacher/detail?teacherUuid={teacherUuid}

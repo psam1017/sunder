@@ -49,19 +49,19 @@ public class TeacherCommandService {
 
     // 등록 후 한달이 지나면 TRIAL 에서 TRIAL_END 로 변경 => @Scheduled 로 처리
 
-    PUT /api/teacher/status
+    PATCH /api/teacher/status
     선생님 상태 변경 서비스. TRIAN_END -> ACTIVE 포함
 
-    PUT /api/teacher/info
+    PATCH /api/teacher/info
     선생님 정보 수정 서비스
 
-    PUT /api/teacher/password
+    PATCH /api/teacher/password
     선생님 비밀번호 변경 서비스 - PasswordUtils 필요
 
     POST /api/teacher/password/temporary
     선생님 임시 비밀번호 발급 서비스 - PasswordUtils 필요. EmailUtils 필요?
 
-    PUT /api/teacher/withdraw
+    PATCH /api/teacher/withdraw
     선생님 탈퇴 서비스
      */
 
