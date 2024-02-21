@@ -9,6 +9,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.global.security.filter.JwtAuthenticationFilter;
+import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 
@@ -20,13 +23,25 @@ public class RestDocsEnvironment extends SunderApplicationTests {
     @Autowired
     protected RestDocumentationResultHandler restDocs;
 
+    @Autowired
+    protected JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
+        // MockMvc 를 사용할 때는 Filter 를 직접 추가해야 한다.
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(documentationConfiguration(provider))
+                .addFilters(jwtAuthenticationFilter)
                 .alwaysDo(MockMvcResultHandlers.print())
                 .alwaysDo(restDocs)
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .build();
+    }
+
+    protected String createToken(User user) {
+        return "Bearer " + jwtUtils.generateToken(user.getUuid().toString(), 1000 * 60);
     }
 }

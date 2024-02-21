@@ -29,8 +29,6 @@ public class AcademyFullResponse {
     private LocalDateTime createdDateTime;
     @KoreanDateTime
     private LocalDateTime modifiedDateTime;
-    private UUID createdBy;
-    private UUID modifiedBy;
 
     public static AcademyFullResponse from(Academy academy) {
         return AcademyFullResponse.builder()
@@ -43,8 +41,6 @@ public class AcademyFullResponse {
                 .status(academy.getStatus())
                 .createdDateTime(academy.getCreatedDateTime())
                 .modifiedDateTime(academy.getModifiedDateTime())
-                .createdBy(academy.getCreatedBy())
-                .modifiedBy(academy.getModifiedBy())
                 .build();
     }
 }

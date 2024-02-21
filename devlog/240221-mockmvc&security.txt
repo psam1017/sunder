@@ -1,0 +1,37 @@
+점점 프로젝트가 길어지니 체력이 달리는 것도 있지만, 회사에 업무 스트레스가 많아서 할 기운이 없는 게 더 큰 것 같다.
+좀 더 장기적으로 프로젝트를 진행하고 버틸 체력을 위해 최근에 다시 운동을 시작하고 프로젝트는 하루에 조금씩만 하기로 했다.
+어차피 집중해서 해야 할 global 설정은 끝나기도 했으니.
+
+오늘 쓰는 devlog 는 SpringSecurity(또 너냐)와 MockMvc 를 함께 사용할 때의 주의사항에 대한 것이다.
+
+MockMvc 자체는 여러 블로그에서 충분히 다루고 있고, 나도 이때까지 별 문제 없이 사용하고 있었는데 오늘 테스트를 진행하면서 처음 보는 예외 메시지를 발견했다.
+
+(예외 메시지)
+```
+Request processing failed: org.springframework.security.authentication.AuthenticationCredentialsNotFoundException: An Authentication object was not found in the SecurityContext
+```
+
+보자마자 뭔가 이상하다는 생각이 들었다. 컴파일도 잘 되고, 코드에 오류도 없고, 애플리케이션을 실행했을 때 API 도 잘 작동하는데 테스트에서만 실패한다는 것이다.
+게다가 SecurityContext 에 Authentication 이 없기 때문이라고 한다. 이것도 역시 JwtAuthenticationFilter 로 잘 설정해두었는데 이것이 작동하지 않는 것처럼 보였다.
+
+그래서 임시로 JwtAuthenticationFilter 안에 로그를 출력하도록 해봤더니 역시 로그가 출력이 안 된다.
+여기까지 했을 때 머리에 든 생각이 내가 지금 하고 있는 테스트가 "Mock" MVC 라는 점. 무언가 Mocking 되면서 filter 가 빠진 게 아닌가 싶어서 이와 관련하여 검색을 해보니 내 생각이 맞았다. interceptor 는 괜찮지만 filter 의 경우 MockMvc 에 이를 직접 추가해주어야 한다도 한다.
+그리하여 코드를 다음과 같이 수정하고 테스트를 통과할 수 있었다.
+
+(RestDocsEnvironment.java)
+```
+    @Autowired
+    protected JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @BeforeEach
+    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
+        // MockMvc 를 사용할 때는 Filter 를 직접 추가해야 한다.
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(documentationConfiguration(provider))
+                .addFilters(jwtAuthenticationFilter)
+                .alwaysDo(MockMvcResultHandlers.print())
+                .alwaysDo(restDocs)
+                .addFilters(new CharacterEncodingFilter("UTF-8", true))
+                .build();
+    }
+```

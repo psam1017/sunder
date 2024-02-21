@@ -92,12 +92,8 @@ public class AcademyCommandService {
         Teacher saveDirector = teacherCommandRepository.save(directorPOST.toEntity(saveAcademy, encodeLoginPw));
 
         // 원장은 원장, 선생, 학생 권한 모두 취득
-        List<UserRole> userRoles = new ArrayList<>();
-        userRoles.add(buildUserRole(saveDirector, ROLE_DIRECTOR));
-        userRoles.add(buildUserRole(saveDirector, ROLE_TEACHER));
-        userRoles.add(buildUserRole(saveDirector, ROLE_STUDENT));
-
-        userRoleCommandRepository.saveAll(userRoles);
+        UserRole userRole = buildUserRole(saveDirector, ROLE_DIRECTOR);
+        userRoleCommandRepository.save(userRole);
 
         // mailUtils 로 verification mail 발송
         boolean mailResult = mailUtils.sendMail(

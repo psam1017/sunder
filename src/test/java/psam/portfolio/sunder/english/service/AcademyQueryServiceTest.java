@@ -175,8 +175,6 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         assertThat(academyFullResponse.getAddress().getPostalCode()).isEqualTo(academy.getAddress().getPostalCode());
         assertThat(academyFullResponse.getCreatedDateTime()).isNotNull();
         assertThat(academyFullResponse.getModifiedDateTime()).isNotNull();
-        assertThat(academyFullResponse.getCreatedBy()).isEqualTo(academy.getCreatedBy());
-        assertThat(academyFullResponse.getModifiedBy()).isEqualTo(academy.getModifiedBy());
 
         List<TeacherFullResponse> teacherFullResponses = (List<TeacherFullResponse>) result.get("teachers");
         assertThat(teacherFullResponses).hasSize(13)
