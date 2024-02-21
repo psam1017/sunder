@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
+import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.student.model.entity.Student;
 import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Table(name = "academies")
 @Entity
-public class Academy extends BaseEntity {
+public class Academy extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;

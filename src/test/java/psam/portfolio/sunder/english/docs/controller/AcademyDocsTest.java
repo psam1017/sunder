@@ -3,27 +3,34 @@ package psam.portfolio.sunder.english.docs.controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
+import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.web.user.model.entity.User;
 
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.*;
 
 public class AcademyDocsTest extends RestDocsEnvironment {
 
@@ -298,4 +305,158 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                         )
                 ));
     }
+
+    @DisplayName("academy 의 상세 정보를 조회할 수 있다.")
+    @Test
+    void getDetail() throws Exception {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR);
+        Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(teacher, ROLE_TEACHER);
+
+        em.flush();
+        em.clear();
+        String token = createToken(teacher);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/academy")
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, token)
+                        .param("select", "teacher")
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                        queryParameters(
+                                parameterWithName("select")
+                                        .description("""
+                                                    같이 조회할 정보 옵션 +
+                                                    - teacher : 학원에 소속된 선생 목록을 같이 조회
+                                                    """)
+                                        .optional()
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.academy.id")
+                                        .type(STRING)
+                                        .description("학원 아이디"),
+
+                                fieldWithPath("data.academy.name")
+                                        .type(STRING)
+                                        .description("학원 이름"),
+
+                                fieldWithPath("data.academy.address.street")
+                                        .type(STRING)
+                                        .description("학원 주소 (도로명)"),
+
+                                fieldWithPath("data.academy.address.detail")
+                                        .type(STRING)
+                                        .description("학원 주소 (상세주소)"),
+
+                                fieldWithPath("data.academy.address.postalCode")
+                                        .type(STRING)
+                                        .description("학원 주소 (우편번호)"),
+
+                                fieldWithPath("data.academy.phone")
+                                        .type(STRING)
+                                        .description("학원 전화번호"),
+
+                                fieldWithPath("data.academy.email")
+                                        .type(STRING)
+                                        .description("학원 이메일"),
+
+                                fieldWithPath("data.academy.openToPublic")
+                                        .type(BOOLEAN)
+                                        .description("학원 공개 여부"),
+
+                                fieldWithPath("data.academy.status")
+                                        .type(STRING)
+                                        .description("학원 상태"),
+
+                                fieldWithPath("data.academy.createdDateTime")
+                                        .type(STRING)
+                                        .description("학원 생성일시"),
+
+                                fieldWithPath("data.academy.modifiedDateTime")
+                                        .type(STRING)
+                                        .description("학원 수정일시"),
+
+                                fieldWithPath("data.teachers[].id")
+                                        .type(STRING)
+                                        .description("선생 아이디"),
+
+                                fieldWithPath("data.teachers[].loginId")
+                                        .type(STRING)
+                                        .description("선생 로그인 아이디"),
+
+                                fieldWithPath("data.teachers[].name")
+                                        .type(STRING)
+                                        .description("선생 이름"),
+
+                                fieldWithPath("data.teachers[].email")
+                                        .type(STRING)
+                                        .description("선생 이메일"),
+
+                                fieldWithPath("data.teachers[].emailVerified")
+                                        .type(BOOLEAN)
+                                        .description("선생 이메일 인증 여부"),
+
+                                fieldWithPath("data.teachers[].phone")
+                                        .type(STRING)
+                                        .description("선생 전화번호"),
+
+                                fieldWithPath("data.teachers[].address.street")
+                                        .type(STRING)
+                                        .description("선생 주소 (도로명)"),
+
+                                fieldWithPath("data.teachers[].address.detail")
+                                        .type(STRING)
+                                        .description("선생 주소 (상세주소)"),
+
+                                fieldWithPath("data.teachers[].address.postalCode")
+                                        .type(STRING)
+                                        .description("선생 주소 (우편번호)"),
+
+                                fieldWithPath("data.teachers[].status")
+                                        .type(STRING)
+                                        .description("선생 상태"),
+
+                                fieldWithPath("data.teachers[].roles[]")
+                                        .type(ARRAY)
+                                        .description("선생 권한"),
+
+                                fieldWithPath("data.teachers[].lastPasswordChangeDateTime")
+                                        .type(STRING)
+                                        .description("선생 마지막 비밀번호 변경일시"),
+
+                                fieldWithPath("data.teachers[].academyId")
+                                        .type(STRING)
+                                        .description("선생이 속한 학원 아이디"),
+
+                                fieldWithPath("data.teachers[].createdDateTime")
+                                        .type(STRING)
+                                        .description("선생 생성일시"),
+
+                                fieldWithPath("data.teachers[].modifiedDateTime")
+                                        .type(STRING)
+                                        .description("선생 수정일시"),
+
+                                fieldWithPath("data.teachers[].createdBy")
+                                        .type(STRING)
+                                        .description("선생 생성자")
+                                        .optional(),
+
+                                fieldWithPath("data.teachers[].modifiedBy")
+                                        .type(STRING)
+                                        .description("선생 수정자")
+                                        .optional()
+                        )
+                ));
+    }
+
+    // TODO: 2024-02-04 getPublicList, updateInfo 문서화
 }
