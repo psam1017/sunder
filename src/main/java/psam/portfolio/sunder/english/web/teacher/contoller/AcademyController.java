@@ -71,7 +71,7 @@ public class AcademyController {
      * @return 학원 상세 정보 + (선생 목록)
      */
     @GetMapping("")
-    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     public ApiResponse<Map<String, Object>> getDetail(@UserId UUID teacherId,
                                                       @RequestParam(required = false) String select) {
         Map<String, Object> responseData = academyQueryService.getDetail(teacherId, select);
@@ -103,8 +103,8 @@ public class AcademyController {
      * @return 학원 목록
      */
     @GetMapping("/list")
-    public ApiResponse<Map<String, Object>> getPublicList(@RequestParam(required = false) Integer page,
-                                                          @RequestParam(required = false) Integer size,
+    public ApiResponse<Map<String, Object>> getPublicList(@RequestParam Integer page,
+                                                          @RequestParam Integer size,
                                                           @RequestParam(required = false) String prop,
                                                           @RequestParam(required = false) String dir,
                                                           @RequestParam(required = false) String academyName) {
