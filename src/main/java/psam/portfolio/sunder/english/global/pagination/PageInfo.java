@@ -1,6 +1,6 @@
 package psam.portfolio.sunder.english.global.pagination;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PageInfo {
 
@@ -10,7 +10,11 @@ public class PageInfo {
     protected final int lastPage;
     protected final int start;
     protected final int end;
+
+    @JsonProperty("hasPrev")
     protected final boolean hasPrev;
+
+    @JsonProperty("hasNext")
     protected final boolean hasNext;
 
     public PageInfo(int page, int size, long total, int pageSetAmount) {

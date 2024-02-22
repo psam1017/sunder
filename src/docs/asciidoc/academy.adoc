@@ -20,3 +20,6 @@ include::api/academy/checkPhoneDupl.adoc[]
 include::api/academy/registerDirectorWithAcademy.adoc[]
 include::api/academy/verifyAcademy.adoc[]
 include::api/academy/getDetail.adoc[]
+include::api/academy/updateInfo.adoc[]
+// 학원 탈퇴하기
+include::api/academy/getPublicList.adoc[]

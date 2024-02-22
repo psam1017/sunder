@@ -18,6 +18,8 @@ import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.web.user.model.entity.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -455,8 +457,130 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         .description("선생 수정자")
                                         .optional()
                         )
-                ));
+                )
+        );
     }
 
-    // TODO: 2024-02-04 getPublicList, updateInfo 문서화
+    @DisplayName("공개된 학원 목록을 조회할 수 있다.")
+    @Test
+    void getPublicList() throws Exception {
+        // given
+        for (int i = 0; i < 3; i++) {
+            registerAcademy(true, AcademyStatus.VERIFIED);
+        }
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/academy/list")
+                        .contentType(APPLICATION_JSON)
+                        .param("page", "1")
+                        .param("size", "10")
+                        .param("prop", "name")
+                        .param("dir", "asc")
+                        .param("academyName", "학원")
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(restDocs.document(
+                        queryParameters(
+                                parameterWithName("page").description("페이지 번호. 최소 1"),
+                                parameterWithName("size").description("페이지 크기. 최소 10"),
+                                parameterWithName("prop").description("""
+                                                                        정렬 기준 +
+                                                                        - name : 학원 이름 +
+                                                                        - id : 생성 순서(기본값)
+                                                                        """).optional(),
+                                parameterWithName("dir").description("""
+                                                                       정렬 방향 +
+                                                                       - asc : 오름차순 +
+                                                                       - desc : 내림차순(기본값)
+                                                                       """).optional(),
+                                parameterWithName("academyName").description("검색할 학원 이름").optional()
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.academies[].id")
+                                        .type(STRING)
+                                        .description("학원 아이디"),
+
+                                fieldWithPath("data.academies[].name")
+                                        .type(STRING)
+                                        .description("학원 이름"),
+
+                                fieldWithPath("data.academies[].address.street")
+                                        .type(STRING)
+                                        .description("학원 주소 (도로명)"),
+
+                                fieldWithPath("data.academies[].address.detail")
+                                        .type(STRING)
+                                        .description("학원 주소 (상세주소)"),
+
+                                fieldWithPath("data.academies[].address.postalCode")
+                                        .type(STRING)
+                                        .description("학원 주소 (우편번호)"),
+
+                                fieldWithPath("data.academies[].phone")
+                                        .type(STRING)
+                                        .description("학원 전화번호"),
+
+                                fieldWithPath("data.academies[].email")
+                                        .type(STRING)
+                                        .description("학원 이메일"),
+
+                                fieldWithPath("data.academies[].openToPublic")
+                                        .type(BOOLEAN)
+                                        .description("학원 공개 여부"),
+
+                                fieldWithPath("data.academies[].status")
+                                        .type(STRING)
+                                        .description("학원 상태"),
+
+                                fieldWithPath("data.academies[].createdDateTime")
+                                        .type(STRING)
+                                        .description("학원 생성일시"),
+
+                                fieldWithPath("data.academies[].modifiedDateTime")
+                                        .type(STRING)
+                                        .description("학원 수정일시"),
+
+                                fieldWithPath("data.pageInfo.page")
+                                        .type(NUMBER)
+                                        .description("현재 페이지 번호"),
+
+                                fieldWithPath("data.pageInfo.size")
+                                        .type(NUMBER)
+                                        .description("페이지 크기"),
+
+                                fieldWithPath("data.pageInfo.total")
+                                        .type(NUMBER)
+                                        .description("전체 학원 수"),
+
+                                fieldWithPath("data.pageInfo.lastPage")
+                                        .type(NUMBER)
+                                        .description("마지막 페이지 번호"),
+
+                                fieldWithPath("data.pageInfo.start")
+                                        .type(NUMBER)
+                                        .description("페이지 세트의 시작 번호"),
+
+                                fieldWithPath("data.pageInfo.end")
+                                        .type(NUMBER)
+                                        .description("페이지 세트의 끝 번호"),
+
+                                fieldWithPath("data.pageInfo.hasPrev")
+                                        .type(BOOLEAN)
+                                        .description("이전 페이지 존재 여부"),
+
+                                fieldWithPath("data.pageInfo.hasNext")
+                                        .type(BOOLEAN)
+                                        .description("다음 페이지 존재 여부")
+                        )
+                )
+        );
+    }
+
+    // TODO: 2024-02-04 updateInfo 문서화
+    // TODO: 2024-02-22 getDetail -> 학생도 가능, 하려면 User 에 ManyToOne 인 Academy 가 있어야 함.
+    // TODO: 2024-02-22 가이드 - 페이지 세트에 대한 설명
 }
