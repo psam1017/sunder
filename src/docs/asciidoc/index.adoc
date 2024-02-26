@@ -20,6 +20,7 @@ endif::[]
 
 include::guide/api.adoc[]
 include::guide/enumeration.adoc[]
+include::guide/pageInfo.adoc[]
 include::guide/validation.adoc[]
 include::guide/account.adoc[]
 include::guide/token.adoc[]
