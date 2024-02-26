@@ -1,5 +1,6 @@
 package psam.portfolio.sunder.english.web.teacher.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +35,7 @@ public class AcademyPATCH {
     @NotNull
     private Boolean openToPublic;
 
+    @JsonIgnore
     public Address getAddress() {
         return Address.builder()
                 .street(street)

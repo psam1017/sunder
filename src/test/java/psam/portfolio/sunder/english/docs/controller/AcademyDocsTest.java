@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
+import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
 import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
@@ -24,14 +26,15 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.*;
 
 public class AcademyDocsTest extends RestDocsEnvironment {
@@ -58,6 +61,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("name").description("중복체크할 학원 이름")
@@ -87,6 +91,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("phone").description("중복체크할 전화번호")
@@ -116,6 +121,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("email").description("중복체크할 이메일")
@@ -172,6 +178,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                         requestFields(
                                 fieldWithPath("academy.name")
@@ -296,6 +303,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                         pathParameters(
                                 parameterWithName("academyId").description("학원 아이디")
@@ -317,22 +325,23 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         createRole(director, ROLE_DIRECTOR);
         Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
         createRole(teacher, ROLE_TEACHER);
+        String token = createToken(teacher);
 
         em.flush();
         em.clear();
-        String token = createToken(teacher);
 
         // when
         ResultActions resultActions = mockMvc.perform(
                 get("/api/academy")
                         .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, token)
+                        .header(AUTHORIZATION, token)
                         .param("select", "teacher")
         );
 
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                         queryParameters(
                                 parameterWithName("select")
@@ -461,6 +470,84 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         );
     }
 
+    @DisplayName("academy 의 정보를 수정할 수 있다.")
+    @Test
+    void updateInfo() throws Exception {
+        // given
+        Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR);
+        String token = createToken(director);
+
+        em.flush();
+        em.clear();
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name("수정된학원이름")
+                .phone("01012345678")
+                .email("academy@sunder.net")
+                .street("수정된 학원 주소")
+                .addressDetail("수정된 학원 상세주소")
+                .postalCode("12345")
+                .openToPublic(false)
+                .build();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/academy")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, token)
+                        .content(createJson(academyPATCH))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andDo(restDocs.document(
+                                requestFields(
+                                        fieldWithPath("name")
+                                                .type(STRING)
+                                                .description("학원 이름"),
+
+                                        fieldWithPath("phone")
+                                                .type(STRING)
+                                                .optional()
+                                                .description("학원 전화번호"),
+
+                                        fieldWithPath("email")
+                                                .type(STRING)
+                                                .optional()
+                                                .description("학원 이메일"),
+
+                                        fieldWithPath("street")
+                                                .type(STRING)
+                                                .optional()
+                                                .description("학원 주소"),
+
+                                        fieldWithPath("addressDetail")
+                                                .type(STRING)
+                                                .optional()
+                                                .description("학원 상세주소"),
+
+                                        fieldWithPath("postalCode")
+                                                .type(STRING)
+                                                .optional()
+                                                .description("학원 우편번호"),
+
+                                        fieldWithPath("openToPublic")
+                                                .type(BOOLEAN)
+                                                .description("학원 공개 여부")
+                                ),
+                                relaxedResponseFields(
+                                        fieldWithPath("data.academyId")
+                                                .type(STRING)
+                                                .description("수정을 완료한 학원 아이디")
+                                )
+                        )
+                );
+    }
+
     @DisplayName("공개된 학원 목록을 조회할 수 있다.")
     @Test
     void getPublicList() throws Exception {
@@ -483,6 +570,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                         queryParameters(
                                 parameterWithName("page").description("페이지 번호. 최소 1"),
@@ -579,8 +667,4 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 )
         );
     }
-
-    // TODO: 2024-02-04 updateInfo 문서화
-    // TODO: 2024-02-22 getDetail -> 학생도 가능, 하려면 User 에 ManyToOne 인 Academy 가 있어야 함.
-    // TODO: 2024-02-22 가이드 - 페이지 세트에 대한 설명
 }

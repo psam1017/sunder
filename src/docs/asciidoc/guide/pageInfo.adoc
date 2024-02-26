@@ -1,0 +1,54 @@
+=== PageInfo
+
+|===
+| 필드 | 설명
+
+| page | 현재 페이지 번호
+| size | 페이지당 데이터 수
+| total | 전체 데이터 수
+| lastPage | 전체 페이지 중 마지막 페이지 번호
+| start | 현재 페이지 세트의 시작 페이지 번호
+| end | 현재 페이지 세트의 마지막 페이지 번호
+| hasPrev | 이전 페이지 존재 여부
+| hasNext | 다음 페이지 존재 여부
+|===
+
+- 페이지 세트 : 페이지 번호를 일정한 범위로 묶어서 표시하는 것
+----
+페이지 세트가 10인 경우
+- page = 15
+- size = 10
+- total = 200+
+- lastPage = 20+
+- start = 11
+- end = 20
+- hasPrev = true
+- hasNext = true
+[<<] [<] 11 12 13 14 [15] 16 17 18 19 20 [>] [>>]
+----
+
+----
+페이지 세트가 1인 경우
+- page = 4
+- size = 10
+- total = 40+
+- lastPage = 4+
+- start = 4
+- end = 4
+- hasPrev = true
+- hasNext = true
+[<<] [<] [4] [>] [>>]
+----
+
+----
+현재 페이지 세트에 마지막 페이지가 존재하는 경우
+- page = 15
+- size = 10
+- total = 171 ~ 180
+- lastPage = 18
+- start = 11
+- end = 18
+- hasPrev = true
+- hasNext = false
+[<<] [<] 11 12 13 14 [15] 16 17 18
+----

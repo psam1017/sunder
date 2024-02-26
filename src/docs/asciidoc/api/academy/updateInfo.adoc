@@ -3,17 +3,25 @@
 - 학원장만 가능
 
 ==== HTTP Request
-// include::{snippets}/academy-docs-test/get-public-list/http-request.adoc[]
-// include::{snippets}/academy-docs-test/get-public-list/query-parameters.adoc[]
+include::{snippets}/academy-docs-test/update-info/http-request.adoc[]
+include::{snippets}/academy-docs-test/update-info/request-fields.adoc[]
 
 ==== HTTP Response
-// include::{snippets}/academy-docs-test/get-public-list/http-response.adoc[]
-// include::{snippets}/academy-docs-test/get-public-list/response-fields.adoc[]
+include::{snippets}/academy-docs-test/update-info/http-response.adoc[]
+include::{snippets}/academy-docs-test/update-info/response-fields.adoc[]
 
 ==== Api Reasons
 
 |===
 | 코드 | 이유
 
-// | (없음) |
+| NotBlank.name |
+| Pattern.name | regexp = ^[가-힣]{2,30}$
+| Pattern.phone | regexp = ^010[0-9]{8}$
+| Email.email |
+| Pattern.postalCode | regexp = ^[0-9]{5}$
+| NotNull.openToPublic |
+| NoSuchElement.Teacher |
+| NoSuchElement.Academy |
+| DuplicateKey.Academy |
 |===

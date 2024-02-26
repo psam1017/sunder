@@ -64,14 +64,16 @@ public class AcademyController {
     }
 
     /**
-     * 학원 상세 정보 조회 서비스. 자기 학원의 정보만 조회할 수 있다.
+     * 학원 상세 정보 조회 서비스. 선생이 자기 학원의 정보만 조회할 수 있다.
      *
      * @param teacherId 선생 아이디
      * @param select    같이 조회할 정보 = {teacher}
      * @return 학원 상세 정보 + (선생 목록)
+     *
+     * @apiNote 응답값이 상세 정보를 포함하므로, 학생이 조회할 수 있는 학원 상세 정보 API 는 별도로 생성한다.
      */
     @GetMapping("")
-    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     public ApiResponse<Map<String, Object>> getDetail(@UserId UUID teacherId,
                                                       @RequestParam(required = false) String select) {
         Map<String, Object> responseData = academyQueryService.getDetail(teacherId, select);
