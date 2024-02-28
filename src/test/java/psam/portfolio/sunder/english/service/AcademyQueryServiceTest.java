@@ -5,17 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.global.pagination.PageInfo;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.exception.OneParamToCheckAcademyDuplException;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.exception.OneParamToCheckAcademyDuplException;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPublicSearchCond;
-import psam.portfolio.sunder.english.web.teacher.model.response.AcademyFullResponse;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.web.academy.model.response.AcademyFullResponse;
 import psam.portfolio.sunder.english.web.teacher.model.response.TeacherFullResponse;
-import psam.portfolio.sunder.english.web.teacher.service.AcademyQueryService;
+import psam.portfolio.sunder.english.web.academy.service.AcademyQueryService;
 import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.web.user.model.entity.UserRole;
 
 import java.util.List;
 import java.util.Map;
@@ -127,7 +126,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
 
     @DisplayName("선생님이 자기 학원의 정보를 조회할 수 있다.")
     @Test
-    public void getDetail() {
+    public void getDetailByTeacher() {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
@@ -195,6 +194,8 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
                         teacher12.getName()
                 );
     }
+
+    // TODO 학생이 자기 학원의 정보를 조회할 수 있다.
 
     @DisplayName("공개된 학원의 목록에서 학원 1개를 조회할 수 있다.")
     @Test

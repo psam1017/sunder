@@ -1,0 +1,19 @@
+=== 자기 학원 상세 정보 조회하기
+
+- 같은 학원 소속 사용자만 조회 가능
+
+==== HTTP Request
+include::{snippets}/academy-docs-test/get-detail-by-teacher/http-request.adoc[]
+include::{snippets}/academy-docs-test/get-detail-by-teacher/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-docs-test/get-detail-by-teacher/http-response.adoc[]
+include::{snippets}/academy-docs-test/get-detail-by-teacher/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+| NoSuchElement.User |
+|===

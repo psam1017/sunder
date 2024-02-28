@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.teacher.model.request;
+package psam.portfolio.sunder.english.web.academy.model.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -10,8 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 

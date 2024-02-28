@@ -1,7 +1,7 @@
-package psam.portfolio.sunder.english.web.teacher.repository;
+package psam.portfolio.sunder.english.web.academy.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 
 import java.util.UUID;
 

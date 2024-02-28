@@ -37,9 +37,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         parameterWithName("loginId").description("중복체크할 아이디")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.isOk")
-                                                .type(BOOLEAN)
-                                                .description("중복 검사 결과")
+                                        fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
                                 )
                         )
                 );
@@ -67,9 +65,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         parameterWithName("email").description("중복체크할 이메일")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.isOk")
-                                                .type(BOOLEAN)
-                                                .description("중복 검사 결과")
+                                        fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
                                 )
                         )
                 );
@@ -97,9 +93,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         parameterWithName("phone").description("중복체크할 연락처")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.isOk")
-                                                .type(BOOLEAN)
-                                                .description("중복 검사 결과")
+                                        fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
                                 )
                         )
                 );

@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.teacher.model.request;
+package psam.portfolio.sunder.english.web.academy.model.request;
 
 import lombok.Builder;
 import lombok.Getter;
