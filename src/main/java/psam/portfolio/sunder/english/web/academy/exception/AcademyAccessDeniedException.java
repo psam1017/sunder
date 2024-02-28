@@ -1,9 +1,9 @@
-package psam.portfolio.sunder.english.web.teacher.exception;
+package psam.portfolio.sunder.english.web.academy.exception;
 
 import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 
 public class AcademyAccessDeniedException extends ApiException {
     @Override

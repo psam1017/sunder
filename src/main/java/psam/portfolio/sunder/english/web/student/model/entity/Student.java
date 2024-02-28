@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.web.student.model.embeddable.School;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.web.user.model.entity.User;
 

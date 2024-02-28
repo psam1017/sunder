@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.teacher.service;
+package psam.portfolio.sunder.english.web.academy.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -9,15 +9,16 @@ import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.exception.DuplicateAcademyException;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.exception.DuplicateAcademyException;
+import psam.portfolio.sunder.english.web.teacher.exception.RoleDirectorRequiredException;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.AcademyPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.DirectorPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
-import psam.portfolio.sunder.english.web.teacher.repository.AcademyCommandRepository;
-import psam.portfolio.sunder.english.web.teacher.repository.AcademyQueryRepository;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyDirectorPOST.AcademyPOST;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyDirectorPOST.DirectorPOST;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyPATCH;
+import psam.portfolio.sunder.english.web.academy.repository.AcademyCommandRepository;
+import psam.portfolio.sunder.english.web.academy.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
@@ -26,10 +27,11 @@ import psam.portfolio.sunder.english.web.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.web.user.repository.UserRoleCommandRepository;
 
-import java.util.*;
+import java.util.Locale;
+import java.util.UUID;
 
-import static psam.portfolio.sunder.english.web.teacher.model.entity.QAcademy.academy;
-import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.web.academy.model.entity.QAcademy.*;
+import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.web.user.enumeration.UserStatus.PENDING;
 import static psam.portfolio.sunder.english.web.user.model.entity.QUser.user;
 
@@ -92,7 +94,10 @@ public class AcademyCommandService {
         Teacher saveDirector = teacherCommandRepository.save(directorPOST.toEntity(saveAcademy, encodeLoginPw));
 
         // 원장은 원장, 선생, 학생 권한 모두 취득
-        UserRole userRole = buildUserRole(saveDirector, ROLE_DIRECTOR);
+        UserRole userRole = UserRole.builder()
+                .user(saveDirector)
+                .roleName(ROLE_DIRECTOR)
+                .build();
         userRoleCommandRepository.save(userRole);
 
         // mailUtils 로 verification mail 발송
@@ -179,5 +184,41 @@ public class AcademyCommandService {
         getAcademy.setOpenToPublic(academyPATCH.getOpenToPublic());
 
         return getAcademy.getUuid();
+    }
+
+    /**
+     * 학원 폐쇄 서비스. 학원장만 가능. 폐쇄 후 7일 후에 DB 에서 완전히 삭제된다.
+     * @param directorId 학원장 아이디
+     * @return 폐쇄 요청한 학원 아이디
+     */
+    public UUID withdraw(UUID directorId) {
+        Teacher director = teacherQueryRepository.getById(directorId);
+
+        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄는 신중한 조치가 필요하므로 한 번 더 검증한다.
+        if (!director.isDirector()) {
+            throw new RoleDirectorRequiredException();
+        }
+        Academy academy = director.getAcademy();
+        academy.setStatus(AcademyStatus.WITHDRAWN);
+        return academy.getUuid();
+    }
+
+    // TODO scheduler 로 폐쇄 요청한지 7일이 지난 학원 삭제
+
+    /**
+     * 학원 폐쇄 취소 서비스. 학원장만 가능. 폐쇄 신청 후 7일 이내에만 가능하다.
+     * @param directorId 학원장 아이디
+     * @return 폐쇄 취소한 학원 아이디
+     */
+    public UUID revokeWithdrawal(UUID directorId) {
+        Teacher director = teacherQueryRepository.getById(directorId);
+
+        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄는 신중한 조치가 필요하므로 한 번 더 검증한다.
+        if (!director.isDirector()) {
+            throw new RoleDirectorRequiredException();
+        }
+        Academy academy = director.getAcademy();
+        academy.setStatus(AcademyStatus.VERIFIED);
+        return academy.getUuid();
     }
 }

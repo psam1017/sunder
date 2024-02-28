@@ -6,16 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.exception.DuplicateAcademyException;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.exception.DuplicateAcademyException;
+import psam.portfolio.sunder.english.web.teacher.exception.RoleDirectorRequiredException;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.DirectorPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST.AcademyPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
-import psam.portfolio.sunder.english.web.teacher.repository.AcademyQueryRepository;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyDirectorPOST.AcademyPOST;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyDirectorPOST.DirectorPOST;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyPATCH;
+import psam.portfolio.sunder.english.web.academy.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
+import psam.portfolio.sunder.english.web.academy.service.AcademyCommandService;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.web.user.exception.DuplicateUserException;
 
@@ -25,7 +27,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.given;
 
-@SuppressWarnings("ConstantValue")
 public class AcademyCommandServiceTest extends SunderApplicationTests {
 
     @Autowired
@@ -474,5 +475,67 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         // then
         assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
                 .doesNotThrowAnyException();
+    }
+
+    @DisplayName("학원장은 자기 학원을 폐쇄 신청할 수 있다.")
+    @Test
+    void withdraw() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        createRole(registerTeacher, RoleName.ROLE_DIRECTOR);
+
+        // when
+        UUID academyId = refreshAnd(() -> sut.withdraw(registerTeacher.getUuid()));
+
+        // then
+        Academy getAcademy = academyQueryRepository.getById(academyId);
+        assertThat(getAcademy.isWithdrawn()).isTrue();
+    }
+
+    // 학원장이 아니라면 학원 폐쇄 신청을 할 수 없다.
+    @DisplayName("학원장이 아니라면 학원 폐쇄 신청을 할 수 없다.")
+    @Test
+    void withdrawalRequireRoleDirector() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        createRole(registerTeacher, RoleName.ROLE_TEACHER);
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.withdraw(registerTeacher.getUuid())))
+                .isInstanceOf(RoleDirectorRequiredException.class);
+    }
+
+    @DisplayName("학원장은 자기 학원의 폐쇄 신청을 취소할 수 있다.")
+    @Test
+    void revokeWithdraw() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.WITHDRAWN);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        createRole(registerTeacher, RoleName.ROLE_DIRECTOR);
+
+        // when
+        UUID academyId = refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getUuid()));
+
+        // then
+        Academy getAcademy = academyQueryRepository.getById(academyId);
+        assertThat(getAcademy.isWithdrawn()).isFalse();
+    }
+
+    // 학원장이 아니라면 학원 폐쇄 신청을 취소할 수 없다.
+    @DisplayName("학원장이 아니라면 학원 폐쇄 신청을 취소할 수 없다.")
+    @Test
+    void revokeWithdrawalRequireRoleDirector() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.WITHDRAWN);
+        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        createRole(registerTeacher, RoleName.ROLE_TEACHER);
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getUuid())))
+                .isInstanceOf(RoleDirectorRequiredException.class);
     }
 }

@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.web.user.model.entity.User;
 
@@ -27,5 +29,9 @@ public class Teacher extends User {
     public Teacher(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status, Academy academy) {
         super(loginId, loginPw, name, email, emailVerified, phone, address, status);
         this.academy = academy;
+    }
+
+    public boolean isDirector() {
+        return this.getRoles().stream().anyMatch(role -> role.getRoleName() == RoleName.ROLE_DIRECTOR);
     }
 }

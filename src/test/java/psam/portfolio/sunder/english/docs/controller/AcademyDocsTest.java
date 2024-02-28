@@ -3,39 +3,33 @@ package psam.portfolio.sunder.english.docs.controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyDirectorPOST;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
-import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.web.academy.service.AcademyCommandService;
 import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.ROLE_TEACHER;
 
 public class AcademyDocsTest extends RestDocsEnvironment {
 
@@ -67,9 +61,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         parameterWithName("name").description("중복체크할 학원 이름")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.isOk")
-                                                .type(BOOLEAN)
-                                                .description("중복 검사 결과")
+                                        fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
                                 )
                         )
                 );
@@ -97,9 +89,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         parameterWithName("phone").description("중복체크할 전화번호")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.isOk")
-                                                .type(BOOLEAN)
-                                                .description("중복 검사 결과")
+                                        fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
                                 )
                         )
                 );
@@ -127,9 +117,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         parameterWithName("email").description("중복체크할 이메일")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.isOk")
-                                                .type(BOOLEAN)
-                                                .description("중복 검사 결과")
+                                        fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
                                 )
                         )
                 );
@@ -181,84 +169,28 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                         requestFields(
-                                fieldWithPath("academy.name")
-                                        .type(STRING)
-                                        .description("학원 이름"),
-
-                                fieldWithPath("academy.phone")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원 전화번호"),
-
-                                fieldWithPath("academy.email")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원 이메일"),
-
-                                fieldWithPath("academy.street")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원 주소"),
-
-                                fieldWithPath("academy.addressDetail")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원 상세주소"),
-
-                                fieldWithPath("academy.postalCode")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원 우편번호"),
-
-                                fieldWithPath("academy.openToPublic")
-                                        .type(BOOLEAN)
-                                        .description("학원 공개 여부"),
-
-                                fieldWithPath("director.loginId")
-                                        .type(STRING)
-                                        .description("학원장 로그인 아이디"),
-
-                                fieldWithPath("director.loginPw")
-                                        .type(STRING)
-                                        .description("학원장 로그인 비밀번호"),
-
-                                fieldWithPath("director.name")
-                                        .type(STRING)
-                                        .description("학원장 이름"),
-
-                                fieldWithPath("director.email")
-                                        .type(STRING)
-                                        .description("학원장 이메일"),
-
-                                fieldWithPath("director.phone")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원장 전화번호"),
-
-                                fieldWithPath("director.street")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원장 주소"),
-
-                                fieldWithPath("director.addressDetail")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원장 상세주소"),
-
-                                fieldWithPath("director.postalCode")
-                                        .type(STRING)
-                                        .optional()
-                                        .description("학원장 우편번호")
+                                fieldWithPath("academy.name").type(STRING).description("학원 이름"),
+                                fieldWithPath("academy.phone").type(STRING).description("학원 전화번호").optional(),
+                                fieldWithPath("academy.email").type(STRING).description("학원 이메일").optional(),
+                                fieldWithPath("academy.street").type(STRING).description("학원 주소").optional(),
+                                fieldWithPath("academy.addressDetail").type(STRING).description("학원 상세주소").optional(),
+                                fieldWithPath("academy.postalCode").type(STRING).description("학원 우편번호").optional(),
+                                fieldWithPath("academy.openToPublic").description("학원 공개 여부").type(BOOLEAN),
+                                fieldWithPath("director.loginId").type(STRING).description("학원장 로그인 아이디"),
+                                fieldWithPath("director.loginPw").type(STRING).description("학원장 로그인 비밀번호"),
+                                fieldWithPath("director.name").type(STRING).description("학원장 이름"),
+                                fieldWithPath("director.email").type(STRING).description("학원장 이메일"),
+                                fieldWithPath("director.phone").type(STRING).description("학원장 전화번호").optional(),
+                                fieldWithPath("director.street").type(STRING).description("학원장 주소").optional(),
+                                fieldWithPath("director.addressDetail").type(STRING).description("학원장 상세주소").optional(),
+                                fieldWithPath("director.postalCode").type(STRING).description("학원장 우편번호").optional()
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("data.directorId")
-                                        .type(STRING)
-                                        .description("등록된 학원장의 아이디")
+                                fieldWithPath("data.directorId").type(STRING).description("등록된 학원장의 아이디")
                         )
                 ));
     }
 
-    // academy 의 uuid 를 검증하고 승인할 수 있다.
     @DisplayName("academy 의 uuid 를 검증하고 승인할 수 있다.")
     @Test
     void verifyAcademy() throws Exception {
@@ -309,16 +241,14 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                 parameterWithName("academyId").description("학원 아이디")
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("data.verified")
-                                        .type(BOOLEAN)
-                                        .description("학원 승인 여부")
+                                fieldWithPath("data.verified").type(BOOLEAN).description("학원 승인 여부")
                         )
                 ));
     }
 
-    @DisplayName("academy 의 상세 정보를 조회할 수 있다.")
+    @DisplayName("선생이 자기 학원의 상세 정보를 조회할 수 있다.")
     @Test
-    void getDetail() throws Exception {
+    void getDetailByTeacher() throws Exception {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
@@ -352,123 +282,41 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         .optional()
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("data.academy.id")
-                                        .type(STRING)
-                                        .description("학원 아이디"),
-
-                                fieldWithPath("data.academy.name")
-                                        .type(STRING)
-                                        .description("학원 이름"),
-
-                                fieldWithPath("data.academy.address.street")
-                                        .type(STRING)
-                                        .description("학원 주소 (도로명)"),
-
-                                fieldWithPath("data.academy.address.detail")
-                                        .type(STRING)
-                                        .description("학원 주소 (상세주소)"),
-
-                                fieldWithPath("data.academy.address.postalCode")
-                                        .type(STRING)
-                                        .description("학원 주소 (우편번호)"),
-
-                                fieldWithPath("data.academy.phone")
-                                        .type(STRING)
-                                        .description("학원 전화번호"),
-
-                                fieldWithPath("data.academy.email")
-                                        .type(STRING)
-                                        .description("학원 이메일"),
-
-                                fieldWithPath("data.academy.openToPublic")
-                                        .type(BOOLEAN)
-                                        .description("학원 공개 여부"),
-
-                                fieldWithPath("data.academy.status")
-                                        .type(STRING)
-                                        .description("학원 상태"),
-
-                                fieldWithPath("data.academy.createdDateTime")
-                                        .type(STRING)
-                                        .description("학원 생성일시"),
-
-                                fieldWithPath("data.academy.modifiedDateTime")
-                                        .type(STRING)
-                                        .description("학원 수정일시"),
-
-                                fieldWithPath("data.teachers[].id")
-                                        .type(STRING)
-                                        .description("선생 아이디"),
-
-                                fieldWithPath("data.teachers[].loginId")
-                                        .type(STRING)
-                                        .description("선생 로그인 아이디"),
-
-                                fieldWithPath("data.teachers[].name")
-                                        .type(STRING)
-                                        .description("선생 이름"),
-
-                                fieldWithPath("data.teachers[].email")
-                                        .type(STRING)
-                                        .description("선생 이메일"),
-
-                                fieldWithPath("data.teachers[].emailVerified")
-                                        .type(BOOLEAN)
-                                        .description("선생 이메일 인증 여부"),
-
-                                fieldWithPath("data.teachers[].phone")
-                                        .type(STRING)
-                                        .description("선생 전화번호"),
-
-                                fieldWithPath("data.teachers[].address.street")
-                                        .type(STRING)
-                                        .description("선생 주소 (도로명)"),
-
-                                fieldWithPath("data.teachers[].address.detail")
-                                        .type(STRING)
-                                        .description("선생 주소 (상세주소)"),
-
-                                fieldWithPath("data.teachers[].address.postalCode")
-                                        .type(STRING)
-                                        .description("선생 주소 (우편번호)"),
-
-                                fieldWithPath("data.teachers[].status")
-                                        .type(STRING)
-                                        .description("선생 상태"),
-
-                                fieldWithPath("data.teachers[].roles[]")
-                                        .type(ARRAY)
-                                        .description("선생 권한"),
-
-                                fieldWithPath("data.teachers[].lastPasswordChangeDateTime")
-                                        .type(STRING)
-                                        .description("선생 마지막 비밀번호 변경일시"),
-
-                                fieldWithPath("data.teachers[].academyId")
-                                        .type(STRING)
-                                        .description("선생이 속한 학원 아이디"),
-
-                                fieldWithPath("data.teachers[].createdDateTime")
-                                        .type(STRING)
-                                        .description("선생 생성일시"),
-
-                                fieldWithPath("data.teachers[].modifiedDateTime")
-                                        .type(STRING)
-                                        .description("선생 수정일시"),
-
-                                fieldWithPath("data.teachers[].createdBy")
-                                        .type(STRING)
-                                        .description("선생 생성자")
-                                        .optional(),
-
-                                fieldWithPath("data.teachers[].modifiedBy")
-                                        .type(STRING)
-                                        .description("선생 수정자")
-                                        .optional()
+                                fieldWithPath("data.academy.id").type(STRING).description("학원 아이디"),
+                                fieldWithPath("data.academy.name").type(STRING).description("학원 이름"),
+                                fieldWithPath("data.academy.address.street").type(STRING).description("학원 주소 (도로명)"),
+                                fieldWithPath("data.academy.address.detail").type(STRING).description("학원 주소 (상세주소)"),
+                                fieldWithPath("data.academy.address.postalCode").type(STRING).description("학원 주소 (우편번호)"),
+                                fieldWithPath("data.academy.phone").type(STRING).description("학원 전화번호"),
+                                fieldWithPath("data.academy.email").type(STRING).description("학원 이메일"),
+                                fieldWithPath("data.academy.openToPublic").type(BOOLEAN).description("학원 공개 여부"),
+                                fieldWithPath("data.academy.status").type(STRING).description("학원 상태"),
+                                fieldWithPath("data.academy.createdDateTime").type(STRING).description("학원 생성일시"),
+                                fieldWithPath("data.academy.modifiedDateTime").type(STRING).description("학원 수정일시"),
+                                fieldWithPath("data.teachers[].id").type(STRING).description("선생 아이디"),
+                                fieldWithPath("data.teachers[].loginId").type(STRING).description("선생 로그인 아이디"),
+                                fieldWithPath("data.teachers[].name").type(STRING).description("선생 이름"),
+                                fieldWithPath("data.teachers[].email").type(STRING).description("선생 이메일"),
+                                fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("선생 이메일 인증 여부"),
+                                fieldWithPath("data.teachers[].phone").type(STRING).description("선생 전화번호"),
+                                fieldWithPath("data.teachers[].address.street").type(STRING).description("선생 주소 (도로명)"),
+                                fieldWithPath("data.teachers[].address.detail").type(STRING).description("선생 주소 (상세주소)"),
+                                fieldWithPath("data.teachers[].address.postalCode").type(STRING).description("선생 주소 (우편번호)"),
+                                fieldWithPath("data.teachers[].status").type(STRING).description("선생 상태"),
+                                fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생 권한"),
+                                fieldWithPath("data.teachers[].lastPasswordChangeDateTime").type(STRING).description("선생 마지막 비밀번호 변경일시"),
+                                fieldWithPath("data.teachers[].academyId").type(STRING).description("선생이 속한 학원 아이디"),
+                                fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생 생성일시"),
+                                fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생 수정일시"),
+                                fieldWithPath("data.teachers[].createdBy").type(STRING).description("선생 생성자").optional(),
+                                fieldWithPath("data.teachers[].modifiedBy").type(STRING).description("선생 수정자").optional()
                         )
                 )
         );
     }
+
+    // TODO 학생이 자기 학원의 상세 정보를 조회할 수 있다.
+//    @DisplayName("학생이 자기 학원의 상세 정보를 조회할 수 있다.")
 
     @DisplayName("academy 의 정보를 수정할 수 있다.")
     @Test
@@ -506,43 +354,16 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("$.code").value("200"))
                 .andDo(restDocs.document(
                                 requestFields(
-                                        fieldWithPath("name")
-                                                .type(STRING)
-                                                .description("학원 이름"),
-
-                                        fieldWithPath("phone")
-                                                .type(STRING)
-                                                .optional()
-                                                .description("학원 전화번호"),
-
-                                        fieldWithPath("email")
-                                                .type(STRING)
-                                                .optional()
-                                                .description("학원 이메일"),
-
-                                        fieldWithPath("street")
-                                                .type(STRING)
-                                                .optional()
-                                                .description("학원 주소"),
-
-                                        fieldWithPath("addressDetail")
-                                                .type(STRING)
-                                                .optional()
-                                                .description("학원 상세주소"),
-
-                                        fieldWithPath("postalCode")
-                                                .type(STRING)
-                                                .optional()
-                                                .description("학원 우편번호"),
-
-                                        fieldWithPath("openToPublic")
-                                                .type(BOOLEAN)
-                                                .description("학원 공개 여부")
+                                        fieldWithPath("name").type(STRING).description("학원 이름"),
+                                        fieldWithPath("phone").type(STRING).optional().description("학원 전화번호"),
+                                        fieldWithPath("email").type(STRING).optional().description("학원 이메일"),
+                                        fieldWithPath("street").type(STRING).optional().description("학원 주소"),
+                                        fieldWithPath("addressDetail").type(STRING).optional().description("학원 상세주소"),
+                                        fieldWithPath("postalCode").type(STRING).optional().description("학원 우편번호"),
+                                        fieldWithPath("openToPublic").type(BOOLEAN).description("학원 공개 여부")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.academyId")
-                                                .type(STRING)
-                                                .description("수정을 완료한 학원 아이디")
+                                        fieldWithPath("data.academyId").type(STRING).description("수정을 완료한 학원 아이디")
                                 )
                         )
                 );
@@ -588,83 +409,88 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                 parameterWithName("academyName").description("검색할 학원 이름").optional()
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("data.academies[].id")
-                                        .type(STRING)
-                                        .description("학원 아이디"),
-
-                                fieldWithPath("data.academies[].name")
-                                        .type(STRING)
-                                        .description("학원 이름"),
-
-                                fieldWithPath("data.academies[].address.street")
-                                        .type(STRING)
-                                        .description("학원 주소 (도로명)"),
-
-                                fieldWithPath("data.academies[].address.detail")
-                                        .type(STRING)
-                                        .description("학원 주소 (상세주소)"),
-
-                                fieldWithPath("data.academies[].address.postalCode")
-                                        .type(STRING)
-                                        .description("학원 주소 (우편번호)"),
-
-                                fieldWithPath("data.academies[].phone")
-                                        .type(STRING)
-                                        .description("학원 전화번호"),
-
-                                fieldWithPath("data.academies[].email")
-                                        .type(STRING)
-                                        .description("학원 이메일"),
-
-                                fieldWithPath("data.academies[].openToPublic")
-                                        .type(BOOLEAN)
-                                        .description("학원 공개 여부"),
-
-                                fieldWithPath("data.academies[].status")
-                                        .type(STRING)
-                                        .description("학원 상태"),
-
-                                fieldWithPath("data.academies[].createdDateTime")
-                                        .type(STRING)
-                                        .description("학원 생성일시"),
-
-                                fieldWithPath("data.academies[].modifiedDateTime")
-                                        .type(STRING)
-                                        .description("학원 수정일시"),
-
-                                fieldWithPath("data.pageInfo.page")
-                                        .type(NUMBER)
-                                        .description("현재 페이지 번호"),
-
-                                fieldWithPath("data.pageInfo.size")
-                                        .type(NUMBER)
-                                        .description("페이지 크기"),
-
-                                fieldWithPath("data.pageInfo.total")
-                                        .type(NUMBER)
-                                        .description("전체 학원 수"),
-
-                                fieldWithPath("data.pageInfo.lastPage")
-                                        .type(NUMBER)
-                                        .description("마지막 페이지 번호"),
-
-                                fieldWithPath("data.pageInfo.start")
-                                        .type(NUMBER)
-                                        .description("페이지 세트의 시작 번호"),
-
-                                fieldWithPath("data.pageInfo.end")
-                                        .type(NUMBER)
-                                        .description("페이지 세트의 끝 번호"),
-
-                                fieldWithPath("data.pageInfo.hasPrev")
-                                        .type(BOOLEAN)
-                                        .description("이전 페이지 존재 여부"),
-
-                                fieldWithPath("data.pageInfo.hasNext")
-                                        .type(BOOLEAN)
-                                        .description("다음 페이지 존재 여부")
+                                fieldWithPath("data.academies[].id").type(STRING).description("학원 아이디"),
+                                fieldWithPath("data.academies[].name").type(STRING).description("학원 이름"),
+                                fieldWithPath("data.academies[].address.street").type(STRING).description("학원 주소 (도로명)"),
+                                fieldWithPath("data.academies[].address.detail").type(STRING).description("학원 주소 (상세주소)"),
+                                fieldWithPath("data.academies[].address.postalCode").type(STRING).description("학원 주소 (우편번호)"),
+                                fieldWithPath("data.academies[].phone").type(STRING).description("학원 전화번호"),
+                                fieldWithPath("data.academies[].email").type(STRING).description("학원 이메일"),
+                                fieldWithPath("data.academies[].openToPublic").type(BOOLEAN).description("학원 공개 여부"),
+                                fieldWithPath("data.academies[].status").type(STRING).description("학원 상태"),
+                                fieldWithPath("data.academies[].createdDateTime").type(STRING).description("학원 생성일시"),
+                                fieldWithPath("data.academies[].modifiedDateTime").type(STRING).description("학원 수정일시"),
+                                fieldWithPath("data.pageInfo.page").type(NUMBER).description("현재 페이지 번호"),
+                                fieldWithPath("data.pageInfo.size").type(NUMBER).description("페이지 크기"),
+                                fieldWithPath("data.pageInfo.total").type(NUMBER).description("전체 학원 수"),
+                                fieldWithPath("data.pageInfo.lastPage").type(NUMBER).description("마지막 페이지 번호"),
+                                fieldWithPath("data.pageInfo.start").type(NUMBER).description("페이지 세트의 시작 번호"),
+                                fieldWithPath("data.pageInfo.end").type(NUMBER).description("페이지 세트의 끝 번호"),
+                                fieldWithPath("data.pageInfo.hasPrev").type(BOOLEAN).description("이전 페이지 존재 여부"),
+                                fieldWithPath("data.pageInfo.hasNext").type(BOOLEAN).description("다음 페이지 존재 여부")
                         )
                 )
         );
+    }
+
+
+    @DisplayName("학원장은 자기 학원을 폐쇄 신청할 수 있다.")
+    @Test
+    void withdraw() throws Exception {
+        // given
+        Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR);
+        String token = createToken(director);
+
+        em.flush();
+        em.clear();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                delete("/api/academy")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, token)
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andDo(restDocs.document(
+                        relaxedResponseFields(
+                                fieldWithPath("data.academyId").type(STRING).description("페쇄를 신청한 학원 아이디")
+                        )
+                ));
+    }
+
+    @DisplayName("학원장은 자기 학원의 폐쇄 신청을 취소할 수 있다.")
+    @Test
+    void revokeWithdrawal() throws Exception {
+        // given
+        Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR);
+
+        refreshAnd(() -> academyCommandService.withdraw(director.getUuid()));
+
+        String token = createToken(director);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/academy/revoke")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, token)
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andDo(restDocs.document(
+                        relaxedResponseFields(
+                                fieldWithPath("data.academyId").type(STRING).description("페쇄를 취소한 학원 아이디")
+                        )
+                ));
     }
 }

@@ -1,14 +1,14 @@
-package psam.portfolio.sunder.english.web.teacher.model.entity;
+package psam.portfolio.sunder.english.web.academy.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.web.student.model.entity.Student;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.web.user.model.entity.User;
 
 import java.util.Objects;
@@ -73,6 +73,10 @@ public class Academy extends TimeEntity {
         return this.status == AcademyStatus.SUSPENDED;
     }
 
+    public boolean isWithdrawn() {
+        return this.status == AcademyStatus.WITHDRAWN;
+    }
+
     public boolean hasTeacher(User user) {
         return this.teachers.stream().anyMatch(teacher -> Objects.equals(teacher.getUuid(), user.getUuid()));
     }
@@ -95,5 +99,9 @@ public class Academy extends TimeEntity {
 
     public void setOpenToPublic(Boolean openToPublic) {
         this.openToPublic = openToPublic;
+    }
+
+    public void setStatus(AcademyStatus status) {
+        this.status = status;
     }
 }

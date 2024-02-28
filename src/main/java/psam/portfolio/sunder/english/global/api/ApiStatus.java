@@ -17,6 +17,7 @@ public enum ApiStatus {
     ACCESS_DENIAL("013", "AccessDenial"),
     ILLEGAL_DATA("031", "IllegalData"),
     ILLEGAL_STATUS("032", "IllegalStatus"),
+    ILLEGAL_ROLE("033", "IllegalRole"),
     TIME_OUT("041", "TimeOut"),
 
     OK("200", "OK"),

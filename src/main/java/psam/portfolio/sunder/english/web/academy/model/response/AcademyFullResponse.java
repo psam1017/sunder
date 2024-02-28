@@ -1,12 +1,12 @@
-package psam.portfolio.sunder.english.web.teacher.model.response;
+package psam.portfolio.sunder.english.web.academy.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import psam.portfolio.sunder.english.global.jpa.response.AddressResponse;
 import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

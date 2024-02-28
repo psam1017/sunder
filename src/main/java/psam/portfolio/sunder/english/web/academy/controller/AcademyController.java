@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.teacher.contoller;
+package psam.portfolio.sunder.english.web.academy.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,11 +6,11 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyDirectorPOST;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPATCH;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPublicSearchCond;
-import psam.portfolio.sunder.english.web.teacher.service.AcademyCommandService;
-import psam.portfolio.sunder.english.web.teacher.service.AcademyQueryService;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyDirectorPOST;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyPATCH;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.web.academy.service.AcademyCommandService;
+import psam.portfolio.sunder.english.web.academy.service.AcademyQueryService;
 
 import java.util.Map;
 import java.util.UUID;
@@ -64,23 +64,6 @@ public class AcademyController {
     }
 
     /**
-     * 학원 상세 정보 조회 서비스. 선생이 자기 학원의 정보만 조회할 수 있다.
-     *
-     * @param teacherId 선생 아이디
-     * @param select    같이 조회할 정보 = {teacher}
-     * @return 학원 상세 정보 + (선생 목록)
-     *
-     * @apiNote 응답값이 상세 정보를 포함하므로, 학생이 조회할 수 있는 학원 상세 정보 API 는 별도로 생성한다.
-     */
-    @GetMapping("")
-    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
-    public ApiResponse<Map<String, Object>> getDetail(@UserId UUID teacherId,
-                                                      @RequestParam(required = false) String select) {
-        Map<String, Object> responseData = academyQueryService.getDetail(teacherId, select);
-        return ApiResponse.ok(responseData);
-    }
-
-    /**
      * 학원 정보 수정 서비스. 본인의 학원만 수정할 수 있다.
      *
      * @param directorId   학원장 아이디
@@ -93,6 +76,30 @@ public class AcademyController {
                                                      @RequestBody @Valid AcademyPATCH academyPATCH) {
         UUID academyId = academyCommandService.updateInfo(directorId, academyPATCH);
         return ApiResponse.ok(Map.of("academyId", academyId));
+    }
+
+    /**
+     * 학원 페쇄 신청 서비스. 페쇄 신청을 하고 7일 후에 DB 에서 완전히 삭제된다.
+     * @param directorId 학원장 아이디
+     * @return 페쇄를 신청한 학원 아이디
+     */
+    @Secured("ROLE_DIRECTOR")
+    @DeleteMapping("")
+    public ApiResponse<Map<String, UUID>> withdraw(@UserId UUID directorId) {
+        UUID deletedAcademyId = academyCommandService.withdraw(directorId);
+        return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
+    }
+
+    /**
+     * 학원 페쇄 취소 서비스. 페쇄 신청을 취소하고 DB 에서 완전히 삭제된다.
+     * @param directorId 학원장 아이디
+     * @return 페쇄를 취소한 학원 아이디
+     */
+    @Secured("ROLE_DIRECTOR")
+    @PatchMapping("/revoke")
+    public ApiResponse<Map<String, UUID>> revokeWithdraw(@UserId UUID directorId) {
+        UUID deletedAcademyId = academyCommandService.revokeWithdrawal(directorId);
+        return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
     }
 
     /**
@@ -121,4 +128,22 @@ public class AcademyController {
         Map<String, Object> response = academyQueryService.getPublicList(buildCond);
         return ApiResponse.ok(response);
     }
+
+    /**
+     * 학원 상세 정보 조회 서비스. 학원에 소속된 사용자가 자기 학원의 정보만 조회할 수 있다.
+     *
+     * @param userId 조회할 사용자 아이디
+     * @param select 같이 조회할 정보 = {teacher}
+     * @return 학원 상세 정보 + (선생 목록)
+     * @apiNote 학생이 요청할 때와 선생이 요청할 때 응답스펙이 다르다.
+     */
+    @GetMapping("")
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, Object>> getDetail(@UserId UUID userId,
+                                                      @RequestParam(required = false) String select) {
+        Map<String, Object> responseData = academyQueryService.getDetail(userId, select);
+        return ApiResponse.ok(responseData);
+    }
+
+    // TODO 학생의 자기 학원 정보 조회. 다소 제한적으로 정보를 조회할 수 있음
 }

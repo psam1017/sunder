@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.web.teacher.repository;
+package psam.portfolio.sunder.english.web.academy.repository;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -9,16 +9,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import psam.portfolio.sunder.english.web.teacher.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Academy;
-import psam.portfolio.sunder.english.web.teacher.exception.NoSuchAcademyException;
-import psam.portfolio.sunder.english.web.teacher.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.web.academy.exception.NoSuchAcademyException;
+import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.web.academy.model.entity.QAcademy;
+import psam.portfolio.sunder.english.web.academy.model.request.AcademyPublicSearchCond;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.web.teacher.model.entity.QAcademy.*;
+import static psam.portfolio.sunder.english.web.academy.model.entity.QAcademy.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
