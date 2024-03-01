@@ -64,45 +64,6 @@ public class AcademyController {
     }
 
     /**
-     * 학원 정보 수정 서비스. 본인의 학원만 수정할 수 있다.
-     *
-     * @param directorId   학원장 아이디
-     * @param academyPATCH 학원의 수정할 정보
-     * @return 수정을 완료한 학원 아이디
-     */
-    @Secured("ROLE_DIRECTOR")
-    @PatchMapping("")
-    public ApiResponse<Map<String, UUID>> updateInfo(@UserId UUID directorId,
-                                                     @RequestBody @Valid AcademyPATCH academyPATCH) {
-        UUID academyId = academyCommandService.updateInfo(directorId, academyPATCH);
-        return ApiResponse.ok(Map.of("academyId", academyId));
-    }
-
-    /**
-     * 학원 페쇄 신청 서비스. 페쇄 신청을 하고 7일 후에 DB 에서 완전히 삭제된다.
-     * @param directorId 학원장 아이디
-     * @return 페쇄를 신청한 학원 아이디
-     */
-    @Secured("ROLE_DIRECTOR")
-    @DeleteMapping("")
-    public ApiResponse<Map<String, UUID>> withdraw(@UserId UUID directorId) {
-        UUID deletedAcademyId = academyCommandService.withdraw(directorId);
-        return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
-    }
-
-    /**
-     * 학원 페쇄 취소 서비스. 페쇄 신청을 취소하고 DB 에서 완전히 삭제된다.
-     * @param directorId 학원장 아이디
-     * @return 페쇄를 취소한 학원 아이디
-     */
-    @Secured("ROLE_DIRECTOR")
-    @PatchMapping("/revoke")
-    public ApiResponse<Map<String, UUID>> revokeWithdraw(@UserId UUID directorId) {
-        UUID deletedAcademyId = academyCommandService.revokeWithdrawal(directorId);
-        return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
-    }
-
-    /**
      * openToPublic = true 인 공개 학원 목록 조회 서비스
      *
      * @param page 페이지 번호
@@ -134,7 +95,7 @@ public class AcademyController {
      *
      * @param userId 조회할 사용자 아이디
      * @param select 같이 조회할 정보 = {teacher}
-     * @return 학원 상세 정보 + (선생 목록)
+     * @return 학원 상세 정보 + (선생님 목록)
      * @apiNote 학생이 요청할 때와 선생이 요청할 때 응답스펙이 다르다.
      */
     @GetMapping("")
@@ -145,5 +106,44 @@ public class AcademyController {
         return ApiResponse.ok(responseData);
     }
 
-    // TODO 학생의 자기 학원 정보 조회. 다소 제한적으로 정보를 조회할 수 있음
+    /**
+     * 학원 정보 수정 서비스. 본인의 학원만 수정할 수 있다.
+     *
+     * @param directorId   학원장 아이디
+     * @param patch        학원의 수정할 정보
+     * @return 수정을 완료한 학원 아이디
+     */
+    @Secured("ROLE_DIRECTOR")
+    @PatchMapping("")
+    public ApiResponse<Map<String, UUID>> updateInfo(@UserId UUID directorId,
+                                                     @RequestBody @Valid AcademyPATCH patch) {
+        UUID academyId = academyCommandService.updateInfo(directorId, patch);
+        return ApiResponse.ok(Map.of("academyId", academyId));
+    }
+
+    /**
+     * 학원 페쇄 신청 서비스. 페쇄 신청을 하고 7일 후에 DB 에서 완전히 삭제된다.
+     *
+     * @param directorId 학원장 아이디
+     * @return 페쇄를 신청한 학원 아이디
+     */
+    @Secured("ROLE_DIRECTOR")
+    @DeleteMapping("")
+    public ApiResponse<Map<String, UUID>> withdraw(@UserId UUID directorId) {
+        UUID deletedAcademyId = academyCommandService.withdraw(directorId);
+        return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
+    }
+
+    /**
+     * 학원 페쇄 취소 서비스. 페쇄 신청을 취소하고 DB 에서 완전히 삭제된다.
+     *
+     * @param directorId 학원장 아이디
+     * @return 페쇄를 취소한 학원 아이디
+     */
+    @Secured("ROLE_DIRECTOR")
+    @PatchMapping("/revoke")
+    public ApiResponse<Map<String, UUID>> revokeWithdraw(@UserId UUID directorId) {
+        UUID deletedAcademyId = academyCommandService.revokeWithdrawal(directorId);
+        return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
+    }
 }

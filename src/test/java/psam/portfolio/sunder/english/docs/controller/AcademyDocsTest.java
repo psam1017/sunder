@@ -32,6 +32,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
@@ -256,7 +257,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
         Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
         createRole(teacher, ROLE_TEACHER);
         String token = createToken(teacher);
@@ -339,13 +340,13 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
         saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createRole(t, RoleName.ROLE_TEACHER);
+            createRole(t, ROLE_TEACHER);
         }
         Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createRole(director, RoleName.ROLE_DIRECTOR);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         Student student = registerStudent(UserStatus.ACTIVE, academy);
-        createRole(student, RoleName.ROLE_STUDENT);
+        createRole(student, ROLE_STUDENT);
         String token = createToken(student);
 
         em.flush();
@@ -384,6 +385,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.academy.status").type(STRING).description("학원 상태"),
                                         fieldWithPath("data.academy.createdDateTime").type(STRING).description("학원 생성일시"),
                                         fieldWithPath("data.academy.modifiedDateTime").type(STRING).description("학원 수정일시"),
+                                        fieldWithPath("data.teachers[].id").type(STRING).description("선생 아이디"),
                                         fieldWithPath("data.teachers[].name").type(STRING).description("선생 이름"),
                                         fieldWithPath("data.teachers[].status").type(STRING).description("선생 상태"),
                                         fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생 권한"),
@@ -400,7 +402,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
         em.flush();
@@ -516,7 +518,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
         em.flush();
@@ -546,7 +548,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         refreshAnd(() -> academyCommandService.withdraw(director.getUuid()));
 

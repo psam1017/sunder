@@ -27,11 +27,13 @@ import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.*;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.PENDING;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 
@@ -93,12 +95,12 @@ public class AcademyCommandService {
         // teacher 생성
         Teacher saveDirector = teacherCommandRepository.save(directorPOST.toEntity(saveAcademy, encodeLoginPw));
 
-        // 원장은 원장, 선생, 학생 권한 모두 취득
-        UserRole userRole = UserRole.builder()
-                .user(saveDirector)
-                .roleName(ROLE_DIRECTOR)
-                .build();
-        userRoleCommandRepository.save(userRole);
+        // 학원장은 학원장, 선생님 권한 취득
+        List<UserRole> roles = List.of(
+                buildUserRole(saveDirector, ROLE_DIRECTOR),
+                buildUserRole(saveDirector, ROLE_TEACHER)
+        );
+        userRoleCommandRepository.saveAll(roles);
 
         // mailUtils 로 verification mail 발송
         boolean mailResult = mailUtils.sendMail(
@@ -157,18 +159,18 @@ public class AcademyCommandService {
      * 학원 정보 수정 서비스
      *
      * @param directorId 학원장 아이디
-     * @param academyPATCH 학원의 수정할 정보
+     * @param patch      학원의 수정할 정보
      * @return 수정을 완료한 학원 아이디
      */
-    public UUID updateInfo(UUID directorId, AcademyPATCH academyPATCH) {
+    public UUID updateInfo(UUID directorId, AcademyPATCH patch) {
         Teacher getDirector = teacherQueryRepository.getById(directorId);
         Academy getAcademy = getDirector.getAcademy();
 
         // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생, 단, 자기 학원은 제외하며 PENDING 상태도 제외.
         academyQueryRepository.findOne(
-                academy.name.eq(academyPATCH.getName())
-                        .or(academyPATCH.getPhone() != null ? academy.phone.eq(academyPATCH.getPhone()) : null)
-                        .or(academyPATCH.getEmail() != null ? academy.email.eq(academyPATCH.getEmail()) : null),
+                academy.name.eq(patch.getName())
+                        .or(patch.getPhone() != null ? academy.phone.eq(patch.getPhone()) : null)
+                        .or(patch.getEmail() != null ? academy.email.eq(patch.getEmail()) : null),
                 academy.status.ne(AcademyStatus.PENDING),
                 academy.uuid.ne(getAcademy.getUuid())
         ).ifPresent(academy -> {
@@ -177,17 +179,18 @@ public class AcademyCommandService {
 
         // 이메일 인증은 본인인증을 위한 것.
         // 학원의 이메일은 변경해도 조치를 취하지 않는다.
-        getAcademy.setName(academyPATCH.getName());
-        getAcademy.setAddress(academyPATCH.getAddress());
-        getAcademy.setPhone(academyPATCH.getPhone());
-        getAcademy.setEmail(academyPATCH.getEmail());
-        getAcademy.setOpenToPublic(academyPATCH.getOpenToPublic());
+        getAcademy.setName(patch.getName());
+        getAcademy.setAddress(patch.getAddress());
+        getAcademy.setPhone(patch.getPhone());
+        getAcademy.setEmail(patch.getEmail());
+        getAcademy.setOpenToPublic(patch.getOpenToPublic());
 
         return getAcademy.getUuid();
     }
 
     /**
      * 학원 폐쇄 서비스. 학원장만 가능. 폐쇄 후 7일 후에 DB 에서 완전히 삭제된다.
+     *
      * @param directorId 학원장 아이디
      * @return 폐쇄 요청한 학원 아이디
      */
@@ -207,6 +210,7 @@ public class AcademyCommandService {
 
     /**
      * 학원 폐쇄 취소 서비스. 학원장만 가능. 폐쇄 신청 후 7일 이내에만 가능하다.
+     *
      * @param directorId 학원장 아이디
      * @return 폐쇄 취소한 학원 아이디
      */
