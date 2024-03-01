@@ -11,7 +11,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.global.security.filter.JwtAuthenticationFilter;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 

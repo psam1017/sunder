@@ -1,4 +1,4 @@
-=== 자기 학원 상세 정보 조회하기
+=== 자기 학원 상세 정보 조회하기(교사)
 
 - 같은 학원 소속 사용자만 조회 가능
 
@@ -16,4 +16,5 @@ include::{snippets}/academy-docs-test/get-detail-by-teacher/response-fields.adoc
 | 코드 | 이유
 
 | NoSuchElement.User |
+| IllegalData.User.NOT_A_USER | 선생 또는 학생이 아닙니다.
 |===

@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
 import java.io.IOException;
 import java.io.PrintWriter;

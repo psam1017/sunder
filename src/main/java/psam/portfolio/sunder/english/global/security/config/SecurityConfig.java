@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -17,8 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,7 +34,7 @@ import psam.portfolio.sunder.english.global.security.handler.AuthenticationEntry
 import psam.portfolio.sunder.english.global.security.handler.AuthenticationFailureHandlerImpl;
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceImpl;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
-import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
+import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 
 @RequiredArgsConstructor
 @Configuration

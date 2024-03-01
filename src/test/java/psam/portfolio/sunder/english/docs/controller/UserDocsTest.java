@@ -31,7 +31,7 @@ public class UserDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("loginId").description("중복체크할 아이디")
@@ -59,7 +59,7 @@ public class UserDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("email").description("중복체크할 이메일")
@@ -87,7 +87,7 @@ public class UserDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("phone").description("중복체크할 연락처")

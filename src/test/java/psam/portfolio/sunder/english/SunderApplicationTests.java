@@ -20,16 +20,18 @@ import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.testbean.TestConfig;
 import psam.portfolio.sunder.english.testbean.UniqueInfoContainer;
-import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.web.academy.repository.AcademyCommandRepository;
-import psam.portfolio.sunder.english.web.teacher.repository.TeacherCommandRepository;
-import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
-import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
-import psam.portfolio.sunder.english.web.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.web.user.repository.UserRoleCommandRepository;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.student.repository.StudentCommandRepository;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
+import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,9 @@ public class SunderApplicationTests {
 	protected MailUtils mailUtils;
 
 	@Autowired
+	private StudentCommandRepository studentCommandRepository;
+
+	@Autowired
 	private TeacherCommandRepository teacherCommandRepository;
 
 	@Autowired
@@ -85,13 +90,13 @@ public class SunderApplicationTests {
 	}
 
 	public <T> T refreshAnd(Supplier<T> action) {
-		log.info("========== Flush and Clear before Action ==========");
 		em.flush();
 		em.clear();
+		System.out.println("\n#============================== Flush and Clear. Action Start. ==============================\n");
 		T result = action.get();
 		em.flush();
 		em.clear();
-		log.info("========== Flush and Clear after Action ==========");
+		System.out.println("\n#============================== Flush and Clear. Action Finished. ==============================\n");
 		return result;
 	}
 
@@ -149,6 +154,26 @@ public class SunderApplicationTests {
 				.academy(academy)
 				.build();
 		return teacherCommandRepository.save(teacher);
+	}
+
+	protected Student registerStudent(UserStatus status, Academy academy) {
+		String uniqueId = uic.getUniqueLoginId();
+		Student student = Student.builder()
+				.loginId(uniqueId)
+				.loginPw(passwordUtils.encode("qwe123!@#"))
+				.name("사용자" + uniqueId.substring(0, 3))
+				.email(uic.getUniqueEmail())
+				.emailVerified(true)
+				.phone(uic.getUniquePhoneNumber())
+				.attendanceId(uic.getUniqueAttendanceId())
+				.note("note about student")
+				.address(uic.getAnyAddress())
+				.school(uic.getAnySchool())
+				.parent(uic.getAnyParent())
+				.status(status)
+				.academy(academy)
+				.build();
+		return studentCommandRepository.save(student);
 	}
 
 	protected List<UserRole> createRole(User user, RoleName... roleNames) {

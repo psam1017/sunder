@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
-import psam.portfolio.sunder.english.web.user.exception.NoSuchUserException;
-import psam.portfolio.sunder.english.web.user.repository.UserQueryRepository;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.exception.NoSuchUserException;
+import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 
 import java.util.UUID;
 
