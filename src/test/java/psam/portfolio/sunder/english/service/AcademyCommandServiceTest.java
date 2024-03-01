@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
@@ -26,6 +27,8 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.given;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 
 public class AcademyCommandServiceTest extends SunderApplicationTests {
 
@@ -229,6 +232,48 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
 
         Academy getAcademy = academyQueryRepository.getById(getTeacher.getAcademy().getUuid());
         assertThat(getAcademy.isPending()).isTrue();
+    }
+
+    @DisplayName("등록된 학원장은 학원장, 교사의 권한을 가진다.")
+    @Test
+    void hasRoleDirectorAndTeacher() {
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
+        // given
+        AcademyPOST academyPOST = AcademyPOST.builder()
+                .name(uic.getUniqueAcademyName())
+                .phone(uic.getUniquePhoneNumber())
+                .email(uic.getUniqueEmail())
+                .street("street")
+                .addressDetail("detail")
+                .postalCode("00000")
+                .openToPublic(true)
+                .build();
+
+        DirectorPOST directorPOST = DirectorPOST.builder()
+                .loginId(uic.getUniqueLoginId())
+                .loginPw("loginPw")
+                .name("name")
+                .email(uic.getUniqueEmail())
+                .phone(uic.getUniquePhoneNumber())
+                .street("street")
+                .addressDetail("detail")
+                .postalCode("00000")
+                .build();
+
+        // when
+        UUID teacherId = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
+
+        // then
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        assertThat(getTeacher.getRoles()).hasSize(2)
+                .extracting(UserRole::getRoleName)
+                .containsExactlyInAnyOrder(
+                        ROLE_DIRECTOR,
+                        ROLE_TEACHER
+                );
     }
 
     @DisplayName("학원 uuid 로 학원과 학원장을 인증할 수 있다.")
@@ -483,7 +528,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         // given
         Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, RoleName.ROLE_DIRECTOR);
+        createRole(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
         UUID academyId = refreshAnd(() -> sut.withdraw(registerTeacher.getUuid()));
@@ -500,7 +545,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         // given
         Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, RoleName.ROLE_TEACHER);
+        createRole(registerTeacher, ROLE_TEACHER);
 
         // when
         // then
@@ -514,7 +559,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         // given
         Academy registerAcademy = registerAcademy(AcademyStatus.WITHDRAWN);
         Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, RoleName.ROLE_DIRECTOR);
+        createRole(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
         UUID academyId = refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getUuid()));
@@ -531,7 +576,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         // given
         Academy registerAcademy = registerAcademy(AcademyStatus.WITHDRAWN);
         Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, RoleName.ROLE_TEACHER);
+        createRole(registerTeacher, ROLE_TEACHER);
 
         // when
         // then

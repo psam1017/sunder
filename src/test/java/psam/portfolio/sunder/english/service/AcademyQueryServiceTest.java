@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 
 @SuppressWarnings({"unchecked", "ConstantValue"})
 public class AcademyQueryServiceTest extends SunderApplicationTests {
@@ -147,11 +148,11 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
         saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createRole(t, RoleName.ROLE_TEACHER);
+            createRole(t, ROLE_TEACHER);
         }
 
         Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createRole(director, RoleName.ROLE_DIRECTOR);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
         saveTeachers.add(0, director);
 
         // when
@@ -200,15 +201,15 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
         saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createRole(t, RoleName.ROLE_TEACHER);
+            createRole(t, ROLE_TEACHER);
         }
 
         Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createRole(director, RoleName.ROLE_DIRECTOR);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
         saveTeachers.add(0, director);
 
         Student student = registerStudent(UserStatus.ACTIVE, academy);
-        createRole(student, RoleName.ROLE_STUDENT);
+        createRole(student, ROLE_STUDENT);
 
         // when
         Map<String, Object> result = refreshAnd(() -> sut.getDetail(student.getUuid(), "teacher"));

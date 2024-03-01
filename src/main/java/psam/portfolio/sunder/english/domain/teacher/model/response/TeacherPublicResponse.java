@@ -11,6 +11,7 @@ import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -19,6 +20,7 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 public class TeacherPublicResponse {
 
+    private UUID id;
     private String name;
     private UserStatus status;
     private List<RoleName> roles;
@@ -29,6 +31,7 @@ public class TeacherPublicResponse {
 
     public static TeacherPublicResponse from(Teacher teacher) {
         return TeacherPublicResponse.builder()
+                .id(teacher.getUuid())
                 .name(teacher.getName())
                 .status(teacher.getStatus())
                 .roles(teacher.getRoles().stream().map(UserRole::getRoleName).toList())

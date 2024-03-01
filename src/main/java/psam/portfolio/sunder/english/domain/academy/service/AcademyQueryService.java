@@ -79,7 +79,7 @@ public class AcademyQueryService {
      *
      * @param userId 조회할 사용자 아이디
      * @param select 같이 조회할 정보 = {teacher}
-     * @return 학원 상세 정보 + (선생 목록)
+     * @return 학원 상세 정보 + (선생님 목록)
      * @apiNote 학생이 요청할 때와 선생이 요청할 때 응답스펙이 다르다.
      */
     public Map<String, Object> getDetail(UUID userId, String select) {
@@ -104,11 +104,11 @@ public class AcademyQueryService {
         AcademyFullResponse academyFullResponse = AcademyFullResponse.from(getAcademy);
         response.put("academy", academyFullResponse);
 
-        // 선생 정보 추가 조회
+        // 선생님 정보 추가 조회
         if (StringUtils.hasText(select)) {
             select = select.length() > 20 ? select.substring(0, 20).toLowerCase() : select.toLowerCase();
 
-            // 정렬 순서 : 원장 > 상태 > 이름
+            // 정렬 순서 : 학원장 > 상태 > 이름
             if (select.contains("teacher")) {
                 List<Teacher> sortedTeachers = getAcademy.getTeachers().stream()
                         .sorted(Comparator.comparing((Teacher t) ->

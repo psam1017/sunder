@@ -1,4 +1,4 @@
 package psam.portfolio.sunder.english.domain.teacher.model.request;
 
-public class TeacherPATCH {
+public class TeacherPATCHStatus {
 }
