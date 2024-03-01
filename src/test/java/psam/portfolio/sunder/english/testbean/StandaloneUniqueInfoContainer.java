@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.testbean;
 
 import lombok.Builder;
-import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +13,7 @@ public class StandaloneUniqueInfoContainer implements UniqueInfoContainer {
     private int emailIndex = 0;
     private int phoneIndex = 0;
     private int academyNameIndex = 0;
+    private int attendanceIdIndex = 0;
 
     private final int size;
 
@@ -21,14 +21,16 @@ public class StandaloneUniqueInfoContainer implements UniqueInfoContainer {
     private final List<String> uniqueEmailList;
     private final List<String> uniquePhoneNumberList;
     private final List<String> uniqueAcademyNameList;
+    private final List<String> uniqueAttendanceIdList;
 
     @Builder
-    public StandaloneUniqueInfoContainer(int numVal, int loginIdLen, int emailLen, String emailDomain, int academyNameMinLen, int academyNameMaxLen) {
-        size = numVal;
-        uniqueIdList = generateUniqueIds(numVal, loginIdLen);
-        uniqueEmailList = generateUniqueEmails(numVal, emailLen, emailDomain);
-        uniquePhoneNumberList = generateUniquePhoneNumbers(numVal);
-        uniqueAcademyNameList = generateUniqueAcademyNames(numVal, academyNameMinLen, academyNameMaxLen);
+    public StandaloneUniqueInfoContainer(int numberOfCollection, int loginIdLen, int emailLen, String emailDomain, int academyNameMinLen, int academyNameMaxLen, int attendateIdLen) {
+        size = numberOfCollection;
+        uniqueIdList = generateUniqueIds(numberOfCollection, loginIdLen);
+        uniqueEmailList = generateUniqueEmails(numberOfCollection, emailLen, emailDomain);
+        uniquePhoneNumberList = generateUniquePhoneNumbers(numberOfCollection);
+        uniqueAcademyNameList = generateUniqueAcademyNames(numberOfCollection, academyNameMinLen, academyNameMaxLen);
+        uniqueAttendanceIdList = generateUniqueAttendanceIds(numberOfCollection, attendateIdLen);
     }
 
     @Override
@@ -49,6 +51,11 @@ public class StandaloneUniqueInfoContainer implements UniqueInfoContainer {
     @Override
     public String getUniqueAcademyName() {
         return uniqueAcademyNameList.get(academyNameIndex++ % size);
+    }
+
+    @Override
+    public String getUniqueAttendanceId() {
+        return uniqueAttendanceIdList.get(attendanceIdIndex++ % size);
     }
 
     private List<String> generateUniqueIds(int numberOfIds, int length) {
@@ -101,12 +108,15 @@ public class StandaloneUniqueInfoContainer implements UniqueInfoContainer {
         return uniqueNames;
     }
 
-    @Override
-    public Address getAnyAddress() {
-        return Address.builder()
-                .street("서울특별시 영등포구 의사당대로 1")
-                .detail("국회")
-                .postalCode("07233")
-                .build();
+    private List<String> generateUniqueAttendanceIds(int numberOfIds, int attendateIdLen) {
+        List<String> uniqueIds = new ArrayList<>();
+        while (uniqueIds.size() < numberOfIds) {
+            String uuid = UUID.randomUUID().toString();
+            if (uuid.length() > attendateIdLen) {
+                uuid = "attend" + uuid.substring(0, attendateIdLen);
+            }
+            uniqueIds.add(uuid);
+        }
+        return uniqueIds;
     }
 }

@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.testbean;
 
 import lombok.Builder;
-import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,13 +12,15 @@ public class ConcurrentUniqueInfoContainer implements UniqueInfoContainer {
     private final Iterator<String> uniqueEmailIterator;
     private final Iterator<String> uniquePhoneNumberIterator;
     private final Iterator<String> uniqueAcademyNameIterator;
+    private final Iterator<String> uniqueAttendanceIdIterator;
 
     @Builder
-    public ConcurrentUniqueInfoContainer(int numVal, int userNameLen, int userEmailLen, String emailDom, int academyNameMinLen, int academyNameMaxLen) {
-        uniqueIdIterator = generateUniqueIds(numVal, userNameLen).iterator();
-        uniqueEmailIterator = generateUniqueEmails(numVal, userEmailLen, emailDom).iterator();
-        uniquePhoneNumberIterator = generateUniquePhoneNumbers(numVal).iterator();
-        uniqueAcademyNameIterator = generateUniqueAcademyNames(numVal, academyNameMinLen, academyNameMaxLen).iterator();
+    public ConcurrentUniqueInfoContainer(int numberOfCollection, int userNameLen, int userEmailLen, String emailDom, int academyNameMinLen, int academyNameMaxLen, int attendateIdLen) {
+        uniqueIdIterator = generateUniqueIds(numberOfCollection, userNameLen).iterator();
+        uniqueEmailIterator = generateUniqueEmails(numberOfCollection, userEmailLen, emailDom).iterator();
+        uniquePhoneNumberIterator = generateUniquePhoneNumbers(numberOfCollection).iterator();
+        uniqueAcademyNameIterator = generateUniqueAcademyNames(numberOfCollection, academyNameMinLen, academyNameMaxLen).iterator();
+        uniqueAttendanceIdIterator = generateUniqueAttendanceIds(numberOfCollection, attendateIdLen).iterator();
     }
 
     @Override
@@ -48,6 +49,13 @@ public class ConcurrentUniqueInfoContainer implements UniqueInfoContainer {
         String academyName = uniqueAcademyNameIterator.next();
         uniqueAcademyNameIterator.remove();
         return academyName;
+    }
+
+    @Override
+    public String getUniqueAttendanceId() {
+        String attendanceId = uniqueAttendanceIdIterator.next();
+        uniqueAttendanceIdIterator.remove();
+        return attendanceId;
     }
 
     private Set<String> generateUniqueIds(int numberOfIds, int length) {
@@ -100,12 +108,15 @@ public class ConcurrentUniqueInfoContainer implements UniqueInfoContainer {
         return uniqueNames;
     }
 
-    @Override
-    public Address getAnyAddress() {
-        return Address.builder()
-                .street("서울특별시 영등포구 의사당대로 1")
-                .detail("국회")
-                .postalCode("07233")
-                .build();
+    private Set<String> generateUniqueAttendanceIds(int numberOfIds, int length) {
+        Set<String> uniqueIds = Collections.synchronizedSet(new HashSet<>());
+        while (uniqueIds.size() < numberOfIds) {
+            String uuid = UUID.randomUUID().toString();
+            if (uuid.length() > length) {
+                uuid = "attend" + uuid.substring(0, length);
+            }
+            uniqueIds.add(uuid);
+        }
+        return uniqueIds;
     }
 }

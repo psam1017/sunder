@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.global.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
 import java.io.IOException;
 import java.io.PrintWriter;

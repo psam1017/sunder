@@ -6,16 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
-import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.web.academy.model.request.AcademyDirectorPOST;
-import psam.portfolio.sunder.english.web.academy.model.request.AcademyPATCH;
-import psam.portfolio.sunder.english.web.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.web.academy.service.AcademyCommandService;
-import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
+import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
+import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
+import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -28,8 +32,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.web.user.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 public class AcademyDocsTest extends RestDocsEnvironment {
 
@@ -55,7 +59,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("name").description("중복체크할 학원 이름")
@@ -83,7 +87,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("phone").description("중복체크할 전화번호")
@@ -111,7 +115,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
                                         parameterWithName("email").description("중복체크할 이메일")
@@ -166,7 +170,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         requestFields(
                                 fieldWithPath("academy.name").type(STRING).description("학원 이름"),
@@ -235,7 +239,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         pathParameters(
                                 parameterWithName("academyId").description("학원 아이디")
@@ -271,7 +275,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         queryParameters(
                                 parameterWithName("select")
@@ -315,8 +319,80 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         );
     }
 
-    // TODO 학생이 자기 학원의 상세 정보를 조회할 수 있다.
-//    @DisplayName("학생이 자기 학원의 상세 정보를 조회할 수 있다.")
+    @DisplayName("학생이 자기 학원의 상세 정보를 조회할 수 있다.")
+    @Test
+    void getDetailByStudent() throws Exception {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+
+        List<Teacher> saveTeachers = new ArrayList<>();
+        saveTeachers.add(registerTeacher("Alice", UserStatus.ACTIVE, academy));
+        saveTeachers.add(registerTeacher("Bob", UserStatus.ACTIVE, academy));
+        saveTeachers.add(registerTeacher("Charlie", UserStatus.TRIAL, academy));
+        saveTeachers.add(registerTeacher("David", UserStatus.TRIAL, academy));
+        saveTeachers.add(registerTeacher("Eve", UserStatus.PENDING, academy));
+        saveTeachers.add(registerTeacher("Frank", UserStatus.PENDING, academy));
+        saveTeachers.add(registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
+        for (Teacher t : saveTeachers) {
+            createRole(t, RoleName.ROLE_TEACHER);
+        }
+        Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
+        createRole(director, RoleName.ROLE_DIRECTOR);
+
+        Student student = registerStudent(UserStatus.ACTIVE, academy);
+        createRole(student, RoleName.ROLE_STUDENT);
+        String token = createToken(student);
+
+        em.flush();
+        em.clear();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/academy")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, token)
+                        .param("select", "teacher")
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                                queryParameters(
+                                        parameterWithName("select")
+                                                .description("""
+                                                            같이 조회할 정보 옵션 +
+                                                            - teacher : 학원에 소속된 선생 목록을 같이 조회
+                                                            """)
+                                                .optional()
+                                ),
+                                relaxedResponseFields(
+                                        fieldWithPath("data.academy.id").type(STRING).description("학원 아이디"),
+                                        fieldWithPath("data.academy.name").type(STRING).description("학원 이름"),
+                                        fieldWithPath("data.academy.address.street").type(STRING).description("학원 주소 (도로명)"),
+                                        fieldWithPath("data.academy.address.detail").type(STRING).description("학원 주소 (상세주소)"),
+                                        fieldWithPath("data.academy.address.postalCode").type(STRING).description("학원 주소 (우편번호)"),
+                                        fieldWithPath("data.academy.phone").type(STRING).description("학원 전화번호"),
+                                        fieldWithPath("data.academy.email").type(STRING).description("학원 이메일"),
+                                        fieldWithPath("data.academy.openToPublic").type(BOOLEAN).description("학원 공개 여부"),
+                                        fieldWithPath("data.academy.status").type(STRING).description("학원 상태"),
+                                        fieldWithPath("data.academy.createdDateTime").type(STRING).description("학원 생성일시"),
+                                        fieldWithPath("data.academy.modifiedDateTime").type(STRING).description("학원 수정일시"),
+                                        fieldWithPath("data.teachers[].name").type(STRING).description("선생 이름"),
+                                        fieldWithPath("data.teachers[].status").type(STRING).description("선생 상태"),
+                                        fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생 권한"),
+                                        fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생 생성일시"),
+                                        fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생 수정일시")
+                                )
+                        )
+                );
+    }
 
     @DisplayName("academy 의 정보를 수정할 수 있다.")
     @Test
@@ -351,7 +427,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 requestFields(
                                         fieldWithPath("name").type(STRING).description("학원 이름"),
@@ -391,7 +467,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         queryParameters(
                                 parameterWithName("page").description("페이지 번호. 최소 1"),
@@ -456,7 +532,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         relaxedResponseFields(
                                 fieldWithPath("data.academyId").type(STRING).description("페쇄를 신청한 학원 아이디")
@@ -486,7 +562,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         relaxedResponseFields(
                                 fieldWithPath("data.academyId").type(STRING).description("페쇄를 취소한 학원 아이디")

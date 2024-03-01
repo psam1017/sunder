@@ -26,7 +26,7 @@ public class PageInfo {
             this.start = page;
             this.end = page;
         } else {
-            this.start = ((page - 1) / size) * size + 1;
+            this.start = ((page - 1) / pageSetAmount) * pageSetAmount + 1;
             this.end = Math.min(start + pageSetAmount - 1, lastPage);
         }
         this.hasPrev = start != 1;

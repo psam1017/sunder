@@ -1,7 +1,7 @@
 (CommandRepository V1)
 ```
 import org.springframework.data.jpa.repository.JpaRepository;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.web.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
 import java.util.List;
 import java.util.UUID;

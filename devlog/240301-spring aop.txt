@@ -1,0 +1,93 @@
+오늘 테스트를 돌아보면서 문득, UniqueInfoContainer 의 생성 시간이 궁금해졌다.
+UniqueInfoContainer 에서는 빈 생성 시점에 사용자가 지정한 개수 만큼의 고유 정보들을 가지고 있다.
+예를 들어 unique 한 로그인 아이디를 50개 만들라고 하면, 인스턴스 생성 시점에 그 50개의 고유한 문자열을 만드는 식이다.
+그리고 UniqueInfoContainer 는 로그인 아이디만이 아니라 연락처, 이메일 주소 등 여러 고유값들을 가지고 있기 때문에 혹시 이 객체의 인스턴스 생성이 과도하게 시간을 소모하지 않을지 궁금해졌다.
+UniqueInfoContainer 는 테스트의 편의와 품질 향상을 위해 생성한 객체인 만큼, 이 객체에 의해 테스트 비용이 오히려 증가한다면 이 객체의 의의가 없어지기 때문이다.
+
+처음에는 빈 등록 메소드에 log 를 남겼는데, 생각해보니 UniqueInfoContainer 만이 아니라 다른 여러 객체상황에서도 이렇게 생성/실행 시간을 측정할 수 있을 것 같았다.
+그리고 이렇게 횡단 관심사를 특정 메소드의 코드에 투입하여 결합도를 높이는 것 자체가 바람직한 일은 아니다.
+
+그래서 오랜만에 스프링 AOP 참고자료를 보면서 aop 기능을 추가했고, annotation 기반으로 생성했다.
+aspectJ 표현식은 여러 가지 있긴 하지만 그렇다고 필요 없는 내용을 모두 추가하지는 않고 필요한 내용 위주로 프로젝트에 적용할 계획이다.
+
+Aspect 를 적용하는 김에 package 구조도 다시 정리를 했다. 기존에는 ControllerAdvice 와 ExceptionHandler 클래스가 ...global.advice.controller 패키지 안에 있었는데, 이렇게 하다 보니 aop 용어인 advice 와 겹치는 게 신경이 쓰였다.
+물론 ControllerAdvice 의 이 Advice 는 위에서 언급한 그것이 적용된 게 맞다. 하지만 ControllerAdvice 는 자주 사용될 뿐더러 그 기능이 다른 aspect 와도 구별되는 감이 있기 때문에 이를 aspect 패키지 안에 두는 게 영 맘에 들지 않았다. 그렇다고 패키지 이름을 controlleradvice 라고 짓자니 가독성이 떨어지는 것 같았다.
+찾기 편하면서 && 용어/주제가 겹치지 않고 && ControllerAdvice 라는 응집도를 잘 나타내는, 그런 이름을 고민하다가 exhandler 라고 이름을 지었다. 이것도 아주 마음에 들지는 않는다. 나중에 또 바꿀 수도 있을 것 같다.
+만약 외부인이 ControllerAdvice "만" 찾으려고 한다면 접근이 어려울 것이다. 하지만 적어도 ControllerAdvice 의 의의와 기능을 알기만 한다면 exhandler 를 한 번은 찾아보게 되지 않을까 싶다.
+아니면 하다 못해 김영한의 Spring Web 강의를 수강했다면, 해당 강의에서도 exhandler 라는 용어를 사용하니 그 기억을 더듬어 찾아볼 수 있지 않을까 하는 낙관적인 생각에 이렇게 지었다.
+
+* 아래는 이번에 적용한 Aspect 코드 및 그 예시이다.
+
+(annotation)
+```
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Trace {
+
+    boolean runtime() default true;
+
+    boolean signature() default true;
+}
+```
+
+(aspect)
+```
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+
+@Slf4j
+@Aspect
+public class TraceAspect {
+
+    @Around("@annotation(trace)")
+    public Object doTrace(ProceedingJoinPoint pjp, Trace trace) throws Throwable {
+        long startTime = System.currentTimeMillis();
+        Object proceed = pjp.proceed();
+        long endTime = System.currentTimeMillis();
+
+        if (trace.runtime()) {
+            log.info("[Trace - Runtime] {} : {}ms", proceed.getClass().getSimpleName(), endTime - startTime);
+        }
+
+        if (trace.signature()) {
+            log.info("[Trace - Signature] {} : args = {}", pjp.getSignature(), pjp.getArgs());
+        }
+
+        return proceed;
+    }
+}
+```
+
+(적용 예시)
+```
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import psam.portfolio.sunder.english.global.aspect.trace.Trace;
+
+@Slf4j
+@TestConfiguration
+public class TestConfig {
+
+    @Bean
+    @Trace(signature = false)
+    public UniqueInfoContainer uniqueInfoContainer() {
+        return StandaloneUniqueInfoContainer.builder()
+                .numberOfCollection(30)
+                .loginIdLen(8)
+                .emailLen(8)
+                .emailDomain("sunder.net")
+                .academyNameMinLen(2)
+                .academyNameMaxLen(8)
+                .attendateIdLen(8)
+                .build();
+    }
+}
+```

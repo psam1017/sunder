@@ -5,17 +5,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.global.pagination.PageInfo;
-import psam.portfolio.sunder.english.web.academy.enumeration.AcademyStatus;
-import psam.portfolio.sunder.english.web.academy.exception.OneParamToCheckAcademyDuplException;
-import psam.portfolio.sunder.english.web.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.web.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.web.academy.model.request.AcademyPublicSearchCond;
-import psam.portfolio.sunder.english.web.academy.model.response.AcademyFullResponse;
-import psam.portfolio.sunder.english.web.teacher.model.response.TeacherFullResponse;
-import psam.portfolio.sunder.english.web.academy.service.AcademyQueryService;
-import psam.portfolio.sunder.english.web.user.enumeration.RoleName;
-import psam.portfolio.sunder.english.web.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.exception.OneParamToCheckAcademyDuplException;
+import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.domain.academy.model.response.AcademyFullResponse;
+import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
+import psam.portfolio.sunder.english.domain.academy.service.AcademyQueryService;
+import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -129,33 +132,27 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     public void getDetailByTeacher() {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createRole(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
 
-        Teacher teacher1 = registerTeacher("Alice", UserStatus.ACTIVE, academy);
-        createRole(teacher1, RoleName.ROLE_TEACHER);
-        Teacher teacher2 = registerTeacher("Bob", UserStatus.ACTIVE, academy);
-        createRole(teacher2, RoleName.ROLE_TEACHER);
-        Teacher teacher3 = registerTeacher("Charlie", UserStatus.TRIAL, academy);
-        createRole(teacher3, RoleName.ROLE_TEACHER);
-        Teacher teacher4 = registerTeacher("David", UserStatus.TRIAL, academy);
-        createRole(teacher4, RoleName.ROLE_TEACHER);
-        Teacher teacher5 = registerTeacher("Eve", UserStatus.PENDING, academy);
-        createRole(teacher5, RoleName.ROLE_TEACHER);
-        Teacher teacher6 = registerTeacher("Frank", UserStatus.PENDING, academy);
-        createRole(teacher6, RoleName.ROLE_TEACHER);
-        Teacher teacher7 = registerTeacher("Grace", UserStatus.WITHDRAWN, academy);
-        createRole(teacher7, RoleName.ROLE_TEACHER);
-        Teacher teacher8 = registerTeacher("Hank", UserStatus.WITHDRAWN, academy);
-        createRole(teacher8, RoleName.ROLE_TEACHER);
-        Teacher teacher9 = registerTeacher("Ivy", UserStatus.FORBIDDEN, academy);
-        createRole(teacher9, RoleName.ROLE_TEACHER);
-        Teacher teacher10 = registerTeacher("Jack", UserStatus.FORBIDDEN, academy);
-        createRole(teacher10, RoleName.ROLE_TEACHER);
-        Teacher teacher11 = registerTeacher("Kate", UserStatus.TRIAL_END, academy);
-        createRole(teacher11, RoleName.ROLE_TEACHER);
-        Teacher teacher12 = registerTeacher("Liam", UserStatus.TRIAL_END, academy);
-        createRole(teacher12, RoleName.ROLE_TEACHER);
+        List<Teacher> saveTeachers = new ArrayList<>();
+        saveTeachers.add(registerTeacher("Alice", UserStatus.ACTIVE, academy));
+        saveTeachers.add(registerTeacher("Bob", UserStatus.ACTIVE, academy));
+        saveTeachers.add(registerTeacher("Charlie", UserStatus.TRIAL, academy));
+        saveTeachers.add(registerTeacher("David", UserStatus.TRIAL, academy));
+        saveTeachers.add(registerTeacher("Eve", UserStatus.PENDING, academy));
+        saveTeachers.add(registerTeacher("Frank", UserStatus.PENDING, academy));
+        saveTeachers.add(registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
+        for (Teacher t : saveTeachers) {
+            createRole(t, RoleName.ROLE_TEACHER);
+        }
+
+        Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
+        createRole(director, RoleName.ROLE_DIRECTOR);
+        saveTeachers.add(0, director);
 
         // when
         Map<String, Object> result = refreshAnd(() -> sut.getDetail(director.getUuid(), "teacher"));
@@ -178,24 +175,66 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         List<TeacherFullResponse> teacherFullResponses = (List<TeacherFullResponse>) result.get("teachers");
         assertThat(teacherFullResponses).hasSize(13)
                 .extracting(TeacherFullResponse::getName)
-                .containsExactly(
-                        director.getName(),
-                        teacher1.getName(),
-                        teacher2.getName(),
-                        teacher3.getName(),
-                        teacher4.getName(),
-                        teacher5.getName(),
-                        teacher6.getName(),
-                        teacher7.getName(),
-                        teacher8.getName(),
-                        teacher9.getName(),
-                        teacher10.getName(),
-                        teacher11.getName(),
-                        teacher12.getName()
+                .containsExactlyElementsOf(
+                        saveTeachers.stream().map(Teacher::getName).toList()
                 );
     }
 
-    // TODO 학생이 자기 학원의 정보를 조회할 수 있다.
+    @DisplayName("학생이 자기 학원의 정보를 조회할 수 있다.")
+    @Test
+    public void getDetailByStudent() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+
+        List<Teacher> saveTeachers = new ArrayList<>();
+        saveTeachers.add(registerTeacher("Alice", UserStatus.ACTIVE, academy));
+        saveTeachers.add(registerTeacher("Bob", UserStatus.ACTIVE, academy));
+        saveTeachers.add(registerTeacher("Charlie", UserStatus.TRIAL, academy));
+        saveTeachers.add(registerTeacher("David", UserStatus.TRIAL, academy));
+        saveTeachers.add(registerTeacher("Eve", UserStatus.PENDING, academy));
+        saveTeachers.add(registerTeacher("Frank", UserStatus.PENDING, academy));
+        saveTeachers.add(registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
+        for (Teacher t : saveTeachers) {
+            createRole(t, RoleName.ROLE_TEACHER);
+        }
+
+        Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
+        createRole(director, RoleName.ROLE_DIRECTOR);
+        saveTeachers.add(0, director);
+
+        Student student = registerStudent(UserStatus.ACTIVE, academy);
+        createRole(student, RoleName.ROLE_STUDENT);
+
+        // when
+        Map<String, Object> result = refreshAnd(() -> sut.getDetail(student.getUuid(), "teacher"));
+
+        // then
+        AcademyFullResponse academyFullResponse = (AcademyFullResponse) result.get("academy");
+        assertThat(academyFullResponse).isNotNull();
+        assertThat(academyFullResponse.getId()).isEqualTo(academy.getUuid());
+        assertThat(academyFullResponse.getName()).isEqualTo(academy.getName());
+        assertThat(academyFullResponse.getPhone()).isEqualTo(academy.getPhone());
+        assertThat(academyFullResponse.getEmail()).isEqualTo(academy.getEmail());
+        assertThat(academyFullResponse.isOpenToPublic()).isEqualTo(academy.isOpenToPublic());
+        assertThat(academyFullResponse.getStatus()).isEqualTo(academy.getStatus());
+        assertThat(academyFullResponse.getAddress().getStreet()).isEqualTo(academy.getAddress().getStreet());
+        assertThat(academyFullResponse.getAddress().getDetail()).isEqualTo(academy.getAddress().getDetail());
+        assertThat(academyFullResponse.getAddress().getPostalCode()).isEqualTo(academy.getAddress().getPostalCode());
+        assertThat(academyFullResponse.getCreatedDateTime()).isNotNull();
+        assertThat(academyFullResponse.getModifiedDateTime()).isNotNull();
+
+        List<TeacherPublicResponse> teacherPublicResponses = (List<TeacherPublicResponse>) result.get("teachers");
+        assertThat(teacherPublicResponses).hasSize(13)
+                .extracting(TeacherPublicResponse::getName)
+                .containsExactlyElementsOf(
+                        saveTeachers.stream().map(Teacher::getName).toList()
+                );
+    }
 
     @DisplayName("공개된 학원의 목록에서 학원 1개를 조회할 수 있다.")
     @Test
