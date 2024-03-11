@@ -30,6 +30,8 @@ public class TeacherCommandService {
     private final TeacherCommandRepository teacherCommandRepository;
     private final TeacherQueryRepository teacherQueryRepository;
 
+    // TODO
+
     /**
      * 선생님 등록 서비스
      *

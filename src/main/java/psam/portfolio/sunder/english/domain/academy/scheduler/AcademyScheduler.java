@@ -16,7 +16,9 @@ public class AcademyScheduler {
 
     private final AcademyCommandRepository academyCommandRepository;
 
-    // 폐쇄 요청한지 7일 이상 지난 학원은 삭제
+    /**
+     * 매일 0시 1분에 탈퇴 요청 후 7일 이상 지난 학원은 삭제
+     */
     @Scheduled(cron = "0 1 0 * * *")
     public void deleteWithdrawnAcademy() {
         academyCommandRepository.deleteAllByStatusAndWithdrawalAtBefore(

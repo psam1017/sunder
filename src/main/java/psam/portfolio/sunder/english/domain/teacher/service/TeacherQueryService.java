@@ -16,6 +16,8 @@ public class TeacherQueryService {
 
     private final TeacherQueryRepository teacherQueryRepository;
 
+    // TODO
+
     /**
      * 선생님 목록 조회 서비스
      *

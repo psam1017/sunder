@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
 import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
@@ -226,5 +227,16 @@ public class AcademyCommandService {
         Academy academy = director.getAcademy();
         academy.setStatus(AcademyStatus.VERIFIED);
         return academy.getUuid();
+    }
+
+    /**
+     * 체험판을 종료하고 정식으로 서비스를 사용하기 위해 회원 상태를 전환하는 서비스
+     * - 학원장의 아이디와 비밀번호로만 가능하며, 해당 학원 소속의 모든 사용자의 상태가 전환된다.
+     * @param userInfo 학원장의 아이디와 비밀번호
+     * @return 전환 완료 여부
+     */
+    public boolean endTrial(UserPOSTLogin userInfo) {
+        // TODO
+        return false;
     }
 }
