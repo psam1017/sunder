@@ -27,6 +27,8 @@ import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -201,12 +203,12 @@ public class AcademyCommandService {
         if (!director.isDirector()) {
             throw new RoleDirectorRequiredException();
         }
+
         Academy academy = director.getAcademy();
         academy.setStatus(AcademyStatus.WITHDRAWN);
+        academy.setWithdrawalAt(LocalDate.now().plusDays(8).atStartOfDay());
         return academy.getUuid();
     }
-
-    // TODO scheduler 로 폐쇄 요청한지 7일이 지난 학원 삭제
 
     /**
      * 학원 폐쇄 취소 서비스. 학원장만 가능. 폐쇄 신청 후 7일 이내에만 가능하다.

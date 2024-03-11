@@ -63,6 +63,9 @@ public class SunderApplicationTests {
 	@Autowired
 	protected UniqueInfoContainer uic;
 
+	@Autowired
+	private PasswordUtils passwordUtils;
+
 	@MockBean
 	protected MailUtils mailUtils;
 
@@ -77,9 +80,6 @@ public class SunderApplicationTests {
 
 	@Autowired
 	private UserRoleCommandRepository userRoleCommandRepository;
-
-	@Autowired
-	private PasswordUtils passwordUtils;
 
 	protected String createJson(Object body) {
 		try {
@@ -98,6 +98,16 @@ public class SunderApplicationTests {
 		em.clear();
 		System.out.println("\n#============================== Flush and Clear. Action Finished. ==============================\n");
 		return result;
+	}
+
+	public void refreshAnd(Runnable action) {
+		em.flush();
+		em.clear();
+		System.out.println("\n#============================== Flush and Clear. Action Start. ==============================\n");
+		action.run();
+		em.flush();
+		em.clear();
+		System.out.println("\n#============================== Flush and Clear. Action Finished. ==============================\n");
 	}
 
 	protected Academy registerAcademy(AcademyStatus status) {

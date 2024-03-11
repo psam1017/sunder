@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.exhandler;
+package psam.portfolio.sunder.english.global.exception;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
