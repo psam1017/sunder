@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
@@ -145,5 +146,17 @@ public class AcademyController {
     public ApiResponse<Map<String, UUID>> revokeWithdraw(@UserId UUID directorId) {
         UUID deletedAcademyId = academyCommandService.revokeWithdrawal(directorId);
         return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
+    }
+
+    /**
+     * 체험판을 종료하고 정식으로 서비스를 사용하기 위해 회원 상태를 전환하는 서비스
+     * - 학원장의 아이디와 비밀번호로만 가능하며, 해당 학원 소속의 모든 사용자의 상태가 전환된다.
+     * @param userInfo 학원장의 아이디와 비밀번호
+     * @return 전환 완료 여부
+     */
+    @PostMapping("/end-trial")
+    public ApiResponse<Map<String, Boolean>> endTrial(@RequestBody @Valid UserPOSTLogin userInfo) {
+        boolean result = academyCommandService.endTrial(userInfo);
+        return ApiResponse.ok(Map.of("endTrial", result));
     }
 }

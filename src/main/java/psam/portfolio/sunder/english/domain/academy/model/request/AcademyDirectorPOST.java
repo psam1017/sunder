@@ -82,7 +82,7 @@ public class AcademyDirectorPOST {
     public static class DirectorPOST {
 
         @NotBlank
-        @Pattern(regexp = "^[a-zA-Z0-9]{4,20}$")
+        @Pattern(regexp = "^[a-zA-Z0-9]{6,20}$")
         private String loginId;
 
         @NotBlank

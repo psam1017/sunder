@@ -90,11 +90,23 @@ public abstract class User extends BaseEntity {
         this.status = UserStatus.TRIAL;
     }
 
+    public void startActive() {
+        this.status = UserStatus.ACTIVE;
+    }
+
+    public void setLastPasswordChangeDateTime(LocalDateTime lastPasswordChangeDateTime) {
+        this.lastPasswordChangeDateTime = lastPasswordChangeDateTime;
+    }
+
     public boolean isPasswordExpired() {
         return this.lastPasswordChangeDateTime.plusMonths(3).isBefore(LocalDateTime.now());
     }
 
     public boolean isAdmin() {
         return this.roles.stream().anyMatch(userRole -> userRole.getRoleName() == RoleName.ROLE_ADMIN);
+    }
+
+    public void setLoginPw(String loginPw) {
+        this.loginPw = loginPw;
     }
 }

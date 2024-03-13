@@ -10,13 +10,17 @@ UniqueInfoContainer 는 테스트의 편의와 품질 향상을 위해 생성한
 그래서 오랜만에 스프링 AOP 참고자료를 보면서 aop 기능을 추가했고, annotation 기반으로 생성했다.
 aspectJ 표현식은 여러 가지 있긴 하지만 그렇다고 필요 없는 내용을 모두 추가하지는 않고 필요한 내용 위주로 프로젝트에 적용할 계획이다.
 
+* 적용된 Aspect 코드 및 그 예시는 아래에 기술한다.
+* 결과적으로, UniqueInfoContainer 의 인스턴스 생성을 포함한 빈 등록 전체 시간이 5ms ~ 20ms 정도로 비용이 거의 발생하지 않는 것으로 나타났다.
+
 Aspect 를 적용하는 김에 package 구조도 다시 정리를 했다. 기존에는 ControllerAdvice 와 ExceptionHandler 클래스가 ...global.advice.controller 패키지 안에 있었는데, 이렇게 하다 보니 aop 용어인 advice 와 겹치는 게 신경이 쓰였다.
 물론 ControllerAdvice 의 이 Advice 는 위에서 언급한 그것이 적용된 게 맞다. 하지만 ControllerAdvice 는 자주 사용될 뿐더러 그 기능이 다른 aspect 와도 구별되는 감이 있기 때문에 이를 aspect 패키지 안에 두는 게 영 맘에 들지 않았다. 그렇다고 패키지 이름을 controlleradvice 라고 짓자니 가독성이 떨어지는 것 같았다.
 찾기 편하면서 && 용어/주제가 겹치지 않고 && ControllerAdvice 라는 응집도를 잘 나타내는, 그런 이름을 고민하다가 exhandler 라고 이름을 지었다. 이것도 아주 마음에 들지는 않는다. 나중에 또 바꿀 수도 있을 것 같다.
 만약 외부인이 ControllerAdvice "만" 찾으려고 한다면 접근이 어려울 것이다. 하지만 적어도 ControllerAdvice 의 의의와 기능을 알기만 한다면 exhandler 를 한 번은 찾아보게 되지 않을까 싶다.
 아니면 하다 못해 김영한의 Spring Web 강의를 수강했다면, 해당 강의에서도 exhandler 라는 용어를 사용하니 그 기억을 더듬어 찾아볼 수 있지 않을까 하는 낙관적인 생각에 이렇게 지었다.
 
-* 아래는 이번에 적용한 Aspect 코드 및 그 예시이다.
+(03.11. 추가)
+package 이름은 한동안 계속 바뀔 수 있을 것 같다. 이것저것 한동안 바꾸면서 내 마음에 드는 이름을 천천히 정하려고 한다.
 
 (annotation)
 ```

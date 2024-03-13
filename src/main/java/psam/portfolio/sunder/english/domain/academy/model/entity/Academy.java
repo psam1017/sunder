@@ -11,6 +11,7 @@ import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -41,6 +42,8 @@ public class Academy extends TimeEntity {
     @Enumerated(EnumType.STRING)
     private AcademyStatus status;
 
+    private LocalDateTime withdrawalAt;
+
     @OneToMany(mappedBy = "academy")
     private Set<Teacher> teachers;
 
@@ -55,6 +58,7 @@ public class Academy extends TimeEntity {
         this.email = email;
         this.openToPublic = openToPublic;
         this.status = status;
+        this.withdrawalAt = null;
     }
 
     public void verify() {
@@ -103,5 +107,9 @@ public class Academy extends TimeEntity {
 
     public void setStatus(AcademyStatus status) {
         this.status = status;
+    }
+
+    public void setWithdrawalAt(LocalDateTime withdrawalAt) {
+        this.withdrawalAt = withdrawalAt;
     }
 }

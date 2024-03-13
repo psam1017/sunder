@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.exhandler;
+package psam.portfolio.sunder.english.global.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
