@@ -1,18 +1,21 @@
 package psam.portfolio.sunder.english.domain.user.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostID;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostPW;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostId;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostPw;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTPassword;
+import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
+import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -44,19 +47,31 @@ public class UserController {
      * @return 인증한 사용자에게 발급하는 토큰
      */
     @PostMapping("/login")
-    public ApiResponse<Map<String, String>> login(@RequestBody @Valid UserPOSTLogin loginInfo) {
-        String token = userQueryService.login(loginInfo);
-        return ApiResponse.ok(Map.of("token", token));
+    public ApiResponse<LoginResult> login(@RequestBody @Valid UserPOSTLogin loginInfo) {
+        LoginResult result = userQueryService.login(loginInfo);
+        return ApiResponse.ok(result);
     }
+
+    /**
+     * 로그인 비밀번호 변경 알림 지연 서비스
+     * @return 지연 성공 여부
+     */
+    @PostMapping("/delay-password-change")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, Boolean>> delayPasswordChange(@UserId UUID userId) {
+        boolean result = userCommandService.delayPasswordChange(userId);
+        return ApiResponse.ok(Map.of("delay", result));
+    }
+
 
     /**
      * 토큰 재발급 서비스
      * @return 새로 발급한 토큰
      */
     @PostMapping("/new-token")
-    public ApiResponse<Map<String, String>> reissueToken(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        String newToken = userQueryService.reissueToken(token);
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, String>> reissueToken(@UserId UUID userId) {
+        String newToken = userQueryService.reissueToken(userId);
         return ApiResponse.ok(Map.of("token", newToken));
     }
 
@@ -67,7 +82,7 @@ public class UserController {
      * @return 이메일 발송 여부
      */
     @PostMapping("/find-login-id")
-    public ApiResponse<Map<String, Boolean>> findLoginId(@RequestBody @Valid UserPOSTLostID userInfo) {
+    public ApiResponse<Map<String, Boolean>> findLoginId(@RequestBody @Valid UserPOSTLostId userInfo) {
         boolean result = userQueryService.findLoginId(userInfo);
         return ApiResponse.ok(Map.of("email", result));
     }
@@ -79,7 +94,7 @@ public class UserController {
      * @return 이메일 발송 여부
      */
     @PostMapping("/issue-temp-password")
-    public ApiResponse<Map<String, Boolean>> issueTempPassword(@RequestBody @Valid UserPOSTLostPW userInfo) {
+    public ApiResponse<Map<String, Boolean>> issueTempPassword(@RequestBody @Valid UserPOSTLostPw userInfo) {
         boolean result = userCommandService.issueTempPassword(userInfo);
         return ApiResponse.ok(Map.of("email", result));
     }

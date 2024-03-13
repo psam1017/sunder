@@ -2,23 +2,30 @@ package psam.portfolio.sunder.english.domain.user.service;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostID;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostPW;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostId;
+import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.global.api.ApiStatus;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
+import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
+import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
@@ -31,6 +38,9 @@ public class UserQueryService {
     private final UserQueryRepository userQueryRepository;
     private final JwtUtils jwtUtils;
     private final PasswordUtils passwordUtils;
+    private final MailUtils mailUtils;
+    private final MessageSource messageSource;
+    private final TemplateEngine templateEngine;
 
     /**
      * GET /api/user/check-dupl?loginId={loginId}&email={email}&phone={phone}
@@ -88,14 +98,17 @@ public class UserQueryService {
      * 로그인 서비스
      *
      * @param loginInfo 로그인 정보
-     * @return 인증한 사용자에게 발급하는 토큰
+     * @return 인증한 사용자에게 발급하는 토큰과 함께 비밀번호 변경 알림 여부를 반환
      */
-    public String login(UserPOSTLogin loginInfo) {
+    public LoginResult login(UserPOSTLogin loginInfo) {
 
-        User getUser = userQueryRepository.getOne(
-                user.loginId.eq(loginInfo.getLoginId()),
-                user.loginPw.eq(loginInfo.getLoginPw())
-        );
+        User getUser = userQueryRepository.findOne(
+                user.loginId.eq(loginInfo.getLoginId())
+        ).orElseThrow(LoginFailException::new);
+
+        if (!passwordUtils.matches(getUser.getLoginPw(), loginInfo.getLoginPw())) {
+            throw new LoginFailException();
+        }
 
         UserStatus userStatus = getUser.getStatus();
         if (userStatus != ACTIVE && userStatus != TRIAL) {
@@ -108,20 +121,20 @@ public class UserQueryService {
         }
 
         // 토큰 만료 시간은 3시간
-        return jwtUtils.generateToken(getUser.getUuid().toString(), 1000 * 60 * 60 * 3);
+        String token = jwtUtils.generateToken(getUser.getUuid().toString(), 1000 * 60 * 60 * 3);
+        return new LoginResult(token, getUser.isPasswordExpired());
     }
-
-    // TODO
 
     /**
      * POST /api/user/new-token
      * 토큰 재발급 서비스
      *
-     * @param token 기존 토큰
+     * @param userId 사용자 아이디
      * @return 새로 발급한 토큰
      */
-    public String reissueToken(String token) {
-        return null;
+    public String reissueToken(UUID userId) {
+        // 토큰 만료 시간은 3시간
+        return jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3);
     }
 
     /**
@@ -129,10 +142,29 @@ public class UserQueryService {
      * 로그인 아이디를 분실한 경우 가입 여부를 확인하는 서비스
      *
      * @param userInfo 로그인 아이디를 분실한 가입자 정보
-     * @return 이메일 발송 여부
+     * @return 이메일 발송 성공 여부
      */
-    public boolean findLoginId(UserPOSTLostID userInfo) {
+    public boolean findLoginId(UserPOSTLostId userInfo) {
+        Optional<User> optUser = userQueryRepository.findOne(
+                user.email.eq(userInfo.getEmail()),
+                user.name.eq(userInfo.getName())
+        );
+
+        if (optUser.isPresent()) {
+            User getUser = optUser.get();
+            return mailUtils.sendMail(
+                    getUser.getEmail(),
+                    messageSource.getMessage("mail.login-id.subject", null, Locale.getDefault()),
+                    setFindLoginIdMailText(getUser)
+            );
+        }
         return false;
+    }
+
+    private String setFindLoginIdMailText(User user) {
+        Context context = new Context();
+        context.setVariable("loginId", user.getLoginId());
+        return templateEngine.process("mail-login-id", context);
     }
 
     /**

@@ -6,35 +6,40 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
-import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
-import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
-import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
-import psam.portfolio.sunder.english.domain.teacher.exception.RoleDirectorRequiredException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.DirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepository;
+import psam.portfolio.sunder.english.domain.student.repository.StudentCommandRepository;
+import psam.portfolio.sunder.english.domain.teacher.exception.RoleDirectorRequiredException;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.QTeacher;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
+import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
+import psam.portfolio.sunder.english.global.api.ApiException;
+import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.global.api.ApiStatus;
+import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
+import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
+import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.*;
+import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.academy;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.PENDING;
@@ -54,6 +59,7 @@ public class AcademyCommandService {
     private final AcademyQueryRepository academyQueryRepository;
     private final TeacherCommandRepository teacherCommandRepository;
     private final TeacherQueryRepository teacherQueryRepository;
+    private final StudentCommandRepository studentCommandRepository;
     private final UserQueryRepository userQueryRepository;
     private final UserRoleCommandRepository userRoleCommandRepository;
 
@@ -236,7 +242,26 @@ public class AcademyCommandService {
      * @return 전환 완료 여부
      */
     public boolean endTrial(UserPOSTLogin userInfo) {
-        // TODO
-        return false;
+        Teacher director = teacherQueryRepository.findOne(
+                QTeacher.teacher.loginId.eq(userInfo.getLoginId())
+        ).orElseThrow(LoginFailException::new);
+
+        if (!passwordUtils.matches(director.getLoginPw(), userInfo.getLoginPw())) {
+            throw new LoginFailException();
+        }
+
+        if (!director.isTrial() && !director.isTrialEnd()) {
+            throw new ApiException() {
+                @Override
+                public ApiResponse<?> initialize() {
+                    return ApiResponse.error(ApiStatus.ILLEGAL_STATUS, Teacher.class, director.getStatus().toString(), "체험판 종료가 불가능한 상태입니다. [" + director.getStatus() + "]");
+                }
+            };
+        }
+
+        String academyId = director.getAcademy().getUuid().toString();
+        teacherCommandRepository.startActiveByAcademyId(academyId);
+        studentCommandRepository.startActiveByAcademyId(academyId);
+        return true;
     }
 }
