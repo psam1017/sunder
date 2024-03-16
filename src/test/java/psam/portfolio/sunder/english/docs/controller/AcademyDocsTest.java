@@ -7,7 +7,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -568,6 +568,43 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andDo(restDocs.document(
                         relaxedResponseFields(
                                 fieldWithPath("data.academyId").type(STRING).description("페쇄를 취소한 학원 아이디")
+                        )
+                ));
+    }
+
+    @DisplayName("사용 체험 중인 학원장이 정규회원으로 전환할 수 있다.")
+    @Test
+    void endTrial() throws Exception {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.TRIAL, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        String token = createToken(director);
+
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+
+        em.flush();
+        em.clear();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/academy/end-trial")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, token)
+                        .content(createJson(loginForm))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                        requestFields(
+                                fieldWithPath("loginId").type(STRING).description("학원장 로그인 아이디"),
+                                fieldWithPath("loginPw").type(STRING).description("학원장 로그인 비밀번호")
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.endTrial").type(BOOLEAN).description("정규전환 성공 여부")
                         )
                 ));
     }

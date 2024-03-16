@@ -4,14 +4,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostId;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostPw;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTPassword;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPATCHPassword;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
+import psam.portfolio.sunder.english.global.resolver.argument.Token;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
 import java.util.Map;
@@ -47,7 +48,7 @@ public class UserController {
      * @return 인증한 사용자에게 발급하는 토큰
      */
     @PostMapping("/login")
-    public ApiResponse<LoginResult> login(@RequestBody @Valid UserPOSTLogin loginInfo) {
+    public ApiResponse<LoginResult> login(@RequestBody @Valid UserLoginForm loginInfo) {
         LoginResult result = userQueryService.login(loginInfo);
         return ApiResponse.ok(result);
     }
@@ -63,16 +64,15 @@ public class UserController {
         return ApiResponse.ok(Map.of("delay", result));
     }
 
-
     /**
      * 토큰 재발급 서비스
      * @return 새로 발급한 토큰
      */
-    @PostMapping("/new-token")
+    @PostMapping("/refresh-token")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Map<String, String>> reissueToken(@UserId UUID userId) {
-        String newToken = userQueryService.reissueToken(userId);
-        return ApiResponse.ok(Map.of("token", newToken));
+    public ApiResponse<Map<String, String>> refreshToken(@UserId UUID userId) {
+        String refreshToken = userQueryService.refreshToken(userId);
+        return ApiResponse.ok(Map.of("token", refreshToken));
     }
 
     /**
@@ -101,23 +101,35 @@ public class UserController {
 
     /**
      * 비밀번호 변경을 위한 재인증 요청 서비스
+     *
+     * @param userId 비밀번호 변경 요청을 하려는 사용자 아이디
      * @param password 기존 패스워드
      * @return 패스워드 변경이 가능한 토큰
+     *
+     * @apiNote 응답하는 token 의 calim 에는 PASSWORD_CHANGE 가 포함되어야 한다.
      */
     @PostMapping("/request-password-change")
-    public ApiResponse<Map<String, String>> requestPasswordChange(@RequestBody @Valid UserPOSTPassword password) {
-        String token = userQueryService.requestPasswordChange(password.getLoginPw());
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, String>> requestPasswordChange(@UserId UUID userId,
+                                                                  @RequestBody @Valid UserPATCHPassword password) {
+        String token = userQueryService.requestPasswordChange(userId, password.getLoginPw());
         return ApiResponse.ok(Map.of("token", token));
     }
 
     /**
      * 재인증에 성공하고 비밀번호를 변경하는 서비스
+     *
+     * @param token 비밀번호을 변경하는 사용자의 토큰
      * @param password 변경할 패스워드
      * @return 변경 성공 여부
+     *
+     * @apiNote 전달된 token 의 calim 에는 PASSWORD_CHANGE 가 포함되어야 한다.
      */
-    @PostMapping("/change-password")
-    public ApiResponse<Map<String, Boolean>> changePassword(@RequestBody @Valid UserPOSTPassword password) {
-        boolean result = userCommandService.changePassword(password.getLoginPw());
+    @PatchMapping("/change-password")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, Boolean>> changePassword(@Token String token,
+                                                            @RequestBody @Valid UserPATCHPassword password) {
+        boolean result = userCommandService.changePassword(token, password.getLoginPw());
         return ApiResponse.ok(Map.of("newPassword", result));
     }
 }

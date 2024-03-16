@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
+import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
@@ -18,7 +20,6 @@ import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 
@@ -569,7 +570,6 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         assertThat(getAcademy.isWithdrawn()).isFalse();
     }
 
-    // 학원장이 아니라면 학원 폐쇄 신청을 취소할 수 없다.
     @DisplayName("학원장이 아니라면 학원 폐쇄 신청을 취소할 수 없다.")
     @Test
     void revokeWithdrawalRequireRoleDirector() {
@@ -582,5 +582,79 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         // then
         assertThatThrownBy(() -> refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getUuid())))
                 .isInstanceOf(RoleDirectorRequiredException.class);
+    }
+
+    @DisplayName("사용 체험 중인 학원장이 정규회원으로 전환할 수 있다.")
+    @Test
+    void fromTrialToActive() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = registerTeacher(UserStatus.TRIAL, registerAcademy);
+        createRole(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
+        Teacher registerTeacher = registerTeacher(UserStatus.TRIAL, registerAcademy);
+        createRole(registerTeacher, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+
+        // when
+        Boolean result = refreshAnd(() -> sut.endTrial(loginForm));
+
+        // then
+        assertThat(result).isTrue();
+        Teacher getDirector = teacherQueryRepository.getById(registerDirector.getUuid());
+        assertThat(getDirector.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        Teacher getTeacher = teacherQueryRepository.getById(registerTeacher.getUuid());
+        assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @DisplayName("사용 체험이 종료된 학원장이 정규회원으로 전환할 수 있다.")
+    @Test
+    void fromTrialEndToActive() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = registerTeacher(UserStatus.TRIAL_END, registerAcademy);
+        createRole(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+
+        // when
+        Boolean result = refreshAnd(() -> sut.endTrial(loginForm));
+
+        // then
+        assertThat(result).isTrue();
+        Teacher getDirector = teacherQueryRepository.getById(registerDirector.getUuid());
+        assertThat(getDirector.getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @DisplayName("학원장이 아니라면 정규회원으로 전환할 수 없다.")
+    @Test
+    void endTrialRequireRoleDirector() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = registerTeacher(UserStatus.TRIAL, registerAcademy);
+        createRole(registerDirector, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.endTrial(loginForm)))
+                .isInstanceOf(RoleDirectorRequiredException.class);
+    }
+
+    @DisplayName("사용 체험 중이지 않은 학원장은 정규회원으로 전환할 수 없다.")
+    @Test
+    void endTrialRequireTrial() {
+        // given
+        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        createRole(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.endTrial(loginForm)))
+                .isInstanceOf(ApiException.class);
     }
 }

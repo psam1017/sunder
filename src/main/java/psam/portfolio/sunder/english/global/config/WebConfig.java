@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import psam.portfolio.sunder.english.global.enumpattern.EnumPatternValidator;
+import psam.portfolio.sunder.english.global.resolver.argument.TokenArgumentResolver;
 import psam.portfolio.sunder.english.global.resolver.argument.UserIdArgumentResolver;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
@@ -41,5 +42,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new UserIdArgumentResolver(jwtUtils));
+        resolvers.add(new TokenArgumentResolver(jwtUtils));
     }
 }
