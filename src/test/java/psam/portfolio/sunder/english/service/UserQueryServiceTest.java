@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
@@ -9,11 +10,22 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
+import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostId;
+import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
+import psam.portfolio.sunder.english.global.api.ApiException;
+import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.*;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 @SuppressWarnings("ConstantValue")
 class UserQueryServiceTest extends SunderApplicationTests {
@@ -23,6 +35,9 @@ class UserQueryServiceTest extends SunderApplicationTests {
 
     @Autowired
     TeacherCommandRepository teacherCommandRepository;
+
+    @Autowired
+    JwtUtils jwtUtils;
 
     @DisplayName("중복 검사를 위해서 loginId, email, phone 중 하나만 입력해야 한다.")
     @Test
@@ -141,5 +156,143 @@ class UserQueryServiceTest extends SunderApplicationTests {
 
         // then
         assertThat(isOk).isTrue();
+    }
+
+    @DisplayName("사용자가 로그인하고 토큰을 발급받을 수 있다.")
+    @Test
+    void loginAndGetToken() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+
+        // when
+        LoginResult result = refreshAnd(() -> sut.login(loginForm));
+
+        // then
+        String subject = jwtUtils.extractSubject(result.getToken());
+        assertThat(subject).isEqualTo(director.getUuid().toString());
+        assertThat(result.isPasswordChangeRequired()).isFalse();
+    }
+
+    @DisplayName("사용자 로그인 아이디가 틀리면 로그인할 수 없다.")
+    @Test
+    void loginFailByLoginId() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId().substring(3), "qwe123!@#");
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm)))
+                .isInstanceOf(LoginFailException.class);
+    }
+
+    @DisplayName("사용자 로그인 비밀번호가 틀리면 로그인할 수 없다.")
+    @Test
+    void loginFailByLoginPw() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#".substring(3));
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm)))
+                .isInstanceOf(LoginFailException.class);
+    }
+
+    @DisplayName("서비스를 사용할 수 없는 사용자는 로그인할 수 없다.")
+    @Test
+    void loginFailByStatus() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.FORBIDDEN, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm)))
+                .isInstanceOf(ApiException.class);
+    }
+
+    @DisplayName("로그인 시점에 마지막으로 비밀번호를 변경한지 3개월이 지났는지 여부를 알 수 있다.")
+    @Test
+    void passwordChangeRequiredTrue() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
+
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+
+        // when
+        LoginResult result = refreshAnd(() -> sut.login(loginForm));
+
+        // then
+        assertThat(result.isPasswordChangeRequired()).isTrue();
+    }
+
+    @DisplayName("사용자에게 새로운 토큰을 발급할 수 있다.")
+    @Test
+    void refreshToken() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        // when
+        String refreshToken = refreshAnd(() -> sut.refreshToken(director.getUuid()));
+
+        // then
+        String subject = jwtUtils.extractSubject(refreshToken);
+        assertThat(subject).isEqualTo(director.getUuid().toString());
+    }
+
+    @DisplayName("사용자의 이메일과 이름으로 로그인 아이디를 이메일로 전송할 수 있다.")
+    @Test
+    void findLoginId() {
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserPOSTLostId userInfo = new UserPOSTLostId(director.getEmail(), director.getName());
+
+        // when
+        boolean result = refreshAnd(() -> sut.findLoginId(userInfo));
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @DisplayName("비밀번호를 변경하기 위해 기존 비밀번호를 입력하고 비밀번호 변경을 인가하는 토큰을 받을 수 있다.")
+    @Test
+    void requestPasswordChange() {
+        // given
+        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
+        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        // when
+        String token = refreshAnd(() -> sut.requestPasswordChange(director.getUuid(), "qwe123!@#"));
+
+        // then
+        Boolean changeable = jwtUtils.extractClaim(token, claims -> claims.get("PASSWORD_CHANGE", Boolean.class));
+        assertThat(changeable).isTrue();
     }
 }

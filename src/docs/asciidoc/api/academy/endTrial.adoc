@@ -1,0 +1,27 @@
+=== 체험판 종료 후 정규회원으로 전환하기
+
+==== HTTP Request
+include::{snippets}/academy-docs-test/end-trial/http-request.adoc[]
+include::{snippets}/academy-docs-test/end-trial/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-docs-test/end-trial/http-response.adoc[]
+include::{snippets}/academy-docs-test/end-trial/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+| NotBlank.loginId |
+| NotBlank.loginPw |
+| IllegalData.User.LOGIN_FAIL | 아이디 또는 비밀번호가 불일치합니다.
+| IllegalRole.UserRole.ROLE_DIRECTOR | 학원장만 가능한 서비스입니다.
+| IllegalStatus.User.PENDING | 체험판 종료가 불가능한 상태입니다.
+| IllegalStatus.User.ACTIVE | 체험판 종료가 불가능한 상태입니다.
+| IllegalStatus.User.FORBIDDEN | 체험판 종료가 불가능한 상태입니다.
+| IllegalStatus.User.WITHDRAWN | 체험판 종료가 불가능한 상태입니다.
+| IllegalStatus.Academy.PENDING | 체험판 종료가 불가능한 상태입니다.
+| IllegalStatus.Academy.SUSPENDED | 체험판 종료가 불가능한 상태입니다.
+| IllegalStatus.Academy.WITHDRAWN | 체험판 종료가 불가능한 상태입니다.
+|===

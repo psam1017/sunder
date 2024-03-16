@@ -8,7 +8,7 @@ import psam.portfolio.sunder.english.global.aspect.trace.TraceAspect;
 public class AspectConfig {
 
     @Bean
-    public TraceAspect beanCreationTimeAspect() {
+    public TraceAspect traceAspect() {
         return new TraceAspect();
     }
 }

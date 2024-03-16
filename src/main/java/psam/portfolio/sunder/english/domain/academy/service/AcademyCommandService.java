@@ -23,8 +23,9 @@ import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepos
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLogin;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
 import psam.portfolio.sunder.english.global.api.ApiException;
@@ -238,16 +239,20 @@ public class AcademyCommandService {
     /**
      * 체험판을 종료하고 정식으로 서비스를 사용하기 위해 회원 상태를 전환하는 서비스
      * - 학원장의 아이디와 비밀번호로만 가능하며, 해당 학원 소속의 모든 사용자의 상태가 전환된다.
-     * @param userInfo 학원장의 아이디와 비밀번호
+     * @param loginForm 학원장의 아이디와 비밀번호
      * @return 전환 완료 여부
      */
-    public boolean endTrial(UserPOSTLogin userInfo) {
+    public boolean endTrial(UserLoginForm loginForm) {
         Teacher director = teacherQueryRepository.findOne(
-                QTeacher.teacher.loginId.eq(userInfo.getLoginId())
+                QTeacher.teacher.loginId.eq(loginForm.getLoginId())
         ).orElseThrow(LoginFailException::new);
 
-        if (!passwordUtils.matches(director.getLoginPw(), userInfo.getLoginPw())) {
+        if (!passwordUtils.matches(loginForm.getLoginPw(), director.getLoginPw())) {
             throw new LoginFailException();
+        }
+
+        if (!director.isDirector()) {
+            throw new RoleDirectorRequiredException();
         }
 
         if (!director.isTrial() && !director.isTrialEnd()) {
@@ -259,9 +264,21 @@ public class AcademyCommandService {
             };
         }
 
-        String academyId = director.getAcademy().getUuid().toString();
-        teacherCommandRepository.startActiveByAcademyId(academyId);
-        studentCommandRepository.startActiveByAcademyId(academyId);
+        Academy getAcademy = director.getAcademy();
+        if (!getAcademy.isVerified()) {
+            throw new ApiException() {
+                @Override
+                public ApiResponse<?> initialize() {
+                    return ApiResponse.error(ApiStatus.ILLEGAL_STATUS, Academy.class, getAcademy.getStatus().toString(), "체험판 종료가 불가능한 상태입니다. [" + getAcademy.getStatus() + "]");
+                }
+            };
+        }
+
+        getAcademy.getTeachers().forEach(User::startActive);
+        getAcademy.getStudents().forEach(User::startActive);
+//        UUID academyId = getAcademy.getUuid();
+//        teacherCommandRepository.startActiveByAcademyId(academyId);
+//        studentCommandRepository.startActiveByAcademyId(academyId);
         return true;
     }
 }
