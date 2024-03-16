@@ -1,23 +1,22 @@
 package psam.portfolio.sunder.english.docs.controller;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
-import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
-import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
-import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
+import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +33,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 public class AcademyDocsTest extends RestDocsEnvironment {
 
@@ -573,7 +570,6 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 ));
     }
 
-    @Disabled
     @DisplayName("사용 체험 중인 학원장이 정규회원으로 전환할 수 있다.")
     @Test
     void endTrial() throws Exception {

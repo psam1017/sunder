@@ -1,36 +1,35 @@
 package psam.portfolio.sunder.english.service;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
-import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
-import psam.portfolio.sunder.english.global.api.ApiException;
-import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
-import psam.portfolio.sunder.english.domain.teacher.exception.RoleDirectorRequiredException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.DirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepository;
-import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
+import psam.portfolio.sunder.english.domain.teacher.exception.RoleDirectorRequiredException;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
+import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
+import psam.portfolio.sunder.english.global.api.ApiException;
+import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.anyString;
 import static org.mockito.BDDMockito.given;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 public class AcademyCommandServiceTest extends SunderApplicationTests {
 
@@ -585,7 +584,6 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .isInstanceOf(RoleDirectorRequiredException.class);
     }
 
-    @Disabled
     @DisplayName("사용 체험 중인 학원장이 정규회원으로 전환할 수 있다.")
     @Test
     void fromTrialToActive() {
@@ -609,7 +607,6 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 
-    @Disabled
     @DisplayName("사용 체험이 종료된 학원장이 정규회원으로 전환할 수 있다.")
     @Test
     void fromTrialEndToActive() {

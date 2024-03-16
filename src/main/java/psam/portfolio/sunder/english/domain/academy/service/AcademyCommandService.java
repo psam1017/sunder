@@ -23,6 +23,7 @@ import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepos
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
@@ -273,9 +274,11 @@ public class AcademyCommandService {
             };
         }
 
-        UUID academyId = getAcademy.getUuid();
-        teacherCommandRepository.startActiveByAcademyId(academyId);
-        studentCommandRepository.startActiveByAcademyId(academyId);
+        getAcademy.getTeachers().forEach(User::startActive);
+        getAcademy.getStudents().forEach(User::startActive);
+//        UUID academyId = getAcademy.getUuid();
+//        teacherCommandRepository.startActiveByAcademyId(academyId);
+//        studentCommandRepository.startActiveByAcademyId(academyId);
         return true;
     }
 }

@@ -1,6 +1,5 @@
 package psam.portfolio.sunder.english.scheduler;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AcademySchedulerTest extends SunderApplicationTests {
 
+    // TODO User API 문서화. @Modifying 버그 수정. TeacherService 구현
+    // spring boot 버전 변경?
+
     @Autowired
     AcademyScheduler sut;
 
     @Autowired
     AcademyQueryRepository academyQueryRepository;
 
-    @Disabled
     @DisplayName("폐쇄 요청한지 7일 이상 지난 학원은 삭제할 수 있다.")
     @Test
     public void deleteWithdrawnAcademy() {
