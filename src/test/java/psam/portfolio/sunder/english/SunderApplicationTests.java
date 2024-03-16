@@ -44,12 +44,7 @@ import java.util.function.Supplier;
 @ActiveProfiles("test")
 @Transactional
 @SpringBootTest
-public class SunderApplicationTests {
-
-	@Test
-	void contextLoads() {
-
-	}
+public abstract class SunderApplicationTests {
 
 	@Autowired
 	protected MockMvc mockMvc;

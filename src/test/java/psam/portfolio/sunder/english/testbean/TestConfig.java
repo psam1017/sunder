@@ -17,7 +17,7 @@ public class TestConfig {
                 .loginIdLen(8)
                 .emailLen(8)
                 .emailDomain("sunder.net")
-                .academyNameMinLen(2)
+                .academyNameMinLen(4)
                 .academyNameMaxLen(8)
                 .attendateIdLen(8)
                 .build();

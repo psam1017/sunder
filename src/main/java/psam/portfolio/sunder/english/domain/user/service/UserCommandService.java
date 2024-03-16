@@ -60,10 +60,13 @@ public class UserCommandService {
         );
 
         if (optUser.isPresent()) {
-            User getUser = optUser.get();
             String tempPassword = createTempPassword();
             String encodedPassword = passwordUtils.encode(tempPassword);
+
+            User getUser = optUser.get();
             getUser.setLoginPw(encodedPassword);
+            getUser.setLastPasswordChangeDateTime(LocalDateTime.now());
+
             return mailUtils.sendMail(
                     getUser.getEmail(),
                     messageSource.getMessage("mail.login-id.subject", null, Locale.getDefault()),
@@ -102,7 +105,7 @@ public class UserCommandService {
     /**
      * POST /api/user/change-password
      *
-     * @param userId 비밀번호을 변경하는 사용자 아이디
+     * @param token 비밀번호을 변경하는 사용자의 토큰
      * @param newLoginPw 새로운 패스워드
      * @return 패스워드 변경 성공 여부
      *
@@ -116,8 +119,11 @@ public class UserCommandService {
 
         String subject = jwtUtils.extractSubject(token);
         UUID userId = UUID.fromString(subject);
+
         User user = userQueryRepository.getById(userId);
         user.setLoginPw(passwordUtils.encode(newLoginPw));
+        user.setLastPasswordChangeDateTime(LocalDateTime.now());
+
         return true;
     }
 }

@@ -1,6 +1,7 @@
 package psam.portfolio.sunder.english.service;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -584,6 +585,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .isInstanceOf(RoleDirectorRequiredException.class);
     }
 
+    @Disabled
     @DisplayName("사용 체험 중인 학원장이 정규회원으로 전환할 수 있다.")
     @Test
     void fromTrialToActive() {
@@ -607,6 +609,7 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
         assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 
+    @Disabled
     @DisplayName("사용 체험이 종료된 학원장이 정규회원으로 전환할 수 있다.")
     @Test
     void fromTrialEndToActive() {

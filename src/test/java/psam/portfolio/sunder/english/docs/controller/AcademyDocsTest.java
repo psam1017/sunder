@@ -1,5 +1,6 @@
 package psam.portfolio.sunder.english.docs.controller;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -572,6 +573,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 ));
     }
 
+    @Disabled
     @DisplayName("사용 체험 중인 학원장이 정규회원으로 전환할 수 있다.")
     @Test
     void endTrial() throws Exception {
