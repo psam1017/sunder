@@ -274,11 +274,9 @@ public class AcademyCommandService {
             };
         }
 
-        getAcademy.getTeachers().forEach(User::startActive);
-        getAcademy.getStudents().forEach(User::startActive);
-//        UUID academyId = getAcademy.getUuid();
-//        teacherCommandRepository.startActiveByAcademyId(academyId);
-//        studentCommandRepository.startActiveByAcademyId(academyId);
+        UUID academyId = getAcademy.getUuid();
+        teacherCommandRepository.startActiveByAcademyId(academyId);
+        studentCommandRepository.startActiveByAcademyId(academyId);
         return true;
     }
 }

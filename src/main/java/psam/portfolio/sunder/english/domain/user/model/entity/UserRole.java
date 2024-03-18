@@ -21,7 +21,7 @@ public class UserRole {
     private RoleName roleName;
     private LocalDateTime assignedDateTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_uuid")
     private User user;
 

@@ -48,5 +48,4 @@ public class Student extends User {
         this.parent = parent;
         this.academy = academy;
     }
-
 }
