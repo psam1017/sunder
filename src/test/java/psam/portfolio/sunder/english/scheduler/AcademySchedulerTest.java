@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AcademySchedulerTest extends SunderApplicationTests {
 
     // TODO User API 문서화. @Modifying 버그 수정. TeacherService 구현
-    // spring boot 버전 변경?
 
     @Autowired
     AcademyScheduler sut;

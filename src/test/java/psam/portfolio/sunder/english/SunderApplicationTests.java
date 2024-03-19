@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,25 +15,27 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.docs.RestDocsConfig;
-import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
-import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
-import psam.portfolio.sunder.english.testbean.TestConfig;
-import psam.portfolio.sunder.english.testbean.UniqueInfoContainer;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.repository.StudentCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
+import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
+import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
+import psam.portfolio.sunder.english.testbean.DataCleaner;
+import psam.portfolio.sunder.english.testbean.TestConfig;
+import psam.portfolio.sunder.english.testbean.UniqueInfoContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +54,14 @@ public class SunderApplicationTests {
 	void contextLoads() {
 
 	}
+
+	@BeforeEach
+	void setUp() {
+		dataCleaner.cleanUp();
+	}
+
+	@Autowired
+	protected DataCleaner dataCleaner;
 
 	@Autowired
 	protected MockMvc mockMvc;

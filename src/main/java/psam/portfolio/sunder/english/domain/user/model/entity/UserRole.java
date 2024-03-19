@@ -9,10 +9,14 @@ import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "user_roles",
+        indexes = @Index(columnList = "user_uuid")
+)
 @Entity
-@Table(name = "user_roles")
 public class UserRole {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +25,8 @@ public class UserRole {
     private RoleName roleName;
     private LocalDateTime assignedDateTime;
 
-    @ManyToOne
-    @JoinColumn(name = "user_uuid")
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
     @Builder

@@ -13,12 +13,11 @@ import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepos
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 @Component
 public class AcademyScheduler {
 
-    private final AcademyQueryRepository academyQueryRepository;
     private final AcademyCommandRepository academyCommandRepository;
 
     /**
@@ -26,15 +25,9 @@ public class AcademyScheduler {
      */
     @Scheduled(cron = "0 1 0 * * *")
     public void deleteWithdrawnAcademy() {
-        List<Academy> deleteAcademies = academyQueryRepository.findAll(
-                QAcademy.academy.status.eq(AcademyStatus.WITHDRAWN),
-                QAcademy.academy.withdrawalAt.before(LocalDateTime.now())
+        academyCommandRepository.deleteAllByStatusAndWithdrawalAtBefore(
+                AcademyStatus.WITHDRAWN,
+                LocalDateTime.now()
         );
-        academyCommandRepository.deleteAll(deleteAcademies);
-
-//        academyCommandRepository.deleteAllByStatusAndWithdrawalAtBefore(
-//                AcademyStatus.WITHDRAWN,
-//                LocalDateTime.now()
-//        );
     }
 }
