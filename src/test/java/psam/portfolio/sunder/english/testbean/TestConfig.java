@@ -1,9 +1,12 @@
 package psam.portfolio.sunder.english.testbean;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import psam.portfolio.sunder.english.global.aspect.trace.Trace;
+
+import javax.sql.DataSource;
 
 @Slf4j
 @TestConfiguration
@@ -21,5 +24,10 @@ public class TestConfig {
                 .academyNameMaxLen(8)
                 .attendateIdLen(8)
                 .build();
+    }
+
+    @Bean
+    public DataCleaner dataCleaner(DataSource dataSource, EntityManager entityManager) {
+        return new DataCleaner(dataSource, entityManager);
     }
 }

@@ -17,6 +17,10 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("STUDENT")
+@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+@Table(name = "students",
+        indexes = @Index(columnList = "academy_uuid")
+)
 @Entity
 public class Student extends User {
 
@@ -36,7 +40,7 @@ public class Student extends User {
     private Parent parent;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "academy_uuid")
+    @JoinColumn(name = "academy_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
 
     @Builder

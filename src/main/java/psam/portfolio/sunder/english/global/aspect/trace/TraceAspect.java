@@ -18,9 +18,8 @@ public class TraceAspect {
         if (trace.signature()) {
             log.info("[Trace - Signature] {} : args = {}", pjp.getSignature(), pjp.getArgs());
         }
-
         if (trace.runtime()) {
-            log.info("[Trace - Runtime] {} : {}ms", proceed.getClass().getSimpleName(), endTime - startTime);
+            log.info("[Trace - Runtime] {} : {}ms", pjp.getSignature().getName(), endTime - startTime);
         }
 
         return proceed;
