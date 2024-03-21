@@ -17,6 +17,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("STUDENT")
+@Table(name = "students")
 @Entity
 public class Student extends User {
 
