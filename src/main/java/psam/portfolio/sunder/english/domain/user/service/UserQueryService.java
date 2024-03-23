@@ -13,8 +13,9 @@ import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostId;
+import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
+import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.global.api.ApiResponse;
@@ -30,6 +31,7 @@ import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
+import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -133,9 +135,10 @@ public class UserQueryService {
      * @param userId 사용자 아이디
      * @return 새로 발급한 토큰
      */
-    public String refreshToken(UUID userId) {
+    public TokenRefreshResponse refreshToken(UUID userId) {
         // 토큰 만료 시간은 3시간
-        return jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3);
+        String token = jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3);
+        return new TokenRefreshResponse(token);
     }
 
     /**
@@ -145,7 +148,7 @@ public class UserQueryService {
      * @param userInfo 로그인 아이디를 분실한 가입자 정보
      * @return 이메일 발송 성공 여부
      */
-    public boolean findLoginId(UserPOSTLostId userInfo) {
+    public boolean findLoginId(LostLoginIdForm userInfo) {
         Optional<User> optUser = userQueryRepository.findOne(
                 user.email.eq(userInfo.getEmail()),
                 user.name.eq(userInfo.getName())
@@ -175,13 +178,14 @@ public class UserQueryService {
      * @param loginPw 기존 비밀번호
      * @return 패스워드 변경이 가능한 토큰
      */
-    public String requestPasswordChange(UUID userId, String loginPw) {
+    public TokenRefreshResponse authenticateToChangePassword(UUID userId, String loginPw) {
         User getUser = userQueryRepository.getById(userId);
         if (!passwordUtils.matches(loginPw, getUser.getLoginPw())) {
             throw new LoginFailException();
         }
 
-        Map<String, Object> claims = Map.of("PASSWORD_CHANGE", true);
-        return jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3, claims);
+        Map<String, Object> claims = Map.of(PASSWORD_CHANGE.toString(), true);
+        String token = jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3, claims);
+        return new TokenRefreshResponse(token);
     }
 }

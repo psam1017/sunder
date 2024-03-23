@@ -12,10 +12,12 @@ import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostId;
+import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
+import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
 import psam.portfolio.sunder.english.global.api.ApiException;
+import psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
 import java.time.LocalDateTime;
@@ -172,6 +174,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
 
         // then
         String subject = jwtUtils.extractSubject(result.getToken());
+        assertThat(result.getType()).isEqualTo("Bearer ");
         assertThat(subject).isEqualTo(director.getUuid().toString());
         assertThat(result.isPasswordChangeRequired()).isFalse();
     }
@@ -251,11 +254,12 @@ class UserQueryServiceTest extends SunderApplicationTests {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        String refreshToken = refreshAnd(() -> sut.refreshToken(director.getUuid()));
+        TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getUuid()));
 
         // then
-        String subject = jwtUtils.extractSubject(refreshToken);
+        String subject = jwtUtils.extractSubject(response.getToken());
         assertThat(subject).isEqualTo(director.getUuid().toString());
+        assertThat(response.getType()).isEqualTo("Bearer ");
     }
 
     @DisplayName("사용자의 이메일과 이름으로 로그인 아이디를 이메일로 전송할 수 있다.")
@@ -270,7 +274,7 @@ class UserQueryServiceTest extends SunderApplicationTests {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserPOSTLostId userInfo = new UserPOSTLostId(director.getEmail(), director.getName());
+        LostLoginIdForm userInfo = new LostLoginIdForm(director.getEmail(), director.getName());
 
         // when
         boolean result = refreshAnd(() -> sut.findLoginId(userInfo));
@@ -288,10 +292,11 @@ class UserQueryServiceTest extends SunderApplicationTests {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        String token = refreshAnd(() -> sut.requestPasswordChange(director.getUuid(), infoContainer.getRawPassword()));
+        TokenRefreshResponse response = refreshAnd(() -> sut.authenticateToChangePassword(director.getUuid(), infoContainer.getRawPassword()));
 
         // then
-        Boolean changeable = jwtUtils.extractClaim(token, claims -> claims.get("PASSWORD_CHANGE", Boolean.class));
+        Boolean changeable = jwtUtils.extractClaim(response.getToken(), claims -> claims.get(JwtClaim.PASSWORD_CHANGE.toString(), Boolean.class));
         assertThat(changeable).isTrue();
+        assertThat(response.getType()).isEqualTo("Bearer ");
     }
 }

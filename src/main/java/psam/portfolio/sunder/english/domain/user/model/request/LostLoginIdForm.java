@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPOSTLostPw {
-
-    @NotBlank
-    private String loginId;
+public class LostLoginIdForm {
 
     @NotBlank
     private String email;
