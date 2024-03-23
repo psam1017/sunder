@@ -2,7 +2,6 @@ package psam.portfolio.sunder.english.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
@@ -71,8 +70,8 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void checkLoginIdDupl(){
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
 
         String loginId = teacher.getLoginId();
         String email = null;
@@ -89,8 +88,8 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void checkEmailDupl(){
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
 
         String loginId = null;
         String email = teacher.getEmail();
@@ -107,8 +106,8 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void checkPhoneDupl(){
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
 
         String loginId = null;
         String email = null;
@@ -125,8 +124,8 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void ifPendingOk(){
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = registerTeacher(UserStatus.PENDING, academy);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.PENDING, academy);
 
         String loginId = teacher.getLoginId();
         String email = null;
@@ -143,8 +142,8 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void ifEmailNotVerifiedOk(){
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         teacher.verifyEmail(false);
 
         String loginId = teacher.getLoginId();
@@ -162,11 +161,11 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void loginAndGetToken() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
 
         // when
         LoginResult result = refreshAnd(() -> sut.login(loginForm));
@@ -181,11 +180,11 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void loginFailByLoginId() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId().substring(3), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId().substring(3), infoContainer.getRawPassword());
 
         // when
         // then
@@ -197,11 +196,11 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void loginFailByLoginPw() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#".substring(3));
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword().substring(3));
 
         // when
         // then
@@ -213,11 +212,11 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void loginFailByStatus() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.FORBIDDEN, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.FORBIDDEN, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
 
         // when
         // then
@@ -229,12 +228,12 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void passwordChangeRequiredTrue() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
 
         // when
         LoginResult result = refreshAnd(() -> sut.login(loginForm));
@@ -247,9 +246,9 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void refreshToken() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
         String refreshToken = refreshAnd(() -> sut.refreshToken(director.getUuid()));
@@ -267,9 +266,9 @@ class UserQueryServiceTest extends SunderApplicationTests {
                 .willReturn(true);
 
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         UserPOSTLostId userInfo = new UserPOSTLostId(director.getEmail(), director.getName());
 
@@ -284,12 +283,12 @@ class UserQueryServiceTest extends SunderApplicationTests {
     @Test
     void requestPasswordChange() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        String token = refreshAnd(() -> sut.requestPasswordChange(director.getUuid(), "qwe123!@#"));
+        String token = refreshAnd(() -> sut.requestPasswordChange(director.getUuid(), infoContainer.getRawPassword()));
 
         // then
         Boolean changeable = jwtUtils.extractClaim(token, claims -> claims.get("PASSWORD_CHANGE", Boolean.class));

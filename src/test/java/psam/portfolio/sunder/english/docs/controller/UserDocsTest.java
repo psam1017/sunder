@@ -47,7 +47,7 @@ public class UserDocsTest extends RestDocsEnvironment {
     @Test
     void checkEmailDupl() throws Exception {
         // given
-        String email = "example@sunder.net";
+        String email = "example@sunder.edu";
 
         // when
         ResultActions resultActions = mockMvc.perform(

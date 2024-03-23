@@ -6,7 +6,7 @@ package psam.portfolio.sunder.english.global.api;
  */
 public abstract class ApiException extends RuntimeException {
 
-    private final ApiResponse<?> response;
+    protected ApiResponse<?> response;
 
     public ApiException() {
         response = initialize();

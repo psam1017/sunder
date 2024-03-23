@@ -14,8 +14,8 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@DiscriminatorValue("TEACHER")
 @PrimaryKeyJoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+@DiscriminatorValue("TEACHER")
 @Table(name = "teachers",
         indexes = @Index(columnList = "academy_uuid")
 )

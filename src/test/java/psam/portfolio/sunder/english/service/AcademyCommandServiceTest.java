@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
+import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.DirectorPOST;
@@ -18,6 +19,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
+import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.global.api.ApiException;
@@ -53,12 +55,12 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .willReturn(true);
 
         // given
-        Academy duplicateAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy duplicateAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         AcademyPOST academyPOST = AcademyPOST.builder()
                 .name(duplicateAcademy.getName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -66,11 +68,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -90,13 +92,13 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .willReturn(true);
 
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher duplicateTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher duplicateTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
 
         AcademyPOST academyPOST = AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -107,8 +109,8 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .loginId(duplicateTeacher.getLoginId())
                 .loginPw("loginPw")
                 .name("name")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -128,8 +130,8 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .willReturn(true);
 
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.PENDING);
-        Teacher registerTeacher = registerTeacher(UserStatus.PENDING, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.PENDING);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.PENDING, registerAcademy);
 
         AcademyPOST academyPOST = AcademyPOST.builder()
                 .name(registerAcademy.getName()) // PENDING 상태인 학원의 이름
@@ -167,9 +169,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
 
         // given
         AcademyPOST academyPOST = AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -177,11 +179,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -204,9 +206,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
 
         // given
         AcademyPOST academyPOST = AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -214,11 +216,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -244,9 +246,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
 
         // given
         AcademyPOST academyPOST = AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -254,11 +256,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -286,9 +288,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
 
         // given
         AcademyPOST academyPOST = AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -296,11 +298,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -332,9 +334,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
 
         // given
         AcademyPOST academyPOST = AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -342,11 +344,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
                 .build();
 
         DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("loginPw")
                 .name("name")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street("street")
                 .addressDetail("detail")
                 .postalCode("00000")
@@ -368,12 +370,12 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void updateInfo() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
 
-        String uniqueAcademyName = uic.getUniqueAcademyName();
-        String uniquePhoneNumber = uic.getUniquePhoneNumber();
-        String uniqueEmail = uic.getUniqueEmail();
+        String uniqueAcademyName = infoContainer.getUniqueAcademyName();
+        String uniquePhoneNumber = infoContainer.getUniquePhoneNumber();
+        String uniqueEmail = infoContainer.getUniqueEmail();
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(uniqueAcademyName)
@@ -403,15 +405,15 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void updateInfoWithDuplicateName() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
 
-        Academy anotherAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(anotherAcademy.getName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")
@@ -428,15 +430,15 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void updateInfoWithDuplicatePhone() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
 
-        Academy anotherAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
-                .name(uic.getUniqueAcademyName())
+                .name(infoContainer.getUniqueAcademyName())
                 .phone(anotherAcademy.getPhone())
-                .email(uic.getUniqueEmail())
+                .email(infoContainer.getUniqueEmail())
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")
@@ -453,14 +455,14 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void updateInfoWithDuplicateEmail() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
 
-        Academy anotherAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .email(anotherAcademy.getEmail())
                 .street("new street")
                 .addressDetail("new detail")
@@ -478,10 +480,10 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void updateInfoWithPending() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
 
-        Academy anotherAcademy = registerAcademy(AcademyStatus.PENDING);
+        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.PENDING);
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(anotherAcademy.getName())
@@ -504,13 +506,13 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void updateInfoWithSelf() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(registerAcademy.getName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")
@@ -527,9 +529,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void withdraw() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
         UUID academyId = refreshAnd(() -> sut.withdraw(registerTeacher.getUuid()));
@@ -544,9 +546,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void withdrawalRequireRoleDirector() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerTeacher, ROLE_TEACHER);
 
         // when
         // then
@@ -558,9 +560,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void revokeWithdraw() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.WITHDRAWN);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.WITHDRAWN);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
         UUID academyId = refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getUuid()));
@@ -574,9 +576,9 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void revokeWithdrawalRequireRoleDirector() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.WITHDRAWN);
-        Teacher registerTeacher = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerTeacher, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.WITHDRAWN);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerTeacher, ROLE_TEACHER);
 
         // when
         // then
@@ -588,13 +590,13 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void fromTrialToActive() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerDirector = registerTeacher(UserStatus.TRIAL, registerAcademy);
-        createRole(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
-        Teacher registerTeacher = registerTeacher(UserStatus.TRIAL, registerAcademy);
-        createRole(registerTeacher, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.TRIAL, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.TRIAL, registerAcademy);
+        dataCreator.createUserRoles(registerTeacher, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
 
         // when
         Boolean result = refreshAnd(() -> sut.endTrial(loginForm));
@@ -611,11 +613,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void fromTrialEndToActive() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerDirector = registerTeacher(UserStatus.TRIAL_END, registerAcademy);
-        createRole(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.TRIAL_END, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
 
         // when
         Boolean result = refreshAnd(() -> sut.endTrial(loginForm));
@@ -630,11 +632,11 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void endTrialRequireRoleDirector() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerDirector = registerTeacher(UserStatus.TRIAL, registerAcademy);
-        createRole(registerDirector, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.TRIAL, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
 
         // when
         // then
@@ -646,15 +648,31 @@ public class AcademyCommandServiceTest extends SunderApplicationTests {
     @Test
     void endTrialRequireTrial() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerDirector = registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        createRole(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
 
         // when
         // then
         assertThatThrownBy(() -> refreshAnd(() -> sut.endTrial(loginForm)))
-                .isInstanceOf(ApiException.class);
+                .isInstanceOf(IllegalStatusUserException.class);
+    }
+
+    @DisplayName("인증되지 않은 학원에서는 학원장이 정규회원으로 전환할 수 없다.")
+    @Test
+    void endTrialRequireVerifiedAcademy() {
+        // given
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.PENDING);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.TRIAL, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.endTrial(loginForm)))
+                .isInstanceOf(IllegalStatusAcademyException.class);
     }
 }

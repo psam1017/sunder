@@ -13,8 +13,12 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "user_roles",
-        indexes = @Index(columnList = "user_uuid")
+@Table(
+        name = "user_roles",
+        indexes = {
+                @Index(columnList = "user_uuid"),
+                @Index(columnList = "role_id")
+        }
 )
 @Entity
 public class UserRole {
@@ -22,17 +26,24 @@ public class UserRole {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private RoleName roleName;
     private LocalDateTime assignedDateTime;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Role role;
+
     @Builder
-    public UserRole(User user, RoleName roleName) {
+    public UserRole(User user, Role role) {
         this.user = user;
-        this.roleName = roleName;
         this.assignedDateTime = LocalDateTime.now();
+        this.role = role;
+    }
+
+    public RoleName getRoleName() {
+        return this.getRole().getName();
     }
 }
