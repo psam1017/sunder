@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.testbean;
+package psam.portfolio.sunder.english.testbean.container;
 
 import lombok.Builder;
 
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class StandaloneUniqueInfoContainer implements UniqueInfoContainer {
+public class StandaloneInfoContainer implements InfoContainer {
 
     private int idIndex = 0;
     private int emailIndex = 0;
@@ -24,7 +24,7 @@ public class StandaloneUniqueInfoContainer implements UniqueInfoContainer {
     private final List<String> uniqueAttendanceIdList;
 
     @Builder
-    public StandaloneUniqueInfoContainer(int numberOfCollection, int loginIdLen, int emailLen, String emailDomain, int academyNameMinLen, int academyNameMaxLen, int attendateIdLen) {
+    public StandaloneInfoContainer(int numberOfCollection, int loginIdLen, int emailLen, String emailDomain, int academyNameMinLen, int academyNameMaxLen, int attendateIdLen) {
         size = numberOfCollection;
         uniqueIdList = generateUniqueIds(numberOfCollection, loginIdLen);
         uniqueEmailList = generateUniqueEmails(numberOfCollection, emailLen, emailDomain);

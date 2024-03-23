@@ -1,9 +1,6 @@
 package psam.portfolio.sunder.english.domain.teacher.model.entity;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +14,19 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 @DiscriminatorValue("TEACHER")
-@Table(name = "teachers")
+@Table(
+        name = "teachers",
+        indexes = {
+                @Index(name = "idx_teachers_academy_uuid", columnList = "academy_uuid")
+        }
+)
 @Entity
 public class Teacher extends User {
 
     @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "academy_uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
 
     @Builder

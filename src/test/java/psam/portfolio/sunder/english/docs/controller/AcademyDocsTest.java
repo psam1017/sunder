@@ -46,7 +46,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void checkNameDupl() throws Exception {
         // given
-        String name = uic.getUniqueAcademyName();
+        String name = infoContainer.getUniqueAcademyName();
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -74,7 +74,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void checkPhoneDupl() throws Exception {
         // given
-        String phone = uic.getUniquePhoneNumber();
+        String phone = infoContainer.getUniquePhoneNumber();
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -102,7 +102,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void checkEmailDupl() throws Exception {
         // given
-        String email = uic.getUniqueEmail();
+        String email = infoContainer.getUniqueEmail();
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -134,12 +134,12 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .willReturn(true);
 
         // given
-        Address anyAddress = uic.getAnyAddress();
+        Address anyAddress = infoContainer.getAnyAddress();
 
         AcademyDirectorPOST.AcademyPOST buildAcademyPOST = AcademyDirectorPOST.AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street(anyAddress.getStreet())
                 .addressDetail(anyAddress.getDetail())
                 .postalCode(anyAddress.getPostalCode())
@@ -147,11 +147,11 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .build();
 
         AcademyDirectorPOST.DirectorPOST buildDirectorPOST = AcademyDirectorPOST.DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("P@ssw0rd")
                 .name("홍길동")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street(anyAddress.getStreet())
                 .addressDetail(anyAddress.getDetail())
                 .postalCode(anyAddress.getPostalCode())
@@ -202,12 +202,12 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .willReturn(true);
 
         // given
-        Address anyAddress = uic.getAnyAddress();
+        Address anyAddress = infoContainer.getAnyAddress();
 
         AcademyDirectorPOST.AcademyPOST buildAcademyPOST = AcademyDirectorPOST.AcademyPOST.builder()
-                .name(uic.getUniqueAcademyName())
-                .phone(uic.getUniquePhoneNumber())
-                .email(uic.getUniqueEmail())
+                .name(infoContainer.getUniqueAcademyName())
+                .phone(infoContainer.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
                 .street(anyAddress.getStreet())
                 .addressDetail(anyAddress.getDetail())
                 .postalCode(anyAddress.getPostalCode())
@@ -215,11 +215,11 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .build();
 
         AcademyDirectorPOST.DirectorPOST buildDirectorPOST = AcademyDirectorPOST.DirectorPOST.builder()
-                .loginId(uic.getUniqueLoginId())
+                .loginId(infoContainer.getUniqueLoginId())
                 .loginPw("P@ssw0rd")
                 .name("홍길동")
-                .email(uic.getUniqueEmail())
-                .phone(uic.getUniquePhoneNumber())
+                .email(infoContainer.getUniqueEmail())
+                .phone(infoContainer.getUniquePhoneNumber())
                 .street(anyAddress.getStreet())
                 .addressDetail(anyAddress.getDetail())
                 .postalCode(anyAddress.getPostalCode())
@@ -255,9 +255,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(teacher, ROLE_TEACHER);
+        createUserRoles(teacher, ROLE_TEACHER);
         String token = createToken(teacher);
 
         em.flush();
@@ -338,13 +338,13 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
         saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createRole(t, ROLE_TEACHER);
+            createUserRoles(t, ROLE_TEACHER);
         }
         Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         Student student = registerStudent(UserStatus.ACTIVE, academy);
-        createRole(student, ROLE_STUDENT);
+        createUserRoles(student, ROLE_STUDENT);
         String token = createToken(student);
 
         em.flush();
@@ -400,7 +400,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
         em.flush();
@@ -409,7 +409,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name("수정된학원이름")
                 .phone("01012345678")
-                .email("academy@sunder.net")
+                .email("academy@sunder.edu")
                 .street("수정된 학원 주소")
                 .addressDetail("수정된 학원 상세주소")
                 .postalCode("12345")
@@ -516,7 +516,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
         em.flush();
@@ -546,7 +546,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         refreshAnd(() -> academyCommandService.withdraw(director.getUuid()));
 
@@ -576,10 +576,10 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.TRIAL, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), "qwe123!@#");
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
 
         em.flush();
         em.clear();

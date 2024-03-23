@@ -62,11 +62,4 @@ public class UserQueryRepository {
                 .where(expressions)
                 .fetch();
     }
-
-    public boolean existsByUid(String loginId) {
-        return query.selectOne()
-                .from(user)
-                .where(user.loginId.eq(loginId))
-                .fetchFirst() != null;
-    }
 }

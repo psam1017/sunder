@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.testbean;
+package psam.portfolio.sunder.english.testbean.container;
 
 import lombok.Builder;
 
@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings("unused")
-public class ConcurrentUniqueInfoContainer implements UniqueInfoContainer {
+public class ConcurrentInfoContainer implements InfoContainer {
 
     private final Iterator<String> uniqueIdIterator;
     private final Iterator<String> uniqueEmailIterator;
@@ -15,7 +15,7 @@ public class ConcurrentUniqueInfoContainer implements UniqueInfoContainer {
     private final Iterator<String> uniqueAttendanceIdIterator;
 
     @Builder
-    public ConcurrentUniqueInfoContainer(int numberOfCollection, int userNameLen, int userEmailLen, String emailDom, int academyNameMinLen, int academyNameMaxLen, int attendateIdLen) {
+    public ConcurrentInfoContainer(int numberOfCollection, int userNameLen, int userEmailLen, String emailDom, int academyNameMinLen, int academyNameMaxLen, int attendateIdLen) {
         uniqueIdIterator = generateUniqueIds(numberOfCollection, userNameLen).iterator();
         uniqueEmailIterator = generateUniqueEmails(numberOfCollection, userEmailLen, emailDom).iterator();
         uniquePhoneNumberIterator = generateUniquePhoneNumbers(numberOfCollection).iterator();

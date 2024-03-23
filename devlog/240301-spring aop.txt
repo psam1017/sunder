@@ -87,7 +87,7 @@ public class TestConfig {
                 .numberOfCollection(30)
                 .loginIdLen(8)
                 .emailLen(8)
-                .emailDomain("sunder.net")
+                .emailDomain("sunder.edu")
                 .academyNameMinLen(2)
                 .academyNameMaxLen(8)
                 .attendateIdLen(8)

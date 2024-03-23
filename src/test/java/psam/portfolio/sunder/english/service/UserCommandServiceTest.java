@@ -2,25 +2,16 @@ package psam.portfolio.sunder.english.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.SunderApplicationTests;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
-import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
-import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostPw;
-import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
-import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
-import psam.portfolio.sunder.english.global.api.ApiException;
-import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.time.LocalDateTime;
@@ -51,7 +42,7 @@ class UserCommandServiceTest extends SunderApplicationTests {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
         // when
@@ -73,7 +64,7 @@ class UserCommandServiceTest extends SunderApplicationTests {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         UserPOSTLostPw userInfo = new UserPOSTLostPw(director.getLoginId(), director.getEmail(), director.getName());
 
@@ -90,9 +81,9 @@ class UserCommandServiceTest extends SunderApplicationTests {
         // given
         Academy academy = registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        String token = userQueryService.requestPasswordChange(director.getUuid(), "qwe123!@#");
+        String token = userQueryService.requestPasswordChange(director.getUuid(), infoContainer.getRawPassword());
         String newPassword = "asd456$%^";
 
         // when

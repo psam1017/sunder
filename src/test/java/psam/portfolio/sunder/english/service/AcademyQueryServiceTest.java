@@ -15,7 +15,6 @@ import psam.portfolio.sunder.english.domain.academy.model.response.AcademyFullRe
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyQueryService;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.ArrayList;
@@ -148,11 +147,11 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
         saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createRole(t, ROLE_TEACHER);
+            createUserRoles(t, ROLE_TEACHER);
         }
 
         Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         saveTeachers.add(0, director);
 
         // when
@@ -201,15 +200,15 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
         saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
         saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createRole(t, ROLE_TEACHER);
+            createUserRoles(t, ROLE_TEACHER);
         }
 
         Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createRole(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         saveTeachers.add(0, director);
 
         Student student = registerStudent(UserStatus.ACTIVE, academy);
-        createRole(student, ROLE_STUDENT);
+        createUserRoles(student, ROLE_STUDENT);
 
         // when
         Map<String, Object> result = refreshAnd(() -> sut.getDetail(student.getUuid(), "teacher"));

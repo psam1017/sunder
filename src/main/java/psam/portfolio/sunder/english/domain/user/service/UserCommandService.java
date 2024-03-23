@@ -69,7 +69,7 @@ public class UserCommandService {
 
             return mailUtils.sendMail(
                     getUser.getEmail(),
-                    messageSource.getMessage("mail.login-id.subject", null, Locale.getDefault()),
+                    messageSource.getMessage("mail.temp-password.subject", null, Locale.getDefault()),
                     setIssueTempPasswordMailText(tempPassword)
             );
         }
