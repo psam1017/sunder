@@ -40,9 +40,9 @@ class UserCommandServiceTest extends SunderApplicationTests {
     @Test
     void delayPasswordChange() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
         // when
@@ -62,9 +62,9 @@ class UserCommandServiceTest extends SunderApplicationTests {
                 .willReturn(true);
 
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         UserPOSTLostPw userInfo = new UserPOSTLostPw(director.getLoginId(), director.getEmail(), director.getName());
 
@@ -79,9 +79,9 @@ class UserCommandServiceTest extends SunderApplicationTests {
     @Test
     void changePassword() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         String token = userQueryService.requestPasswordChange(director.getUuid(), infoContainer.getRawPassword());
         String newPassword = "asd456$%^";

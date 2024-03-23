@@ -253,15 +253,14 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void getDetailByTeacher() throws Exception {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
-        Teacher teacher = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(teacher, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, ROLE_TEACHER);
         String token = createToken(teacher);
 
-        em.flush();
-        em.clear();
+        refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -322,33 +321,32 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void getDetailByStudent() throws Exception {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         List<Teacher> saveTeachers = new ArrayList<>();
-        saveTeachers.add(registerTeacher("Alice", UserStatus.ACTIVE, academy));
-        saveTeachers.add(registerTeacher("Bob", UserStatus.ACTIVE, academy));
-        saveTeachers.add(registerTeacher("Charlie", UserStatus.TRIAL, academy));
-        saveTeachers.add(registerTeacher("David", UserStatus.TRIAL, academy));
-        saveTeachers.add(registerTeacher("Eve", UserStatus.PENDING, academy));
-        saveTeachers.add(registerTeacher("Frank", UserStatus.PENDING, academy));
-        saveTeachers.add(registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
-        saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Alice", UserStatus.ACTIVE, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Bob", UserStatus.ACTIVE, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Charlie", UserStatus.TRIAL, academy));
+        saveTeachers.add(dataCreator.registerTeacher("David", UserStatus.TRIAL, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Eve", UserStatus.PENDING, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Frank", UserStatus.PENDING, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Kate", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createUserRoles(t, ROLE_TEACHER);
+            dataCreator.createUserRoles(t, ROLE_TEACHER);
         }
-        Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Teacher director = dataCreator.registerTeacher("Director", UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        Student student = registerStudent(UserStatus.ACTIVE, academy);
-        createUserRoles(student, ROLE_STUDENT);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, ROLE_STUDENT);
         String token = createToken(student);
 
-        em.flush();
-        em.clear();
+        refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -398,13 +396,12 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void updateInfo() throws Exception {
         // given
-        Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
-        em.flush();
-        em.clear();
+        refresh();
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name("수정된학원이름")
@@ -450,7 +447,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     void getPublicList() throws Exception {
         // given
         for (int i = 0; i < 3; i++) {
-            registerAcademy(true, AcademyStatus.VERIFIED);
+            dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
         }
 
         // when
@@ -514,13 +511,12 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void withdraw() throws Exception {
         // given
-        Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
-        em.flush();
-        em.clear();
+        refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -544,9 +540,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void revokeWithdrawal() throws Exception {
         // given
-        Academy academy = registerAcademy(true, AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         refreshAnd(() -> academyCommandService.withdraw(director.getUuid()));
 
@@ -574,15 +570,14 @@ public class AcademyDocsTest extends RestDocsEnvironment {
     @Test
     void endTrial() throws Exception {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = registerTeacher(UserStatus.TRIAL, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
 
-        em.flush();
-        em.clear();
+        refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(

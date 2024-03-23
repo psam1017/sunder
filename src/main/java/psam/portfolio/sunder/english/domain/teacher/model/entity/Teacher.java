@@ -14,19 +14,16 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 @DiscriminatorValue("TEACHER")
-@Table(
-        name = "teachers",
-        indexes = {
-                @Index(name = "idx_teachers_academy_uuid", columnList = "academy_uuid")
-        }
+@Table(name = "teachers",
+        indexes = @Index(columnList = "academy_uuid")
 )
 @Entity
 public class Teacher extends User {
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "academy_uuid", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "academy_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
 
     @Builder

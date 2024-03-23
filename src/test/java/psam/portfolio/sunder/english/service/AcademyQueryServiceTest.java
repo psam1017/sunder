@@ -63,7 +63,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     @Test
     void checkNameDupl() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         String name = registerAcademy.getName();
         String phone = null;
@@ -80,7 +80,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     @Test
     void checkPhoneDupl() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         String name = null;
         String phone = registerAcademy.getPhone();
@@ -97,7 +97,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     @Test
     void checkEmailDupl() {
         // given
-        Academy registerAcademy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         String name = null;
         String phone = null;
@@ -114,7 +114,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     @Test
     void ifPendingOk() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.PENDING);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.PENDING);
 
         String name = academy.getName();
         String email = null;
@@ -131,27 +131,27 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     @Test
     public void getDetailByTeacher() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         List<Teacher> saveTeachers = new ArrayList<>();
-        saveTeachers.add(registerTeacher("Alice", UserStatus.ACTIVE, academy));
-        saveTeachers.add(registerTeacher("Bob", UserStatus.ACTIVE, academy));
-        saveTeachers.add(registerTeacher("Charlie", UserStatus.TRIAL, academy));
-        saveTeachers.add(registerTeacher("David", UserStatus.TRIAL, academy));
-        saveTeachers.add(registerTeacher("Eve", UserStatus.PENDING, academy));
-        saveTeachers.add(registerTeacher("Frank", UserStatus.PENDING, academy));
-        saveTeachers.add(registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
-        saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Alice", UserStatus.ACTIVE, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Bob", UserStatus.ACTIVE, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Charlie", UserStatus.TRIAL, academy));
+        saveTeachers.add(dataCreator.registerTeacher("David", UserStatus.TRIAL, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Eve", UserStatus.PENDING, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Frank", UserStatus.PENDING, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Kate", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createUserRoles(t, ROLE_TEACHER);
+            dataCreator.createUserRoles(t, ROLE_TEACHER);
         }
 
-        Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Teacher director = dataCreator.registerTeacher("Director", UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         saveTeachers.add(0, director);
 
         // when
@@ -184,31 +184,31 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     @Test
     public void getDetailByStudent() {
         // given
-        Academy academy = registerAcademy(AcademyStatus.VERIFIED);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         List<Teacher> saveTeachers = new ArrayList<>();
-        saveTeachers.add(registerTeacher("Alice", UserStatus.ACTIVE, academy));
-        saveTeachers.add(registerTeacher("Bob", UserStatus.ACTIVE, academy));
-        saveTeachers.add(registerTeacher("Charlie", UserStatus.TRIAL, academy));
-        saveTeachers.add(registerTeacher("David", UserStatus.TRIAL, academy));
-        saveTeachers.add(registerTeacher("Eve", UserStatus.PENDING, academy));
-        saveTeachers.add(registerTeacher("Frank", UserStatus.PENDING, academy));
-        saveTeachers.add(registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(registerTeacher("Kate", UserStatus.TRIAL_END, academy));
-        saveTeachers.add(registerTeacher("Liam", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Alice", UserStatus.ACTIVE, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Bob", UserStatus.ACTIVE, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Charlie", UserStatus.TRIAL, academy));
+        saveTeachers.add(dataCreator.registerTeacher("David", UserStatus.TRIAL, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Eve", UserStatus.PENDING, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Frank", UserStatus.PENDING, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Kate", UserStatus.TRIAL_END, academy));
+        saveTeachers.add(dataCreator.registerTeacher("Liam", UserStatus.TRIAL_END, academy));
         for (Teacher t : saveTeachers) {
-            createUserRoles(t, ROLE_TEACHER);
+            dataCreator.createUserRoles(t, ROLE_TEACHER);
         }
 
-        Teacher director = registerTeacher("Director", UserStatus.ACTIVE, academy);
-        createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        Teacher director = dataCreator.registerTeacher("Director", UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         saveTeachers.add(0, director);
 
-        Student student = registerStudent(UserStatus.ACTIVE, academy);
-        createUserRoles(student, ROLE_STUDENT);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, ROLE_STUDENT);
 
         // when
         Map<String, Object> result = refreshAnd(() -> sut.getDetail(student.getUuid(), "teacher"));
@@ -240,7 +240,7 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     @Test
     public void getOnePublicAcademy() {
         // given
-        Academy registerAcademy = registerAcademy(true, AcademyStatus.VERIFIED);
+        Academy registerAcademy = dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
         AcademyPublicSearchCond cond = AcademyPublicSearchCond.builder()
                 .page(1)
                 .size(10)
@@ -275,9 +275,9 @@ public class AcademyQueryServiceTest extends SunderApplicationTests {
     public void getNextPublicAcademy() {
         // given
         for (int i = 0; i < 11; i++) {
-            registerAcademy(true, AcademyStatus.VERIFIED);
+            dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
         }
-        registerAcademy(false, AcademyStatus.VERIFIED);
+        dataCreator.registerAcademy(false, AcademyStatus.VERIFIED);
 
         AcademyPublicSearchCond cond = AcademyPublicSearchCond.builder()
                 .page(2)

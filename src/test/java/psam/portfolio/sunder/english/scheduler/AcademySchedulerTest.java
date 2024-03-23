@@ -16,9 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AcademySchedulerTest extends SunderApplicationTests {
 
-    // TODO User API 문서화. @Modifying 버그 수정. TeacherService 구현
-    // spring boot 버전 변경?
-
     @Autowired
     AcademyScheduler sut;
 
@@ -29,11 +26,11 @@ class AcademySchedulerTest extends SunderApplicationTests {
     @Test
     public void deleteWithdrawnAcademy() {
         // given
-        Academy withdrawnTarget1 = registerAcademy(AcademyStatus.WITHDRAWN);
+        Academy withdrawnTarget1 = dataCreator.registerAcademy(AcademyStatus.WITHDRAWN);
         withdrawnTarget1.setWithdrawalAt(LocalDateTime.now().minusDays(1));
-        Academy withdrawnTarget2 = registerAcademy(AcademyStatus.WITHDRAWN);
+        Academy withdrawnTarget2 = dataCreator.registerAcademy(AcademyStatus.WITHDRAWN);
         withdrawnTarget2.setWithdrawalAt(LocalDateTime.now().minusDays(1));
-        Academy withdrawnTomorrow = registerAcademy(AcademyStatus.WITHDRAWN);
+        Academy withdrawnTomorrow = dataCreator.registerAcademy(AcademyStatus.WITHDRAWN);
         withdrawnTomorrow.setWithdrawalAt(LocalDateTime.now().plusDays(1));
 
         // when

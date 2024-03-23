@@ -18,7 +18,6 @@ import java.util.List;
 @Component
 public class AcademyScheduler {
 
-    private final AcademyQueryRepository academyQueryRepository;
     private final AcademyCommandRepository academyCommandRepository;
 
     /**

@@ -8,6 +8,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
+import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.DirectorPOST;
@@ -20,20 +21,15 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.QTeacher;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
+import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
-import psam.portfolio.sunder.english.domain.user.model.entity.QRole;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
-import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
-import psam.portfolio.sunder.english.global.api.ApiException;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
-import psam.portfolio.sunder.english.global.api.ApiStatus;
 import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
@@ -262,22 +258,12 @@ public class AcademyCommandService {
         }
 
         if (!director.isTrial() && !director.isTrialEnd()) {
-            throw new ApiException() {
-                @Override
-                public ApiResponse<?> initialize() {
-                    return ApiResponse.error(ApiStatus.ILLEGAL_STATUS, Teacher.class, director.getStatus().toString(), "체험판 종료가 불가능한 상태입니다. [" + director.getStatus() + "]");
-                }
-            };
+            throw new IllegalStatusUserException(director.getStatus());
         }
 
         Academy getAcademy = director.getAcademy();
         if (!getAcademy.isVerified()) {
-            throw new ApiException() {
-                @Override
-                public ApiResponse<?> initialize() {
-                    return ApiResponse.error(ApiStatus.ILLEGAL_STATUS, Academy.class, getAcademy.getStatus().toString(), "체험판 종료가 불가능한 상태입니다. [" + getAcademy.getStatus() + "]");
-                }
-            };
+            throw new IllegalStatusAcademyException(getAcademy.getStatus());
         }
 
         UUID academyId = getAcademy.getUuid();
