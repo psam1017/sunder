@@ -8,7 +8,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.domain.user.exception.UnauthorizedToChangePasswordException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostPw;
+import psam.portfolio.sunder.english.domain.user.model.request.LostLoginPwForm;
 import psam.portfolio.sunder.english.domain.user.repository.UserCommandRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
+import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.PASSWORD_CHANGE;
 
 @RequiredArgsConstructor
 @Transactional
@@ -41,7 +42,7 @@ public class UserCommandService {
      * @param userId 비밀번호 변경 지연을 요청한 사용자 아이디
      * @return 지연 성공 여부
      */
-    public boolean delayPasswordChange(UUID userId) {
+    public boolean alterPasswordChangeLater(UUID userId) {
         User user = userQueryRepository.getById(userId);
         user.setLastPasswordChangeDateTime(LocalDateTime.now());
         return true;
@@ -52,7 +53,7 @@ public class UserCommandService {
      * @param userInfo 비밀번호를 분실한 가입자 정보
      * @return 이메일 발송 여부
      */
-    public boolean issueTempPassword(UserPOSTLostPw userInfo) {
+    public boolean issueTempPassword(LostLoginPwForm userInfo) {
         Optional<User> optUser = userQueryRepository.findOne(
                 user.loginId.eq(userInfo.getLoginId()),
                 user.email.eq(userInfo.getEmail()),
@@ -112,7 +113,7 @@ public class UserCommandService {
      * @apiNote 전달된 token 의 calim 에는 PASSWORD_CHANGE 가 포함되어야 한다.
      */
     public boolean changePassword(String token, String newLoginPw) {
-        Object changeable = jwtUtils.extractClaim(token, claims -> claims.get("PASSWORD_CHANGE"));
+        Object changeable = jwtUtils.extractClaim(token, claims -> claims.get(PASSWORD_CHANGE.toString()));
         if (changeable == null) {
             throw new UnauthorizedToChangePasswordException();
         }

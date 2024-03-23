@@ -67,27 +67,12 @@ public class AcademyController {
     /**
      * openToPublic = true 인 공개 학원 목록 조회 서비스
      *
-     * @param page 페이지 번호
-     * @param size 페이지 크기
-     * @param prop 정렬 기준
-     * @param dir  정렬 방향
+     * @param cond 학원 검색 조건
      * @return 학원 목록
      */
     @GetMapping("/list")
-    public ApiResponse<Map<String, Object>> getPublicList(@RequestParam Integer page,
-                                                          @RequestParam Integer size,
-                                                          @RequestParam(required = false) String prop,
-                                                          @RequestParam(required = false) String dir,
-                                                          @RequestParam(required = false) String academyName) {
-        AcademyPublicSearchCond buildCond = AcademyPublicSearchCond.builder()
-                .page(page)
-                .size(size)
-                .prop(prop)
-                .order(dir)
-                .academyName(academyName)
-                .build();
-
-        Map<String, Object> response = academyQueryService.getPublicList(buildCond);
+    public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute AcademyPublicSearchCond cond) {
+        Map<String, Object> response = academyQueryService.getPublicList(cond);
         return ApiResponse.ok(response);
     }
 

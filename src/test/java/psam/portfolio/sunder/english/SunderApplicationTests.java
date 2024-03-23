@@ -34,6 +34,10 @@ import java.util.function.Supplier;
 @SpringBootTest
 public class SunderApplicationTests {
 
+	// TODO User API 문서를 docs 에 반영.
+	// 기존 Error Reasons 는 각 문서에서 400 번대를 제외하면 모두 제거.
+	// 000 번대 예외들을 모두 모아서 별도의 문서로 생성
+
 	@Test
 	void contextLoads() {
 

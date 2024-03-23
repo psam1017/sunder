@@ -428,11 +428,11 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andDo(restDocs.document(
                                 requestFields(
                                         fieldWithPath("name").type(STRING).description("학원 이름"),
-                                        fieldWithPath("phone").type(STRING).optional().description("학원 전화번호"),
-                                        fieldWithPath("email").type(STRING).optional().description("학원 이메일"),
-                                        fieldWithPath("street").type(STRING).optional().description("학원 주소"),
-                                        fieldWithPath("addressDetail").type(STRING).optional().description("학원 상세주소"),
-                                        fieldWithPath("postalCode").type(STRING).optional().description("학원 우편번호"),
+                                        fieldWithPath("phone").type(STRING).description("학원 전화번호").optional(),
+                                        fieldWithPath("email").type(STRING).description("학원 이메일").optional(),
+                                        fieldWithPath("street").type(STRING).description("학원 주소").optional(),
+                                        fieldWithPath("addressDetail").type(STRING).description("학원 상세주소").optional(),
+                                        fieldWithPath("postalCode").type(STRING).description("학원 우편번호").optional(),
                                         fieldWithPath("openToPublic").type(BOOLEAN).description("학원 공개 여부")
                                 ),
                                 relaxedResponseFields(

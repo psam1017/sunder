@@ -9,7 +9,8 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.domain.user.model.request.UserPOSTLostPw;
+import psam.portfolio.sunder.english.domain.user.model.request.LostLoginPwForm;
+import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
@@ -38,7 +39,7 @@ class UserCommandServiceTest extends SunderApplicationTests {
 
     @DisplayName("비밀번호를 바꾸지 않더라도 비밀번호 변경 알림을 3개월 지연할 수 있다.")
     @Test
-    void delayPasswordChange() {
+    void alterPasswordChangeLater() {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
@@ -46,7 +47,7 @@ class UserCommandServiceTest extends SunderApplicationTests {
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
         // when
-        boolean result = refreshAnd(() -> sut.delayPasswordChange(director.getUuid()));
+        boolean result = refreshAnd(() -> sut.alterPasswordChangeLater(director.getUuid()));
 
         // then
         Teacher getDirector = teacherQueryRepository.getById(director.getUuid());
@@ -66,7 +67,7 @@ class UserCommandServiceTest extends SunderApplicationTests {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserPOSTLostPw userInfo = new UserPOSTLostPw(director.getLoginId(), director.getEmail(), director.getName());
+        LostLoginPwForm userInfo = new LostLoginPwForm(director.getLoginId(), director.getEmail(), director.getName());
 
         // when
         boolean result = refreshAnd(() -> sut.issueTempPassword(userInfo));
@@ -83,11 +84,11 @@ class UserCommandServiceTest extends SunderApplicationTests {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        String token = userQueryService.requestPasswordChange(director.getUuid(), infoContainer.getRawPassword());
+        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getUuid(), infoContainer.getRawPassword());
         String newPassword = "asd456$%^";
 
         // when
-        boolean result = refreshAnd(() -> sut.changePassword(token, newPassword));
+        boolean result = refreshAnd(() -> sut.changePassword(refresh.getToken(), newPassword));
 
         // then
         Teacher getDirector = teacherQueryRepository.getById(director.getUuid());
