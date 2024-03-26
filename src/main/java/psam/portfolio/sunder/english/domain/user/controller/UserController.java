@@ -89,14 +89,14 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 분실한 경우 임시 비밀번호를 발급하는 서비스
+     * 비밀번호 분실한 경우 새로운 비밀번호를 발급하는 서비스
      *
      * @param userInfo 비밀번호를 분실한 가입자 정보
      * @return 이메일 발송 여부
      */
-    @PostMapping("/password/temp")
-    public ApiResponse<Map<String, Boolean>> issueTempPassword(@RequestBody @Valid LostLoginPwForm userInfo) {
-        boolean result = userCommandService.issueTempPassword(userInfo);
+    @PostMapping("/password/new")
+    public ApiResponse<Map<String, Boolean>> issueNewPassword(@RequestBody @Valid LostLoginPwForm userInfo) {
+        boolean result = userCommandService.issueNewPassword(userInfo);
         return ApiResponse.ok(Map.of("emailSent", result));
     }
 

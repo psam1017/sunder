@@ -157,7 +157,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
     @DisplayName("비밀번호를 바꾸지 않더라도 비밀번호 변경 알림을 3개월 지연할 수 있다.")
     @Test
-    void alterPasswordChangeLater() throws Exception {
+    void alertPasswordChangeLater() throws Exception {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
@@ -258,9 +258,9 @@ public class UserDocsTest extends RestDocsEnvironment {
                 );
     }
 
-    @DisplayName("개인정보를 입력하고 임시 비밀번호를 생성하고 이메일로 받을 수 있다.")
+    @DisplayName("개인정보를 입력하고 새로운 비밀번호를 생성하고 이메일로 받을 수 있다.")
     @Test
-    void issueTempPassword() throws Exception {
+    void issueNewPassword() throws Exception {
         // mocking
         given(mailUtils.sendMail(anyString(), anyString(), anyString()))
                 .willReturn(true);
@@ -276,7 +276,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/user/password/temp")
+                post("/api/user/password/new")
                         .contentType(APPLICATION_JSON)
                         .content(createJson(lostPwForm))
         );
