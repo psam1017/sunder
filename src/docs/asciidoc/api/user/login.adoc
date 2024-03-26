@@ -1,0 +1,18 @@
+=== 로그인하기
+
+==== HTTP Request
+include::{snippets}/user-docs-test/login/http-request.adoc[]
+include::{snippets}/user-docs-test/login/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/user-docs-test/login/http-response.adoc[]
+include::{snippets}/user-docs-test/login/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+| NotBlank.loginId |
+| NotBlank.loginPw |
+|===

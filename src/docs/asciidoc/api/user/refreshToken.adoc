@@ -1,0 +1,16 @@
+=== 새로운 토큰 발급 받기
+
+==== HTTP Request
+include::{snippets}/user-docs-test/refresh-token/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/user-docs-test/refresh-token/http-response.adoc[]
+include::{snippets}/user-docs-test/refresh-token/response-fields.adoc[]
+
+==== Api Reasons
+
+|===
+| 코드 | 이유
+
+|  | 
+|===

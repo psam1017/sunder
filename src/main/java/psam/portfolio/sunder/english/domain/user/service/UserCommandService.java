@@ -53,7 +53,7 @@ public class UserCommandService {
      * @param userInfo 비밀번호를 분실한 가입자 정보
      * @return 이메일 발송 여부
      */
-    public boolean issueTempPassword(LostLoginPwForm userInfo) {
+    public boolean issueNewPassword(LostLoginPwForm userInfo) {
         Optional<User> optUser = userQueryRepository.findOne(
                 user.loginId.eq(userInfo.getLoginId()),
                 user.email.eq(userInfo.getEmail()),

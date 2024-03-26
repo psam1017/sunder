@@ -55,7 +55,7 @@ class UserCommandServiceTest extends SunderApplicationTests {
         assertThat(getDirector.isPasswordExpired()).isFalse();
     }
 
-    @DisplayName("사용자의 아이디, 이메일, 이름으로 임시 비밀번호를 생성하고 이메일로 전송할 수 있다.")
+    @DisplayName("사용자의 아이디, 이메일, 이름으로 새로운 비밀번호를 생성하고 이메일로 전송할 수 있다.")
     @Test
     void issueTempPassword() {
         // mocking
@@ -70,7 +70,7 @@ class UserCommandServiceTest extends SunderApplicationTests {
         LostLoginPwForm userInfo = new LostLoginPwForm(director.getLoginId(), director.getEmail(), director.getName());
 
         // when
-        boolean result = refreshAnd(() -> sut.issueTempPassword(userInfo));
+        boolean result = refreshAnd(() -> sut.issueNewPassword(userInfo));
 
         // then
         assertThat(result).isTrue();
