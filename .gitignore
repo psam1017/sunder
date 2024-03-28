@@ -7,7 +7,6 @@ build/
 
 ### Project ###
 **/application-prod.properties
-**/application-local.properties
 src/main/generated
 logs/
 

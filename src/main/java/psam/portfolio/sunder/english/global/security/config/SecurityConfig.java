@@ -60,7 +60,6 @@ public class SecurityConfig {
                                         "/api/**",
                                         "/docs/**"
                                 ).permitAll()
-                                .requestMatchers(PathRequest.toH2Console()).permitAll()
                                 .anyRequest().hasRole("ADMIN") // hasRole, hasAnyRole 은 prefix 를 생략해야 한다.
                 )
                 .exceptionHandling(exceptionHandling ->

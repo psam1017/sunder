@@ -6,12 +6,3 @@ include::{snippets}/academy-docs-test/withdraw/http-request.adoc[]
 ==== HTTP Response
 include::{snippets}/academy-docs-test/withdraw/http-response.adoc[]
 include::{snippets}/academy-docs-test/withdraw/response-fields.adoc[]
-
-==== Api Reasons
-
-|===
-| 코드 | 이유
-
-| NoSuchElement.Teacher |
-| IllegalRole.UserRole.ROLE_DIRECTOR |
-|===

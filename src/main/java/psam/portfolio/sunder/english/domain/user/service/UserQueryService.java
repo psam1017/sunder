@@ -9,17 +9,15 @@ import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
-import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
 import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
-import psam.portfolio.sunder.english.global.api.ApiException;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
-import psam.portfolio.sunder.english.global.api.ApiStatus;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
@@ -31,7 +29,7 @@ import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
-import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.*;
+import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.PASSWORD_CHANGE;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -113,14 +111,9 @@ public class UserQueryService {
             throw new LoginFailException();
         }
 
-        UserStatus userStatus = getUser.getStatus();
-        if (userStatus != ACTIVE && userStatus != TRIAL) {
-            throw new ApiException() {
-                @Override
-                public ApiResponse<?> initialize() {
-                    return ApiResponse.error(ApiStatus.ILLEGAL_STATUS, User.class, userStatus.toString(), "로그인할 수 없는 상태입니다. [" + userStatus + "]");
-                }
-            };
+        UserStatus status = getUser.getStatus();
+        if (status != ACTIVE && status != TRIAL) {
+            throw new IllegalStatusUserException(status);
         }
 
         // 토큰 만료 시간은 3시간
