@@ -1,9 +1,12 @@
 package psam.portfolio.sunder.english.global.api;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.Getter;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static psam.portfolio.sunder.english.global.api.ApiStatus.BAD_REQUEST;
@@ -40,24 +43,35 @@ public class ApiResponse<T> {
         return new ApiResponse<>(status, List.of(status.message() + "." + clazz.getSimpleName()), data);
     }
 
-    public static <T> ApiResponse<T> badRequest(BindException e) {
-        return new ApiResponse<>(BAD_REQUEST, collectBindExceptionReasons(e), null);
+    public static ApiResponse<Object> badRequest(BindException e) {
+        return fromBindException(e);
     }
 
-    public static <T> ApiResponse<T> badRequest(ConstraintViolationException e) {
-        return new ApiResponse<>(BAD_REQUEST, collectConstraintViolationExceptionReasons(e), null);
+    public static ApiResponse<Object> badRequest(ConstraintViolationException e) {
+        return fromConstraintViolationException(e);
     }
 
-    private static List<String> collectBindExceptionReasons(BindException e) {
-        return e.getFieldErrors().stream().map(fe -> fe.getCode() + "." + fe.getField()).toList();
+    private static ApiResponse<Object> fromBindException(BindException e) {
+        List<String> reasons = new ArrayList<>();
+        List<ApiReasonDetail> data = new ArrayList<>();
+        for (FieldError fieldError : e.getFieldErrors()) {
+            String reason = fieldError.getCode() + "." + fieldError.getField();
+            reasons.add(reason);
+            data.add(new ApiReasonDetail(fieldError));
+        }
+        return new ApiResponse<>(BAD_REQUEST, reasons, data);
     }
 
-    private static List<String> collectConstraintViolationExceptionReasons(ConstraintViolationException e) {
-        return e.getConstraintViolations().stream().map(cve -> {
-            String property = cve.getPropertyPath().toString();
+    private static ApiResponse<Object> fromConstraintViolationException(ConstraintViolationException e) {
+        List<String> reasons = new ArrayList<>();
+        List<ApiReasonDetail> data = new ArrayList<>();
+        for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
+            String property = violation.getPropertyPath().toString();
             String field = property.substring(property.contains("[") ? property.indexOf("[") : property.indexOf("."));
-            String anno = cve.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
-            return anno + ".request" + field;
-        }).toList();
+            String anno = violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
+            reasons.add(anno + ".request" + field);
+            data.add(new ApiReasonDetail(violation));
+        }
+        return new ApiResponse<>(BAD_REQUEST, reasons, data);
     }
 }

@@ -12,7 +12,7 @@ public class IllegalStatusUserException extends ApiException {
         return null;
     }
 
-    public IllegalStatusUserException(UserStatus userStatus) {
-        this.response = ApiResponse.error(ApiStatus.ILLEGAL_STATUS, User.class, userStatus.toString(), "서비스를 이용할 수 없는 상태입니다. [" + userStatus + "]");
+    public IllegalStatusUserException(UserStatus status) {
+        this.response = ApiResponse.error(ApiStatus.ILLEGAL_STATUS, User.class, status.toString(), "서비스를 이용할 수 없는 상태입니다. [" + status + "]");
     }
 }

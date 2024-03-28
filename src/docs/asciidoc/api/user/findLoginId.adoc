@@ -9,12 +9,3 @@ include::{snippets}/user-docs-test/find-login-id/request-fields.adoc[]
 ==== HTTP Response
 include::{snippets}/user-docs-test/find-login-id/http-response.adoc[]
 include::{snippets}/user-docs-test/find-login-id/response-fields.adoc[]
-
-==== Api Reasons
-
-|===
-| 코드 | 이유
-
-| NotBlank.email |
-| NotBlank.name |
-|===

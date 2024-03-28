@@ -7,11 +7,3 @@ include::{snippets}/user-docs-test/check-login-id-dupl/query-parameters.adoc[]
 ==== HTTP Response
 include::{snippets}/user-docs-test/check-login-id-dupl/http-response.adoc[]
 include::{snippets}/user-docs-test/check-login-id-dupl/response-fields.adoc[]
-
-==== Api Reasons
-
-|===
-| 코드 | 이유
-
-| IllegalData.User.ONE_PARAM_TO_CHECK_USER_DUPL | loginId, email, phone 중 하나만 입력해야 합니다.
-|===

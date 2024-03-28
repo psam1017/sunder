@@ -6,11 +6,3 @@ include::{snippets}/user-docs-test/refresh-token/http-request.adoc[]
 ==== HTTP Response
 include::{snippets}/user-docs-test/refresh-token/http-response.adoc[]
 include::{snippets}/user-docs-test/refresh-token/response-fields.adoc[]
-
-==== Api Reasons
-
-|===
-| 코드 | 이유
-
-|  | 
-|===
