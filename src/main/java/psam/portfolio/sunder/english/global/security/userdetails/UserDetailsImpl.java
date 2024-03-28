@@ -31,7 +31,7 @@ public class UserDetailsImpl implements UserDetails {
         return user.getLoginPw();
     }
 
-    // 계정 활성화 여부. 예를 들어 약관 위반에 의한 정지
+    // 계정 활성화 여부
     @Override
     public boolean isEnabled() {
         return user.isActive() || user.isTrial();

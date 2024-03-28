@@ -30,6 +30,8 @@ public class AcademyDirectorPOST {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class AcademyPOST {
 
         @NotBlank
@@ -64,21 +66,12 @@ public class AcademyDirectorPOST {
                     .status(AcademyStatus.PENDING)
                     .build();
         }
-
-        @Builder
-        public AcademyPOST(String name, String phone, String email, String street, String addressDetail, String postalCode, Boolean openToPublic) {
-            this.name = name;
-            this.phone = phone;
-            this.email = email;
-            this.street = street;
-            this.addressDetail = addressDetail;
-            this.postalCode = postalCode;
-            this.openToPublic = openToPublic;
-        }
     }
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class DirectorPOST {
 
         @NotBlank
@@ -121,18 +114,6 @@ public class AcademyDirectorPOST {
                     .status(UserStatus.PENDING)
                     .academy(academy)
                     .build();
-        }
-
-        @Builder
-        public DirectorPOST(String loginId, String loginPw, String name, String email, String phone, String street, String addressDetail, String postalCode) {
-            this.loginId = loginId;
-            this.loginPw = loginPw;
-            this.name = name;
-            this.email = email;
-            this.phone = phone;
-            this.street = street;
-            this.addressDetail = addressDetail;
-            this.postalCode = postalCode;
         }
     }
 }
