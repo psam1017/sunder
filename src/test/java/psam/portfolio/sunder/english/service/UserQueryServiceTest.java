@@ -3,7 +3,7 @@ package psam.portfolio.sunder.english.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -29,7 +29,7 @@ import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROL
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 @SuppressWarnings("ConstantValue")
-class UserQueryServiceTest extends SunderApplicationTests {
+class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
     @Autowired
     UserQueryService sut; // system under test

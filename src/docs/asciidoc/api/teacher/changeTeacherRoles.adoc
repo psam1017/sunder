@@ -1,0 +1,12 @@
+=== 선생님 권한 변경하기
+
+- 학원장만 가능합니다.
+
+==== HTTP Request
+include::{snippets}/teacher-docs-test/change-teacher-roles/http-request.adoc[]
+include::{snippets}/teacher-docs-test/change-teacher-roles/path-parameters.adoc[]
+include::{snippets}/teacher-docs-test/change-teacher-roles/response-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/teacher-docs-test/change-teacher-roles/http-response.adoc[]
+include::{snippets}/teacher-docs-test/change-teacher-roles/response-fields.adoc[]

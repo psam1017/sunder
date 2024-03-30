@@ -8,7 +8,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.global.security.filter.JwtAuthenticationFilter;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
@@ -18,7 +18,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 // Import 와 ExtendWith 는 SunderApplicationTests 에서 수행. 그렇지 않으면 spring boot server 가 한 번 더 초기화됨.
 //@Import(RestDocsConfig.class)
 //@ExtendWith(RestDocumentationExtension.class)
-public class RestDocsEnvironment extends SunderApplicationTests {
+public class RestDocsEnvironment extends AbstractSunderApplicationTest {
 
     @Autowired
     protected RestDocumentationResultHandler restDocs;

@@ -88,7 +88,7 @@ public class AcademyCommandService {
         // user loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING), userEmailVerifiedEq(true)
         userQueryRepository.findOne(
                 user.loginId.eq(directorPOST.getLoginId()) // NotNull
-                        .or(user.email.eq(directorPOST.getEmail())) // NutNull
+                        .or(user.email.eq(directorPOST.getEmail())) // NotNull
                         .or(directorPOST.getPhone() != null ? user.phone.eq(directorPOST.getPhone()) : null), // nullable
                 user.status.ne(PENDING),
                 user.emailVerified.eq(true)
@@ -127,9 +127,9 @@ public class AcademyCommandService {
         return saveDirector.getUuid();
     }
 
-    private static UserRole buildUserRole(Teacher saveDirector, Role role) {
+    private static UserRole buildUserRole(Teacher director, Role role) {
         return UserRole.builder()
-                .user(saveDirector)
+                .user(director)
                 .role(role)
                 .build();
     }

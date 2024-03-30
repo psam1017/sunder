@@ -1,0 +1,11 @@
+=== 선생님 개인정보 수정하기
+
+- 본인 정보만 수정할 수 있습니다.
+
+==== HTTP Request
+include::{snippets}/teacher-docs-test/update-teacher-info/http-request.adoc[]
+include::{snippets}/teacher-docs-test/update-teacher-info/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/teacher-docs-test/update-teacher-info/http-response.adoc[]
+include::{snippets}/teacher-docs-test/update-teacher-info/response-fields.adoc[]

@@ -1,0 +1,9 @@
+=== 선생님 목록 조회하기(학생)
+
+==== HTTP Request
+include::{snippets}/teacher-docs-test/get-teacher-list-by-student/http-request.adoc[]
+include::{snippets}/teacher-docs-test/get-teacher-list-by-student/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/teacher-docs-test/get-teacher-list-by-student/http-response.adoc[]
+include::{snippets}/teacher-docs-test/get-teacher-list-by-student/response-fields.adoc[]
