@@ -3,7 +3,7 @@ package psam.portfolio.sunder.english.scheduler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepository;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class AcademySchedulerTest extends SunderApplicationTests {
+class AcademySchedulerTest extends AbstractSunderApplicationTest {
 
     @Autowired
     AcademyScheduler sut;

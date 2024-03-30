@@ -12,9 +12,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -45,10 +43,10 @@ public class Academy extends TimeEntity {
     private LocalDateTime withdrawalAt;
 
     @OneToMany(mappedBy = "academy")
-    private Set<Teacher> teachers;
+    private List<Teacher> teachers = new ArrayList<>();
 
     @OneToMany(mappedBy = "academy")
-    private Set<Student> students;
+    private List<Student> students = new ArrayList<>();
 
     @Builder
     public Academy(String name, Address address, String phone, String email, boolean openToPublic, AcademyStatus status) {

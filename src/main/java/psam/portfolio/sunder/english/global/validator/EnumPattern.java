@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.enumpattern;
+package psam.portfolio.sunder.english.global.validator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

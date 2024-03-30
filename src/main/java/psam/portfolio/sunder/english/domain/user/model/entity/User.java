@@ -10,6 +10,7 @@ import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public abstract class User extends BaseEntity {
     private LocalDateTime lastPasswordChangeDateTime;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRole> roles;
+    private Set<UserRole> roles = new HashSet<>();
 
     protected User(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status) {
         this.loginId = loginId;
@@ -107,5 +108,25 @@ public abstract class User extends BaseEntity {
 
     public void setLoginPw(String loginPw) {
         this.loginPw = loginPw;
+    }
+
+    public void changeStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

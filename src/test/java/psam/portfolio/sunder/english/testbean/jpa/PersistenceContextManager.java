@@ -36,5 +36,6 @@ public class PersistenceContextManager {
     public void refresh() {
         em.flush();
         em.clear();
+        System.out.println("\n#============================== Flush and Clear. Refresh Done. ==============================\n");
     }
 }

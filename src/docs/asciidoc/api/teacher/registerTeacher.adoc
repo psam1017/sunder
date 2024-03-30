@@ -1,0 +1,9 @@
+=== 선생님 신규 등록하기
+
+==== HTTP Request
+include::{snippets}/teacher-docs-test/register-teacher/http-request.adoc[]
+include::{snippets}/teacher-docs-test/register-teacher/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/teacher-docs-test/register-teacher/http-response.adoc[]
+include::{snippets}/teacher-docs-test/register-teacher/response-fields.adoc[]

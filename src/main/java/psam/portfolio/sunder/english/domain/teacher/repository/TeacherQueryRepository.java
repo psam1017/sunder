@@ -1,13 +1,19 @@
 package psam.portfolio.sunder.english.domain.teacher.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.exception.NoSuchTeacherException;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherSearchCond;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,5 +67,41 @@ public class TeacherQueryRepository {
                 .from(teacher)
                 .where(expressions)
                 .fetch();
+    }
+
+    public List<Teacher> findAllBySearchCond(TeacherSearchCond cond) {
+        return query.selectDistinct(teacher)
+                .from(teacher)
+                .where(
+                        teacherNameContains(cond.getTeacherName()),
+                        userStatusEq(cond.getStatus())
+                )
+                .orderBy(specifiedOrder(cond))
+                .fetch();
+    }
+
+    private BooleanExpression teacherNameContains(String teacherName) {
+        if (StringUtils.hasText(teacherName)) {
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", teacher.name.toLowerCase())
+                    .contains(teacherName.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
+    private BooleanExpression userStatusEq(UserStatus status) {
+        return status != null ? teacher.status.eq(status) : null;
+    }
+
+    private OrderSpecifier<?> specifiedOrder(TeacherSearchCond cond) {
+        String prop = cond.getProp();
+        Order order = cond.getDir();
+
+        if (prop.equals("name")) {
+            return new OrderSpecifier<>(order, teacher.name);
+        } else if (prop.equals("status")) {
+            return new OrderSpecifier<>(order, teacher.status);
+        }
+        return new OrderSpecifier<>(order, teacher.createdDateTime);
     }
 }

@@ -3,7 +3,7 @@ package psam.portfolio.sunder.english.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -23,7 +23,7 @@ import static org.mockito.BDDMockito.*;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
-class UserCommandServiceTest extends SunderApplicationTests {
+class UserCommandServiceTest extends AbstractSunderApplicationTest {
 
     @Autowired
     UserCommandService sut; // system under test

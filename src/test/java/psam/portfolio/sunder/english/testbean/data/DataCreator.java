@@ -85,7 +85,9 @@ public class DataCreator {
                 .status(status)
                 .academy(academy)
                 .build();
-        return teacherCommandRepository.save(teacher);
+        Teacher saveTeacher = teacherCommandRepository.save(teacher);
+        academy.getTeachers().add(saveTeacher);
+        return saveTeacher;
     }
 
     public Teacher registerTeacher(String name, UserStatus status, Academy academy) {
@@ -101,7 +103,9 @@ public class DataCreator {
                 .status(status)
                 .academy(academy)
                 .build();
-        return teacherCommandRepository.save(teacher);
+        Teacher saveTeacher = teacherCommandRepository.save(teacher);
+        academy.getTeachers().add(saveTeacher);
+        return saveTeacher;
     }
 
     public Student registerStudent(UserStatus status, Academy academy) {
@@ -121,18 +125,23 @@ public class DataCreator {
                 .status(status)
                 .academy(academy)
                 .build();
-        return studentCommandRepository.save(student);
+        Student saveStudent = studentCommandRepository.save(student);
+        academy.getStudents().add(saveStudent);
+        return saveStudent;
     }
 
-    public List<UserRole> createUserRoles(User user, RoleName... roleNames) {
+    public void createUserRoles(User user, RoleName... roleNames) {
         List<Role> roles = roleQueryRepository.findAll(
                 QRole.role.name.in(roleNames)
         );
-        List<UserRole> userRoles = new ArrayList<>();
+
+        List<UserRole> buildUserRoles = new ArrayList<>();
         for (Role r : roles) {
-            UserRole userRole = UserRole.builder().user(user).role(r).build();
-            userRoles.add(userRole);
+            UserRole buildUserRole = UserRole.builder().user(user).role(r).build();
+            buildUserRoles.add(buildUserRole);
         }
-        return userRoleCommandRepository.saveAll(userRoles);
+
+        List<UserRole> saveUserRoles = userRoleCommandRepository.saveAll(buildUserRoles);
+        user.getRoles().addAll(saveUserRoles);
     }
 }

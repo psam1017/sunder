@@ -1,0 +1,12 @@
+=== 선생님 상태 변경하기
+
+- 학원장만 가능합니다.
+
+==== HTTP Request
+include::{snippets}/teacher-docs-test/change-teacher-status/http-request.adoc[]
+include::{snippets}/teacher-docs-test/change-teacher-status/path-parameters.adoc[]
+include::{snippets}/teacher-docs-test/change-teacher-status/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/teacher-docs-test/change-teacher-status/http-response.adoc[]
+include::{snippets}/teacher-docs-test/change-teacher-status/response-fields.adoc[]

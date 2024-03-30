@@ -24,7 +24,7 @@ public abstract class SearchCond {
     public SearchCond() {
         this.page = 1;
         this.size = 10;
-        this.prop = "id";
+        this.prop = "";
         this.dir = DESC;
     }
 
@@ -39,7 +39,7 @@ public abstract class SearchCond {
         } else {
             this.size = Math.min(size, 100);
         }
-        this.prop = prop == null ? "id" : prop;
+        this.prop = prop == null ? "" : prop;
         this.dir = "asc".equalsIgnoreCase(dir) ? ASC : DESC;
     }
 

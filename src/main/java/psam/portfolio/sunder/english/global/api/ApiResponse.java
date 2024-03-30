@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static psam.portfolio.sunder.english.global.api.ApiStatus.BAD_REQUEST;
 import static psam.portfolio.sunder.english.global.api.ApiStatus.OK;
@@ -53,25 +54,25 @@ public class ApiResponse<T> {
 
     private static ApiResponse<Object> fromBindException(BindException e) {
         List<String> reasons = new ArrayList<>();
-        List<ApiReasonDetail> data = new ArrayList<>();
+        List<ApiReasonDetail> details = new ArrayList<>();
         for (FieldError fieldError : e.getFieldErrors()) {
             String reason = fieldError.getCode() + "." + fieldError.getField();
             reasons.add(reason);
-            data.add(new ApiReasonDetail(fieldError));
+            details.add(new ApiReasonDetail(fieldError));
         }
-        return new ApiResponse<>(BAD_REQUEST, reasons, data);
+        return new ApiResponse<>(BAD_REQUEST, reasons, Map.of("details", details));
     }
 
     private static ApiResponse<Object> fromConstraintViolationException(ConstraintViolationException e) {
         List<String> reasons = new ArrayList<>();
-        List<ApiReasonDetail> data = new ArrayList<>();
+        List<ApiReasonDetail> details = new ArrayList<>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
             String property = violation.getPropertyPath().toString();
             String field = property.substring(property.contains("[") ? property.indexOf("[") : property.indexOf("."));
             String anno = violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName();
             reasons.add(anno + ".request" + field);
-            data.add(new ApiReasonDetail(violation));
+            details.add(new ApiReasonDetail(violation));
         }
-        return new ApiResponse<>(BAD_REQUEST, reasons, data);
+        return new ApiResponse<>(BAD_REQUEST, reasons, Map.of("details", details));
     }
 }

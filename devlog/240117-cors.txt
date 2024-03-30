@@ -61,7 +61,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
-import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.student.dto.request.StudentSave;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 

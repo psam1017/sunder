@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import psam.portfolio.sunder.english.SunderApplicationTests;
+import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
 import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
@@ -22,7 +22,6 @@ import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserExceptio
 import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
-import psam.portfolio.sunder.english.global.api.ApiException;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.UUID;
@@ -33,7 +32,7 @@ import static org.mockito.BDDMockito.given;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
-public class AcademyCommandServiceTest extends SunderApplicationTests {
+public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
     @Autowired
     AcademyCommandService sut; // system under test

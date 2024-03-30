@@ -71,7 +71,7 @@ public class AcademyController {
      * @return 학원 목록
      */
     @GetMapping("/list")
-    public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute AcademyPublicSearchCond cond) {
+    public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute @Valid AcademyPublicSearchCond cond) {
         Map<String, Object> response = academyQueryService.getPublicList(cond);
         return ApiResponse.ok(response);
     }

@@ -3,6 +3,7 @@ package psam.portfolio.sunder.english.domain.academy.repository;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +73,7 @@ public class AcademyQueryRepository {
         return query.selectDistinct(academy)
                 .from(academy)
                 .where(
-                        academyNameEq(cond.getAcademyName()),
+                        academyNameContains(cond.getAcademyName()),
                         openToPublicEq(true),
                         academyStatusEq(AcademyStatus.VERIFIED)
                 )
@@ -80,16 +81,6 @@ public class AcademyQueryRepository {
                 .offset(cond.getOffset())
                 .limit(cond.getLimit())
                 .fetch();
-    }
-
-    private OrderSpecifier<?> specifyOrder(AcademyPublicSearchCond cond) {
-        String prop = cond.getProp();
-        Order order = cond.getDir();
-
-        if (prop.contains("name")) {
-            return new OrderSpecifier<>(order, academy.name);
-        }
-        return new OrderSpecifier<>(order, academy.createdDateTime);
     }
 
     /**
@@ -124,7 +115,7 @@ public class AcademyQueryRepository {
         Long count = query.select(academy.countDistinct())
                 .from(academy)
                 .where(
-                        academyNameEq(cond.getAcademyName()),
+                        academyNameContains(cond.getAcademyName()),
                         openToPublicEq(true),
                         academyStatusEq(AcademyStatus.VERIFIED)
                 )
@@ -140,7 +131,22 @@ public class AcademyQueryRepository {
         return openToPublic != null ? academy.openToPublic.eq(openToPublic) : null;
     }
 
-    private BooleanExpression academyNameEq(String academyName) {
-        return StringUtils.hasText(academyName) ? academy.name.containsIgnoreCase(academyName) : null;
+    private BooleanExpression academyNameContains(String academyName) {
+        if (StringUtils.hasText(academyName)) {
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", academy.name.toLowerCase())
+                    .contains(academyName.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
+    private OrderSpecifier<?> specifyOrder(AcademyPublicSearchCond cond) {
+        String prop = cond.getProp();
+        Order order = cond.getDir();
+
+        if (prop.contains("name")) {
+            return new OrderSpecifier<>(order, academy.name);
+        }
+        return new OrderSpecifier<>(order, academy.createdDateTime);
     }
 }

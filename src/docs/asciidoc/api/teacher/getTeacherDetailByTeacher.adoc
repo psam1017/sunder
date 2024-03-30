@@ -1,0 +1,9 @@
+=== 선생님 상세 정보 조회하기(선생님)
+
+==== HTTP Request
+include::{snippets}/teacher-docs-test/get-teacher-detail-by-teacher/http-request.adoc[]
+include::{snippets}/teacher-docs-test/get-teacher-detail-by-teacher/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/teacher-docs-test/get-teacher-detail-by-teacher/http-response.adoc[]
+include::{snippets}/teacher-docs-test/get-teacher-detail-by-teacher/response-fields.adoc[]

@@ -310,8 +310,8 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.teachers[].academyId").type(STRING).description("선생이 속한 학원 아이디"),
                                 fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생 생성일시"),
                                 fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생 수정일시"),
-                                fieldWithPath("data.teachers[].createdBy").type(STRING).description("선생 생성자").optional(),
-                                fieldWithPath("data.teachers[].modifiedBy").type(STRING).description("선생 수정자").optional()
+                                fieldWithPath("data.teachers[].createdBy").type(STRING).description("생성자 아이디").optional(),
+                                fieldWithPath("data.teachers[].modifiedBy").type(STRING).description("수정자 아이디").optional()
                         )
                 )
         );
