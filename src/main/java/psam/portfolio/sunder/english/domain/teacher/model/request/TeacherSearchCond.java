@@ -9,15 +9,14 @@ import psam.portfolio.sunder.english.global.pagination.SearchCond;
 @Getter
 public class TeacherSearchCond extends SearchCond {
 
-    @EnumPattern(regexp = "^(PENDING|TRIAL|TRIAL_END|ACTIVE|FORBIDDEN|WITHDRAWN)$", nullable = true)
     private final UserStatus status;
 
     private final String teacherName;
 
     @Builder
-    public TeacherSearchCond(Integer page, Integer size, String prop, String dir, UserStatus status, String teacherName) {
+    public TeacherSearchCond(Integer page, Integer size, String prop, String dir, String status, String teacherName) {
         super(page, size, prop, dir);
-        this.status = status;
+        this.status = UserStatus.ofNullable(status);
         this.teacherName = teacherName;
     }
 }

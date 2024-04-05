@@ -13,11 +13,11 @@ import static lombok.AccessLevel.PROTECTED;
 public class School {
 
     private String schoolName;
-    private Integer grade;
+    private Integer schoolGrade;
 
     @Builder
-    public School(String schoolName, Integer grade) {
+    public School(String schoolName, Integer schoolGrade) {
         this.schoolName = schoolName;
-        this.grade = grade;
+        this.schoolGrade = schoolGrade;
     }
 }

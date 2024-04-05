@@ -2,12 +2,10 @@ package psam.portfolio.sunder.english.testbean.jpa;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-@Component
 public class PersistenceContextManager {
 
     private final EntityManager em;

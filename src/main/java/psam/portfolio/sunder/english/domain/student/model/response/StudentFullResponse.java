@@ -35,8 +35,10 @@ public class StudentFullResponse {
     private List<RoleName> roles;
     private String attendanceId;
     private String note;
-    private SchoolResponse school;
-    private ParentResponse parent;
+    private String schoolName;
+    private Integer schoolGrade;
+    private String parentName;
+    private String parentPhone;
     private UUID academyId;
     @KoreanDateTime
     private LocalDateTime createdDateTime;
@@ -59,8 +61,10 @@ public class StudentFullResponse {
                 .roles(student.getRoles().stream().map(UserRole::getRoleName).toList())
                 .attendanceId(student.getAttendanceId())
                 .note(student.getNote())
-                .school(SchoolResponse.from(student.getSchool()))
-                .parent(ParentResponse.from(student.getParent()))
+                .schoolName(student.getSchool().getSchoolName())
+                .schoolGrade(student.getSchool().getSchoolGrade())
+                .parentName(student.getParent().getParentName())
+                .parentPhone(student.getParent().getParentPhone())
                 .academyId(student.getAcademy().getUuid())
                 .createdDateTime(student.getCreatedDateTime())
                 .modifiedDateTime(student.getModifiedDateTime())

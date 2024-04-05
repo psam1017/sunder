@@ -2,6 +2,8 @@ package psam.portfolio.sunder.english.domain.user.enumeration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
+import java.util.Objects;
+
 public enum UserStatus {
 
     PENDING,
@@ -12,7 +14,12 @@ public enum UserStatus {
     WITHDRAWN;
 
     @JsonCreator
-    public UserStatus of(String str) {
-        return UserStatus.valueOf(str);
+    public static UserStatus ofNullable(String str) {
+        for (UserStatus us : UserStatus.values()) {
+            if (Objects.equals(us.name(), str)) {
+                return us;
+            }
+        }
+        return null;
     }
 }

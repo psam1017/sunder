@@ -27,7 +27,7 @@ public interface InfoContainer {
     default School getAnySchool() {
         return School.builder()
                 .schoolName("선더초등학교")
-                .grade(3)
+                .schoolGrade(3)
                 .build();
     }
 

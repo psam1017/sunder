@@ -11,7 +11,7 @@ import psam.portfolio.sunder.english.domain.user.model.request.UserPATCHPassword
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
 import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
 import psam.portfolio.sunder.english.global.resolver.argument.Token;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;

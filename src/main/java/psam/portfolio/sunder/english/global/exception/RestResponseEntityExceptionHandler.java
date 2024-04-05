@@ -31,8 +31,8 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
-import psam.portfolio.sunder.english.global.api.ApiStatus;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
+import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
 
 import java.util.Objects;
 

@@ -2,9 +2,9 @@ package psam.portfolio.sunder.english.domain.user.exception;
 
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
-import psam.portfolio.sunder.english.global.api.ApiException;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
-import psam.portfolio.sunder.english.global.api.ApiStatus;
+import psam.portfolio.sunder.english.global.api.v1.ApiException;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
+import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
 
 public class IllegalStatusUserException extends ApiException {
     @Override

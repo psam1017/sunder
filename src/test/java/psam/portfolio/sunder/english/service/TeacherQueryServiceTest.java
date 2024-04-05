@@ -8,25 +8,17 @@ import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherSearchCond;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
-import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherQueryService;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
-import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
-import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 
 @SuppressWarnings("unchecked")
@@ -64,7 +56,7 @@ public class TeacherQueryServiceTest extends AbstractSunderApplicationTest {
                 .size(null)
                 .prop("name")
                 .dir("asc")
-                .status(UserStatus.ACTIVE)
+                .status(UserStatus.ACTIVE.toString())
                 .teacherName("A")
                 .build();
 
@@ -110,7 +102,7 @@ public class TeacherQueryServiceTest extends AbstractSunderApplicationTest {
                 .size(null)
                 .prop("name")
                 .dir("asc")
-                .status(UserStatus.ACTIVE)
+                .status(UserStatus.ACTIVE.toString())
                 .teacherName("A")
                 .build();
 
