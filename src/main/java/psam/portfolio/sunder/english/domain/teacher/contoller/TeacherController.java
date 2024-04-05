@@ -9,7 +9,7 @@ import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandServic
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherQueryService;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class TeacherController {
      * 선생님 등록 서비스
      *
      * @param teacherId 학원에 등록할 선생의 아이디
-     * @param post 등록할 선생님 정보
+     * @param post      등록할 선생님 정보
      * @return 등록에 성공한 선생님 아이디
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
@@ -43,15 +43,14 @@ public class TeacherController {
     /**
      * 선생님 목록 조회 서비스. 페이징 없이 모든 선생 목록을 반환한다.
      *
-     * @param userId    사용자 아이디
-     * @param cond 선생님 목록 조회 조건
+     * @param userId 사용자 아이디
+     * @param cond   선생님 목록 조회 조건
      * @return 선생님 목록
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     @GetMapping("/list")
     public ApiResponse<Map<String, List<?>>> getTeacherList(@UserId UUID userId,
-                                                            @ModelAttribute @Valid TeacherSearchCond cond
-    ) {
+                                                            @ModelAttribute TeacherSearchCond cond) {
         List<?> teachers = teacherQueryService.getList(userId, cond);
         return ApiResponse.ok(Map.of("teachers", teachers));
     }
@@ -59,7 +58,7 @@ public class TeacherController {
     /**
      * 선생님 상세 정보 조회 서비스
      *
-     * @param userId 사용자 아이디
+     * @param userId    사용자 아이디
      * @param teacherId 선생님 아이디
      * @return 선생님 상세 정보
      */

@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.api;
+package psam.portfolio.sunder.english.global.api.v1;
 
 /**
  * Create a business exception by inheriting ApiException so that the controller advice can catch the exception.

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;

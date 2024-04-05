@@ -1,8 +1,8 @@
 package psam.portfolio.sunder.english.global.command;
 
-import psam.portfolio.sunder.english.global.api.ApiException;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
-import psam.portfolio.sunder.english.global.api.ApiStatus;
+import psam.portfolio.sunder.english.global.api.v1.ApiException;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
+import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
 
 public class CommandException extends ApiException {
     

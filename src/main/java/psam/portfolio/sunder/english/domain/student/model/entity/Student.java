@@ -12,6 +12,8 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
+import java.util.Optional;
+
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter

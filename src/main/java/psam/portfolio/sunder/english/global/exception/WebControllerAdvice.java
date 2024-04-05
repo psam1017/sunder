@@ -11,9 +11,9 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MultipartException;
-import psam.portfolio.sunder.english.global.api.ApiException;
-import psam.portfolio.sunder.english.global.api.ApiResponse;
-import psam.portfolio.sunder.english.global.api.ApiStatus;
+import psam.portfolio.sunder.english.global.api.v1.ApiException;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
+import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
 
 import static org.springframework.http.HttpStatus.*;
 
