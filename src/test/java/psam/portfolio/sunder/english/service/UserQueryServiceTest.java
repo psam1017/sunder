@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
@@ -25,8 +28,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 
 @SuppressWarnings("ConstantValue")
 class UserQueryServiceTest extends AbstractSunderApplicationTest {
@@ -298,5 +300,35 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         Boolean changeable = jwtUtils.extractClaim(response.getToken(), claims -> claims.get(JwtClaim.PASSWORD_CHANGE.toString(), Boolean.class));
         assertThat(changeable).isTrue();
         assertThat(response.getType()).isEqualTo("Bearer ");
+    }
+
+    @DisplayName("선생이 자기 자신의 정보를 조회할 수 있다.")
+    @Test
+    void getMyInfoByTeacher() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        // when
+        Object myInfo = refreshAnd(() -> sut.getMyInfo(director.getUuid()));
+
+        // then
+        assertThat(myInfo instanceof TeacherFullResponse).isTrue();
+    }
+
+    @DisplayName("학생이 자기 자신의 정보를 조회할 수 있다.")
+    @Test
+    void getMyInfoByStudent() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, ROLE_STUDENT);
+
+        // when
+        Object myInfo = refreshAnd(() -> sut.getMyInfo(student.getUuid()));
+
+        // then
+        assertThat(myInfo instanceof StudentFullResponse).isTrue();
     }
 }

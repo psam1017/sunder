@@ -20,7 +20,8 @@ import static jakarta.persistence.FetchType.LAZY;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("STUDENT")
 @PrimaryKeyJoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-@Table(name = "students",
+@Table(
+        name = "students",
         indexes = @Index(columnList = "academy_uuid")
 )
 @Entity
@@ -53,5 +54,21 @@ public class Student extends User {
         this.school = school;
         this.parent = parent;
         this.academy = academy;
+    }
+
+    public void setAttendanceId(String attendanceId) {
+        this.attendanceId = attendanceId;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public void setSchool(School school) {
+        this.school = school;
+    }
+
+    public void setParent(Parent parent) {
+        this.parent = parent;
     }
 }

@@ -1,0 +1,8 @@
+=== 자기 정보 조회하기(선생님)
+
+==== HTTP Request
+include::{snippets}/user-docs-test/get-my-info-by-teacher/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/user-docs-test/get-my-info-by-teacher/http-response.adoc[]
+include::{snippets}/user-docs-test/get-my-info-by-teacher/response-fields.adoc[]

@@ -111,7 +111,7 @@ public class TeacherController {
     }
 
     /**
-     * 선생님 개인정보 수정 서비스
+     * 선생님 개인정보 수정 서비스. 자기 자신의 정보만 수정할 수 있다.
      *
      * @param teacherId 선생님 아이디
      * @param patch     변경할 개인정보

@@ -31,9 +31,9 @@ public class StudentFullResponse {
     private String addressDetail;
     private String postalCode;
     private UserStatus status;
+    private List<RoleName> roles;
     @KoreanDateTime
     private LocalDateTime lastPasswordChangeDateTime;
-    private List<RoleName> roles;
     private String attendanceId;
     private String note;
     private String schoolName;
@@ -48,7 +48,7 @@ public class StudentFullResponse {
     private UUID createdBy;
     private UUID modifiedBy;
 
-    public static StudentFullResponse from(Student student) {
+    public static StudentFullResponse from(Student student, boolean displayNote) {
         return StudentFullResponse.builder()
                 .id(student.getUuid())
                 .loginId(student.getLoginId())
@@ -63,7 +63,7 @@ public class StudentFullResponse {
                 .lastPasswordChangeDateTime(student.getLastPasswordChangeDateTime())
                 .roles(student.getRoles().stream().map(UserRole::getRoleName).toList())
                 .attendanceId(student.getAttendanceId())
-                .note(student.getNote())
+                .note(displayNote ? student.getNote() : "")
                 .schoolName(student.getSchool().getName())
                 .schoolGrade(student.getSchool().getGrade())
                 .parentName(student.getParent().getName())

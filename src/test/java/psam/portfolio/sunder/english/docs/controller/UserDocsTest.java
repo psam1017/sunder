@@ -7,6 +7,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
@@ -28,8 +29,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 
 public class UserDocsTest extends RestDocsEnvironment {
 
@@ -366,6 +366,97 @@ public class UserDocsTest extends RestDocsEnvironment {
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.newPassword").type(BOOLEAN).description("비밀번호 변경 성공 여부")
+                                )
+                        )
+                );
+    }
+
+    @DisplayName("선생이 자기 자신의 정보를 조회할 수 있다.")
+    @Test
+    void getMyInfoByTeacher() throws Exception {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/user/me")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, createToken(director))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                                relaxedResponseFields(
+                                        fieldWithPath("data.id").type(STRING).description("사용자 아이디"),
+                                        fieldWithPath("data.loginId").type(STRING).description("로그인 아이디"),
+                                        fieldWithPath("data.name").type(STRING).description("이름"),
+                                        fieldWithPath("data.email").type(STRING).description("이메일"),
+                                        fieldWithPath("data.emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
+                                        fieldWithPath("data.phone").type(STRING).description("연락처"),
+                                        fieldWithPath("data.street").type(STRING).description("주소"),
+                                        fieldWithPath("data.addressDetail").type(STRING).description("상세 주소"),
+                                        fieldWithPath("data.postalCode").type(STRING).description("우편번호"),
+                                        fieldWithPath("data.status").type(STRING).description("사용자 상태"),
+                                        fieldWithPath("data.roles").type(ARRAY).description("사용자 권한"),
+                                        fieldWithPath("data.lastPasswordChangeDateTime").type(STRING).description("마지막 비밀번호 변경 일시"),
+                                        fieldWithPath("data.academyId").type(STRING).description("소속 학원 아이디"),
+                                        fieldWithPath("data.createdDateTime").type(STRING).description("생성 일시"),
+                                        fieldWithPath("data.modifiedDateTime").type(STRING).description("수정 일시"),
+                                        fieldWithPath("data.createdBy").type(STRING).description("생성자 아이디").optional(),
+                                        fieldWithPath("data.modifiedBy").type(STRING).description("수정자 아이디").optional()
+                                )
+                        )
+                );
+    }
+
+    @DisplayName("학생이 자기 자신의 정보를 조회할 수 있다.")
+    @Test
+    void getMyInfoByStudent() throws Exception {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, ROLE_STUDENT);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/user/me")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, createToken(student))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                                relaxedResponseFields(
+                                        fieldWithPath("data.id").type(STRING).description("사용자 아이디"),
+                                        fieldWithPath("data.loginId").type(STRING).description("로그인 아이디"),
+                                        fieldWithPath("data.name").type(STRING).description("이름"),
+                                        fieldWithPath("data.email").type(STRING).description("이메일"),
+                                        fieldWithPath("data.emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
+                                        fieldWithPath("data.phone").type(STRING).description("연락처"),
+                                        fieldWithPath("data.street").type(STRING).description("주소"),
+                                        fieldWithPath("data.addressDetail").type(STRING).description("상세 주소"),
+                                        fieldWithPath("data.postalCode").type(STRING).description("우편번호"),
+                                        fieldWithPath("data.status").type(STRING).description("사용자 상태"),
+                                        fieldWithPath("data.roles").type(ARRAY).description("사용자 권한"),
+                                        fieldWithPath("data.lastPasswordChangeDateTime").type(STRING).description("마지막 비밀번호 변경 일시"),
+                                        fieldWithPath("data.attendanceId").type(STRING).description("출석 아이디"),
+                                        fieldWithPath("data.schoolName").type(STRING).description("학교 이름"),
+                                        fieldWithPath("data.schoolGrade").type(NUMBER).description("학년"),
+                                        fieldWithPath("data.parentName").type(STRING).description("부모 이름"),
+                                        fieldWithPath("data.parentPhone").type(STRING).description("부모 연락처"),
+                                        fieldWithPath("data.academyId").type(STRING).description("소속 학원 아이디"),
+                                        fieldWithPath("data.createdDateTime").type(STRING).description("생성 일시"),
+                                        fieldWithPath("data.modifiedDateTime").type(STRING).description("수정 일시"),
+                                        fieldWithPath("data.createdBy").type(STRING).description("생성자 아이디").optional(),
+                                        fieldWithPath("data.modifiedBy").type(STRING).description("수정자 아이디").optional()
                                 )
                         )
                 );

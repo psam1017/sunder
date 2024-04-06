@@ -33,7 +33,7 @@ public interface InfoContainer {
 
     default Parent getAnyParent() {
         return Parent.builder()
-                .name("홍길동")
+                .name("선더부모")
                 .phone("01012345678")
                 .build();
     }

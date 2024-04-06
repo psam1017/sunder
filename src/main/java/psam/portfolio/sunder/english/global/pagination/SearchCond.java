@@ -60,8 +60,7 @@ public abstract class SearchCond {
     }
 
     public long getOffset() {
-        long offset = (long) (this.getPage() - 1) * this.getSize();
-        return Math.max(offset, 0L);
+        return (long) (this.getPage() - 1) * this.getSize();
     }
 
     public int getLimit() {

@@ -29,15 +29,15 @@ public class StudentController {
     /**
      * 학생 중복 체크 서비스
      *
-     * @param academyId    학원 아이디
+     * @param teacherId    검색하는 선생님 아이디
      * @param attendanceId 출석 아이디
      * @return 중복 여부 - 가능 = true, 중복 = false
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
-    @GetMapping("{academyId}/check-dupl")
-    public ApiResponse<Map<String, Boolean>> checkDuplication(@PathVariable UUID academyId,
+    @GetMapping("/check-dupl")
+    public ApiResponse<Map<String, Boolean>> checkDuplication(@UserId UUID teacherId,
                                                               @RequestParam String attendanceId) {
-        boolean result = studentQueryService.checkDuplication(academyId, attendanceId);
+        boolean result = studentQueryService.checkDuplication(teacherId, attendanceId);
         return ApiResponse.ok(Map.of("isOk", result));
     }
 
@@ -72,51 +72,51 @@ public class StudentController {
     }
 
     /**
-     * 학생 상세 정보 조회 서비스
+     * 학생 상세 정보 조회 서비스.
      *
-     * @param userId    사용자 아이디
+     * @param teacherId 학생을 조회하는 선생님 아이디
      * @param studentId 조회할 학생 아이디
      * @return 학생 상세 정보
      */
-    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @GetMapping("/{studentId}")
-    public ApiResponse<Object> getStudent(@UserId UUID userId,
+    public ApiResponse<Object> getStudent(@UserId UUID teacherId,
                                           @PathVariable UUID studentId) {
-        StudentFullResponse studentResponse = studentQueryService.get(userId, studentId);
+        StudentFullResponse studentResponse = studentQueryService.getDetail(teacherId, studentId);
         return ApiResponse.ok(studentResponse);
     }
 
     /**
      * 학생 정보 수정 서비스
      *
-     * @param userId    사용자 아이디
+     * @param teacherId 수정하는 선생님 아이디
      * @param studentId 수정할 학생 아이디
      * @param patch     수정할 학생 정보
      * @return 수정에 성공한 학생 아이디
      */
-    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @PatchMapping("/{studentId}/personal-info")
-    public ApiResponse<Map<String, UUID>> updateStudent(@UserId UUID userId,
+    public ApiResponse<Map<String, UUID>> updateStudent(@UserId UUID teacherId,
                                                         @PathVariable UUID studentId,
                                                         @RequestBody @Valid StudentPATCHInfo patch) {
-        UUID updatedStudentId = studentCommandService.updateInfo(userId, studentId, patch);
+        UUID updatedStudentId = studentCommandService.updateInfo(teacherId, studentId, patch);
         return ApiResponse.ok(Map.of("studentId", updatedStudentId));
     }
 
     /**
      * 학생 상태 변경 서비스. 탈퇴 상태로 변경도 포함한다.
      *
-     * @param directorId 학원장 아이디
-     * @param studentId  상태를 변경할 학생 아이디
-     * @param patch      변경할 상태 - 가능한 값 : PENDING, ACTIVE, WITHDRAWN
+     * @param teacherId 상태를 변경하는 선생님 아이디
+     * @param studentId 상태를 변경할 학생 아이디
+     * @param patch     변경할 상태 - 가능한 값 : PENDING, ACTIVE, WITHDRAWN
      * @return 학생 아이디와 변경된 상태
      */
-    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @PatchMapping("/{studentId}/status")
-    public ApiResponse<Map<String, String>> changeStudentStatus(@UserId UUID directorId,
+    public ApiResponse<Map<String, String>> changeStudentStatus(@UserId UUID teacherId,
                                                                 @PathVariable UUID studentId,
                                                                 @RequestBody @Valid StudentPATCHStatus patch) {
-        UserStatus status = studentCommandService.changeStatus(directorId, studentId, patch);
+        UserStatus status = studentCommandService.changeStatus(teacherId, studentId, patch);
         return ApiResponse.ok(Map.of(
                 "studentId", studentId.toString(),
                 "status", status.name()

@@ -45,6 +45,7 @@ public class UserController {
 
     /**
      * 로그인 서비스
+     *
      * @param loginInfo 로그인 정보
      * @return 인증한 사용자에게 발급하는 토큰
      */
@@ -56,6 +57,7 @@ public class UserController {
 
     /**
      * 로그인 비밀번호 변경 알림 지연 서비스
+     *
      * @return 지연 성공 여부
      */
     @PostMapping("/password/alert-later")
@@ -67,6 +69,7 @@ public class UserController {
 
     /**
      * 토큰 재발급 서비스
+     *
      * @return 새로 발급한 토큰
      */
     @PostMapping("/token/refresh")
@@ -74,6 +77,19 @@ public class UserController {
     public ApiResponse<TokenRefreshResponse> refreshToken(@UserId UUID userId) {
         TokenRefreshResponse response = userQueryService.refreshToken(userId);
         return ApiResponse.ok(response);
+    }
+
+    /**
+     * 자기 정보 조회 서비스
+     *
+     * @param userId 조회할 사용자 아이디
+     * @return 사용자 정보
+     */
+    @GetMapping("/me")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Object> getMyInfo(@UserId UUID userId) {
+        Object myInfo = userQueryService.getMyInfo(userId);
+        return ApiResponse.ok(myInfo);
     }
 
     /**

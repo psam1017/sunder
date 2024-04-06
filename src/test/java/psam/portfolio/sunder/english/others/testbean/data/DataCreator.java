@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
+import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
+import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.repository.StudentCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -18,6 +20,7 @@ import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.repository.RoleCommandRepository;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
+import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import psam.portfolio.sunder.english.others.testbean.container.InfoContainer;
 
@@ -122,6 +125,27 @@ public class DataCreator {
                 .address(uic.getAnyAddress())
                 .school(uic.getAnySchool())
                 .parent(uic.getAnyParent())
+                .status(status)
+                .academy(academy)
+                .build();
+        Student saveStudent = studentCommandRepository.save(student);
+        academy.getStudents().add(saveStudent);
+        return saveStudent;
+    }
+
+    public Student registerStudent(String name, String attendanceId, Address address, School school, Parent parent, UserStatus status, Academy academy) {
+        Student student = Student.builder()
+                .loginId(uic.getUniqueLoginId())
+                .loginPw(passwordUtils.encode(uic.getRawPassword()))
+                .name(name)
+                .email(uic.getUniqueEmail())
+                .emailVerified(true)
+                .phone(uic.getUniquePhoneNumber())
+                .attendanceId(attendanceId)
+                .note("note about student")
+                .address(address)
+                .school(school)
+                .parent(parent)
                 .status(status)
                 .academy(academy)
                 .build();

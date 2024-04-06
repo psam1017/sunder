@@ -275,46 +275,44 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
-                        queryParameters(
-                                parameterWithName("select")
-                                        .description("""
-                                                    같이 조회할 정보 옵션 +
-                                                    - teacher : 학원에 소속된 선생 목록을 같이 조회
-                                                    """)
-                                        .optional()
-                        ),
-                        relaxedResponseFields(
-                                fieldWithPath("data.academy.id").type(STRING).description("학원 아이디"),
-                                fieldWithPath("data.academy.name").type(STRING).description("학원 이름"),
-                                fieldWithPath("data.academy.address.street").type(STRING).description("학원 주소 (도로명)"),
-                                fieldWithPath("data.academy.address.detail").type(STRING).description("학원 주소 (상세주소)"),
-                                fieldWithPath("data.academy.address.postalCode").type(STRING).description("학원 주소 (우편번호)"),
-                                fieldWithPath("data.academy.phone").type(STRING).description("학원 전화번호"),
-                                fieldWithPath("data.academy.email").type(STRING).description("학원 이메일"),
-                                fieldWithPath("data.academy.openToPublic").type(BOOLEAN).description("학원 공개 여부"),
-                                fieldWithPath("data.academy.status").type(STRING).description("학원 상태"),
-                                fieldWithPath("data.academy.createdDateTime").type(STRING).description("학원 생성일시"),
-                                fieldWithPath("data.academy.modifiedDateTime").type(STRING).description("학원 수정일시"),
-                                fieldWithPath("data.teachers[].id").type(STRING).description("선생 아이디"),
-                                fieldWithPath("data.teachers[].loginId").type(STRING).description("선생 로그인 아이디"),
-                                fieldWithPath("data.teachers[].name").type(STRING).description("선생 이름"),
-                                fieldWithPath("data.teachers[].email").type(STRING).description("선생 이메일"),
-                                fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("선생 이메일 인증 여부"),
-                                fieldWithPath("data.teachers[].phone").type(STRING).description("선생 전화번호"),
-                                fieldWithPath("data.teachers[].address.street").type(STRING).description("선생 주소 (도로명)"),
-                                fieldWithPath("data.teachers[].address.detail").type(STRING).description("선생 주소 (상세주소)"),
-                                fieldWithPath("data.teachers[].address.postalCode").type(STRING).description("선생 주소 (우편번호)"),
-                                fieldWithPath("data.teachers[].status").type(STRING).description("선생 상태"),
-                                fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생 권한"),
-                                fieldWithPath("data.teachers[].lastPasswordChangeDateTime").type(STRING).description("선생 마지막 비밀번호 변경일시"),
-                                fieldWithPath("data.teachers[].academyId").type(STRING).description("선생이 속한 학원 아이디"),
-                                fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생 생성일시"),
-                                fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생 수정일시"),
-                                fieldWithPath("data.teachers[].createdBy").type(STRING).description("생성자 아이디").optional(),
-                                fieldWithPath("data.teachers[].modifiedBy").type(STRING).description("수정자 아이디").optional()
+                                queryParameters(
+                                        parameterWithName("select").description("""
+                                                같이 조회할 정보 옵션 +
+                                                - teacher : 학원에 소속된 선생 목록을 같이 조회
+                                                """).optional()
+                                ),
+                                relaxedResponseFields(
+                                        fieldWithPath("data.academy.id").type(STRING).description("학원 아이디"),
+                                        fieldWithPath("data.academy.name").type(STRING).description("학원 이름"),
+                                        fieldWithPath("data.academy.street").type(STRING).description("학원 주소 (도로명)"),
+                                        fieldWithPath("data.academy.addressDetail").type(STRING).description("학원 주소 (상세주소)"),
+                                        fieldWithPath("data.academy.postalCode").type(STRING).description("학원 주소 (우편번호)"),
+                                        fieldWithPath("data.academy.phone").type(STRING).description("학원 전화번호"),
+                                        fieldWithPath("data.academy.email").type(STRING).description("학원 이메일"),
+                                        fieldWithPath("data.academy.openToPublic").type(BOOLEAN).description("학원 공개 여부"),
+                                        fieldWithPath("data.academy.status").type(STRING).description("학원 상태"),
+                                        fieldWithPath("data.academy.createdDateTime").type(STRING).description("학원 생성일시"),
+                                        fieldWithPath("data.academy.modifiedDateTime").type(STRING).description("학원 수정일시"),
+                                        fieldWithPath("data.teachers[].id").type(STRING).description("선생 아이디"),
+                                        fieldWithPath("data.teachers[].loginId").type(STRING).description("선생 로그인 아이디"),
+                                        fieldWithPath("data.teachers[].name").type(STRING).description("선생 이름"),
+                                        fieldWithPath("data.teachers[].email").type(STRING).description("선생 이메일"),
+                                        fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("선생 이메일 인증 여부"),
+                                        fieldWithPath("data.teachers[].phone").type(STRING).description("선생 전화번호"),
+                                        fieldWithPath("data.teachers[].street").type(STRING).description("선생 주소 (도로명)"),
+                                        fieldWithPath("data.teachers[].addressDetail").type(STRING).description("선생 주소 (상세주소)"),
+                                        fieldWithPath("data.teachers[].postalCode").type(STRING).description("선생 주소 (우편번호)"),
+                                        fieldWithPath("data.teachers[].status").type(STRING).description("선생 상태"),
+                                        fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생 권한"),
+                                        fieldWithPath("data.teachers[].lastPasswordChangeDateTime").type(STRING).description("선생 마지막 비밀번호 변경일시"),
+                                        fieldWithPath("data.teachers[].academyId").type(STRING).description("선생이 속한 학원 아이디"),
+                                        fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생 생성일시"),
+                                        fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생 수정일시"),
+                                        fieldWithPath("data.teachers[].createdBy").type(STRING).description("생성자 아이디").optional(),
+                                        fieldWithPath("data.teachers[].modifiedBy").type(STRING).description("수정자 아이디").optional()
+                                )
                         )
-                )
-        );
+                );
     }
 
     @DisplayName("학생이 자기 학원의 상세 정보를 조회할 수 있다.")
@@ -362,19 +360,17 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
-                                        parameterWithName("select")
-                                                .description("""
-                                                            같이 조회할 정보 옵션 +
-                                                            - teacher : 학원에 소속된 선생 목록을 같이 조회
-                                                            """)
-                                                .optional()
+                                        parameterWithName("select").description("""
+                                                같이 조회할 정보 옵션 +
+                                                - teacher : 학원에 소속된 선생 목록을 같이 조회
+                                                """).optional()
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.academy.id").type(STRING).description("학원 아이디"),
                                         fieldWithPath("data.academy.name").type(STRING).description("학원 이름"),
-                                        fieldWithPath("data.academy.address.street").type(STRING).description("학원 주소 (도로명)"),
-                                        fieldWithPath("data.academy.address.detail").type(STRING).description("학원 주소 (상세주소)"),
-                                        fieldWithPath("data.academy.address.postalCode").type(STRING).description("학원 주소 (우편번호)"),
+                                        fieldWithPath("data.academy.street").type(STRING).description("학원 주소 (도로명)"),
+                                        fieldWithPath("data.academy.addressDetail").type(STRING).description("학원 주소 (상세주소)"),
+                                        fieldWithPath("data.academy.postalCode").type(STRING).description("학원 주소 (우편번호)"),
                                         fieldWithPath("data.academy.phone").type(STRING).description("학원 전화번호"),
                                         fieldWithPath("data.academy.email").type(STRING).description("학원 이메일"),
                                         fieldWithPath("data.academy.openToPublic").type(BOOLEAN).description("학원 공개 여부"),
@@ -466,44 +462,44 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
-                        queryParameters(
-                                parameterWithName("page").description("페이지 번호. 최소 1"),
-                                parameterWithName("size").description("페이지 크기. 최소 10"),
-                                parameterWithName("prop").description("""
-                                                                        정렬 기준 +
-                                                                        - name : 학원 이름 +
-                                                                        - id : 생성 순서(기본값)
-                                                                        """).optional(),
-                                parameterWithName("dir").description("""
-                                                                       정렬 방향 +
-                                                                       - asc : 오름차순 +
-                                                                       - desc : 내림차순(기본값)
-                                                                       """).optional(),
-                                parameterWithName("academyName").description("검색할 학원 이름").optional()
-                        ),
-                        relaxedResponseFields(
-                                fieldWithPath("data.academies[].id").type(STRING).description("학원 아이디"),
-                                fieldWithPath("data.academies[].name").type(STRING).description("학원 이름"),
-                                fieldWithPath("data.academies[].address.street").type(STRING).description("학원 주소 (도로명)"),
-                                fieldWithPath("data.academies[].address.detail").type(STRING).description("학원 주소 (상세주소)"),
-                                fieldWithPath("data.academies[].address.postalCode").type(STRING).description("학원 주소 (우편번호)"),
-                                fieldWithPath("data.academies[].phone").type(STRING).description("학원 전화번호"),
-                                fieldWithPath("data.academies[].email").type(STRING).description("학원 이메일"),
-                                fieldWithPath("data.academies[].openToPublic").type(BOOLEAN).description("학원 공개 여부"),
-                                fieldWithPath("data.academies[].status").type(STRING).description("학원 상태"),
-                                fieldWithPath("data.academies[].createdDateTime").type(STRING).description("학원 생성일시"),
-                                fieldWithPath("data.academies[].modifiedDateTime").type(STRING).description("학원 수정일시"),
-                                fieldWithPath("data.pageInfo.page").type(NUMBER).description("현재 페이지 번호"),
-                                fieldWithPath("data.pageInfo.size").type(NUMBER).description("페이지 크기"),
-                                fieldWithPath("data.pageInfo.total").type(NUMBER).description("전체 학원 수"),
-                                fieldWithPath("data.pageInfo.lastPage").type(NUMBER).description("마지막 페이지 번호"),
-                                fieldWithPath("data.pageInfo.start").type(NUMBER).description("페이지 세트의 시작 번호"),
-                                fieldWithPath("data.pageInfo.end").type(NUMBER).description("페이지 세트의 끝 번호"),
-                                fieldWithPath("data.pageInfo.hasPrev").type(BOOLEAN).description("이전 페이지 존재 여부"),
-                                fieldWithPath("data.pageInfo.hasNext").type(BOOLEAN).description("다음 페이지 존재 여부")
+                                queryParameters(
+                                        parameterWithName("page").description("페이지 번호. 최소 1"),
+                                        parameterWithName("size").description("페이지 크기. 최소 10"),
+                                        parameterWithName("prop").description("""
+                                                정렬 기준 +
+                                                - name : 학원 이름 +
+                                                - (default) 생성 순서
+                                                """).optional(),
+                                        parameterWithName("dir").description("""
+                                                정렬 방향 +
+                                                - asc : 오름차순 +
+                                                - desc : 내림차순(기본값)
+                                                """).optional(),
+                                        parameterWithName("academyName").description("검색할 학원 이름").optional()
+                                ),
+                                relaxedResponseFields(
+                                        fieldWithPath("data.academies[].id").type(STRING).description("학원 아이디"),
+                                        fieldWithPath("data.academies[].name").type(STRING).description("학원 이름"),
+                                        fieldWithPath("data.academies[].street").type(STRING).description("학원 주소 (도로명)"),
+                                        fieldWithPath("data.academies[].addressDetail").type(STRING).description("학원 주소 (상세주소)"),
+                                        fieldWithPath("data.academies[].postalCode").type(STRING).description("학원 주소 (우편번호)"),
+                                        fieldWithPath("data.academies[].phone").type(STRING).description("학원 전화번호"),
+                                        fieldWithPath("data.academies[].email").type(STRING).description("학원 이메일"),
+                                        fieldWithPath("data.academies[].openToPublic").type(BOOLEAN).description("학원 공개 여부"),
+                                        fieldWithPath("data.academies[].status").type(STRING).description("학원 상태"),
+                                        fieldWithPath("data.academies[].createdDateTime").type(STRING).description("학원 생성일시"),
+                                        fieldWithPath("data.academies[].modifiedDateTime").type(STRING).description("학원 수정일시"),
+                                        fieldWithPath("data.pageInfo.page").type(NUMBER).description("현재 페이지 번호"),
+                                        fieldWithPath("data.pageInfo.size").type(NUMBER).description("페이지 크기"),
+                                        fieldWithPath("data.pageInfo.total").type(NUMBER).description("전체 학원 수"),
+                                        fieldWithPath("data.pageInfo.lastPage").type(NUMBER).description("마지막 페이지 번호"),
+                                        fieldWithPath("data.pageInfo.start").type(NUMBER).description("페이지 세트의 시작 번호"),
+                                        fieldWithPath("data.pageInfo.end").type(NUMBER).description("페이지 세트의 끝 번호"),
+                                        fieldWithPath("data.pageInfo.hasPrev").type(BOOLEAN).description("이전 페이지 존재 여부"),
+                                        fieldWithPath("data.pageInfo.hasNext").type(BOOLEAN).description("다음 페이지 존재 여부")
+                                )
                         )
-                )
-        );
+                );
     }
 
 
