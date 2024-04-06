@@ -116,8 +116,17 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         queryParameters(
-                                parameterWithName("prop").description("정렬 기준").optional(),
-                                parameterWithName("dir").description("정렬 방향").optional(),
+                                parameterWithName("prop").description("""
+                                        정렬 기준 +
+                                        - name: 이름 +
+                                        - status : 상태 +
+                                        - (default) 생성 순서
+                                        """).optional(),
+                                parameterWithName("dir").description("""
+                                        정렬 방향 +
+                                        - asc : 오름차순 +
+                                        - desc : 내림차순(기본값)
+                                        """).optional(),
                                 parameterWithName("status").description("선생님 상태").optional(),
                                 parameterWithName("teacherName").description("선생님 이름").optional()
                         ),
@@ -128,9 +137,9 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.teachers[].email").type(STRING).description("선생님 이메일"),
                                 fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
                                 fieldWithPath("data.teachers[].phone").type(STRING).description("선생님 전화번호").optional(),
-                                fieldWithPath("data.teachers[].address.street").type(STRING).description("주소"),
-                                fieldWithPath("data.teachers[].address.detail").type(STRING).description("상세주소"),
-                                fieldWithPath("data.teachers[].address.postalCode").type(STRING).description("우편번호"),
+                                fieldWithPath("data.teachers[].street").type(STRING).description("주소"),
+                                fieldWithPath("data.teachers[].addressDetail").type(STRING).description("상세주소"),
+                                fieldWithPath("data.teachers[].postalCode").type(STRING).description("우편번호"),
                                 fieldWithPath("data.teachers[].status").type(STRING).description("선생님 상태"),
                                 fieldWithPath("data.teachers[].roles").type(ARRAY).description("선생님 권한"),
                                 fieldWithPath("data.teachers[].lastPasswordChangeDateTime").type(STRING).description("마지막 비밀번호 변경 일시"),
@@ -182,8 +191,17 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         queryParameters(
-                                parameterWithName("prop").description("정렬 기준").optional(),
-                                parameterWithName("dir").description("정렬 방향").optional(),
+                                parameterWithName("prop").description("""
+                                        정렬 기준 +
+                                        - name: 이름 +
+                                        - status : 상태 +
+                                        - (default) 생성 순서
+                                        """).optional(),
+                                parameterWithName("dir").description("""
+                                        정렬 방향 +
+                                        - asc : 오름차순 +
+                                        - desc : 내림차순(기본값)
+                                        """).optional(),
                                 parameterWithName("status").description("선생님 상태").optional(),
                                 parameterWithName("teacherName").description("선생님 이름").optional()
                         ),
@@ -235,9 +253,9 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.email").type(STRING).description("선생님 이메일"),
                                 fieldWithPath("data.emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
                                 fieldWithPath("data.phone").type(STRING).description("선생님 전화번호").optional(),
-                                fieldWithPath("data.address.street").type(STRING).description("주소"),
-                                fieldWithPath("data.address.detail").type(STRING).description("상세주소"),
-                                fieldWithPath("data.address.postalCode").type(STRING).description("우편번호"),
+                                fieldWithPath("data.street").type(STRING).description("주소"),
+                                fieldWithPath("data.addressDetail").type(STRING).description("상세주소"),
+                                fieldWithPath("data.postalCode").type(STRING).description("우편번호"),
                                 fieldWithPath("data.status").type(STRING).description("선생님 상태"),
                                 fieldWithPath("data.roles").type(ARRAY).description("선생님 권한"),
                                 fieldWithPath("data.lastPasswordChangeDateTime").type(STRING).description("마지막 비밀번호 변경 일시"),

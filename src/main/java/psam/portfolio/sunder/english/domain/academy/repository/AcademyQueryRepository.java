@@ -69,7 +69,7 @@ public class AcademyQueryRepository {
                 .fetch();
     }
 
-    public List<Academy> pageBySearchCond(AcademyPublicSearchCond cond) {
+    public List<Academy> findAllBySearchCond(AcademyPublicSearchCond cond) {
         return query.selectDistinct(academy)
                 .from(academy)
                 .where(
@@ -83,35 +83,23 @@ public class AcademyQueryRepository {
                 .fetch();
     }
 
-    /**
-     * referred to PageableExecutionUtils.getPage(List<T> content, Pageable pageable, LongSupplier totalSupplier);
-     * count 쿼리를 생략할 수 있는 경우
-     * 1. 페이지 시작이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때
-     * 2. 마지막 페이지일 때(offset + 컨텐츠 사이즈)
-     */
-    public Long countBySearchCond(List<?> content, AcademyPublicSearchCond cond) {
-        Integer page = cond.getPage();
-        Integer size = cond.getSize();
+    public long countBySearchCond(long contentSize, AcademyPublicSearchCond cond) {
+        int size = cond.getSize();
+        long offset = cond.getOffset();
 
-        //noinspection ConstantValue
-        boolean isPaged = page != null && size != null && page > 0 && size > 0;
-        long offset = isPaged ? (long) (page - 1) * size : 0L;
-        long contentSize = content.size();
-
-        if (!isPaged || offset == 0) {
-            if (!isPaged || size > contentSize) {
+        if (offset == 0) {
+            if (size > contentSize) {
                 return contentSize;
             }
-            return this.countQuery(cond);
+            return this.countBySearchCondQuery(cond);
         }
-
         if (contentSize != 0 && size > contentSize) {
             return offset + contentSize;
         }
-        return this.countQuery(cond);
+        return this.countBySearchCondQuery(cond);
     }
 
-    private Long countQuery(AcademyPublicSearchCond cond) {
+    private long countBySearchCondQuery(AcademyPublicSearchCond cond) {
         Long count = query.select(academy.countDistinct())
                 .from(academy)
                 .where(
@@ -144,9 +132,9 @@ public class AcademyQueryRepository {
         String prop = cond.getProp();
         Order order = cond.getDir();
 
-        if (prop.contains("name")) {
-            return new OrderSpecifier<>(order, academy.name);
-        }
-        return new OrderSpecifier<>(order, academy.createdDateTime);
+        return switch (prop) {
+            case "name" -> new OrderSpecifier<>(order, academy.name);
+            default -> new OrderSpecifier<>(order, academy.createdDateTime);
+        };
     }
 }

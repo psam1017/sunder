@@ -166,9 +166,9 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(academyFullResponse.getEmail()).isEqualTo(academy.getEmail());
         assertThat(academyFullResponse.isOpenToPublic()).isEqualTo(academy.isOpenToPublic());
         assertThat(academyFullResponse.getStatus()).isEqualTo(academy.getStatus());
-        assertThat(academyFullResponse.getAddress().getStreet()).isEqualTo(academy.getAddress().getStreet());
-        assertThat(academyFullResponse.getAddress().getDetail()).isEqualTo(academy.getAddress().getDetail());
-        assertThat(academyFullResponse.getAddress().getPostalCode()).isEqualTo(academy.getAddress().getPostalCode());
+        assertThat(academyFullResponse.getStreet()).isEqualTo(academy.getAddress().getStreet());
+        assertThat(academyFullResponse.getAddressDetail()).isEqualTo(academy.getAddress().getDetail());
+        assertThat(academyFullResponse.getPostalCode()).isEqualTo(academy.getAddress().getPostalCode());
         assertThat(academyFullResponse.getCreatedDateTime()).isNotNull();
         assertThat(academyFullResponse.getModifiedDateTime()).isNotNull();
 
@@ -222,9 +222,9 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(academyFullResponse.getEmail()).isEqualTo(academy.getEmail());
         assertThat(academyFullResponse.isOpenToPublic()).isEqualTo(academy.isOpenToPublic());
         assertThat(academyFullResponse.getStatus()).isEqualTo(academy.getStatus());
-        assertThat(academyFullResponse.getAddress().getStreet()).isEqualTo(academy.getAddress().getStreet());
-        assertThat(academyFullResponse.getAddress().getDetail()).isEqualTo(academy.getAddress().getDetail());
-        assertThat(academyFullResponse.getAddress().getPostalCode()).isEqualTo(academy.getAddress().getPostalCode());
+        assertThat(academyFullResponse.getStreet()).isEqualTo(academy.getAddress().getStreet());
+        assertThat(academyFullResponse.getAddressDetail()).isEqualTo(academy.getAddress().getDetail());
+        assertThat(academyFullResponse.getPostalCode()).isEqualTo(academy.getAddress().getPostalCode());
         assertThat(academyFullResponse.getCreatedDateTime()).isNotNull();
         assertThat(academyFullResponse.getModifiedDateTime()).isNotNull();
 

@@ -3,6 +3,7 @@ package psam.portfolio.sunder.english.domain.teacher.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.exception.SelfRoleModificationException;
 import psam.portfolio.sunder.english.domain.teacher.exception.RoleDirectorRequiredException;
@@ -18,6 +19,7 @@ import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
@@ -52,6 +54,7 @@ public class TeacherCommandService {
      */
     public UUID register(UUID teacherId, TeacherPOST teacherPOST) {
 
+        // User 회원 정보 중복 체크
         userQueryRepository.findOne(
                 user.loginId.eq(teacherPOST.getLoginId()) // NotNull
                         .or(user.email.eq(teacherPOST.getEmail())) // NotNull
@@ -62,6 +65,7 @@ public class TeacherCommandService {
             throw new DuplicateUserException();
         });
 
+        // Teacher 등록
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Academy getAcademy = getTeacher.getAcademy();
         List<Teacher> directors = teacherQueryRepository.findAll(
@@ -69,12 +73,13 @@ public class TeacherCommandService {
                 QTeacher.teacher.status.in(ACTIVE, TRIAL),
                 QTeacher.teacher.roles.any().role.name.eq(RoleName.ROLE_DIRECTOR)
         );
+        UserStatus status = directors.get(0).getStatus();
 
-        Teacher buildTeacher = teacherCommandRepository.save(teacherPOST.toEntity(getAcademy, directors.get(0).getStatus(), passwordUtils.encode(teacherPOST.getLoginPw())));
+        Teacher saveTeacher = teacherCommandRepository.save(teacherPOST.toEntity(getAcademy, status, passwordUtils.encode(teacherPOST.getLoginPw())));
         Role role = roleQueryRepository.getByName(RoleName.ROLE_TEACHER);
-        userRoleCommandRepository.save(buildUserRole(buildTeacher, role));
+        userRoleCommandRepository.save(buildUserRole(saveTeacher, role));
 
-        return buildTeacher.getUuid();
+        return saveTeacher.getUuid();
     }
 
     /**
@@ -90,7 +95,12 @@ public class TeacherCommandService {
         if (!getDirector.isDirector()) {
             throw new RoleDirectorRequiredException();
         }
+
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        if (!getDirector.hasSameAcademy(getTeacher)) {
+            throw new AcademyAccessDeniedException();
+        }
+
         getTeacher.changeStatus(patch.getStatus());
         return getTeacher.getStatus();
     }
@@ -104,46 +114,39 @@ public class TeacherCommandService {
      * @return 선생님 아이디와 변경 완료된 권한 목록
      */
     public Set<RoleName> changeRoles(UUID directorId, UUID teacherId, TeacherPUTRoles put) {
+        // 자기 자신의 권한 변경 불가
         if (Objects.equals(directorId, teacherId)) {
             throw new SelfRoleModificationException();
         }
 
-        Set<RoleName> requestRoleNames = new HashSet<>(put.getRoles());
-
+        // 학원장만 권한 변경 가능
         Teacher getDirector = teacherQueryRepository.getById(directorId);
         if (!getDirector.isDirector()) {
             throw new RoleDirectorRequiredException();
         }
 
+        // 다른 학원 선생님의 권한 변경 불가
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        if (!getDirector.hasSameAcademy(getTeacher)) {
+            throw new AcademyAccessDeniedException();
+        }
+
+        // 기존 권한 삭제 후 새로운 권한 추가
         Set<UserRole> userRoles = getTeacher.getRoles();
 
-        // 요청 권한에 없는 현재 권한을 삭제
-        Set<UserRole> deleteRoles = new HashSet<>(userRoles);
-        userRoles.forEach(ur -> {
-            Set<RoleName> roles = put.getRoles();
-            if (roles.stream().noneMatch(rn -> Objects.equals(ur.getRoleName(), rn))) {
-                deleteRoles.add(ur);
-                roles.remove(ur.getRoleName());
-            }
-        });
-        userRoleCommandRepository.deleteAll(deleteRoles);
-        userRoles.removeAll(deleteRoles);
+        userRoleCommandRepository.deleteAll(userRoles);
+        userRoles.clear();
 
-        // 현재 권한에 없는 새로운 권한을 추가
         put.getRoles().forEach(rn -> {
-            if (userRoles.stream().noneMatch(ur -> Objects.equals(ur.getRoleName(), rn))) {
-                Role getRole = roleQueryRepository.getByName(rn);
-                UserRole saveUserRole = userRoleCommandRepository.save(buildUserRole(getTeacher, getRole));
-                userRoles.add(saveUserRole);
-            }
+            Role getRole = roleQueryRepository.getByName(rn);
+            UserRole saveUserRole = userRoleCommandRepository.save(buildUserRole(getTeacher, getRole));
+            userRoles.add(saveUserRole);
         });
-
-        return requestRoleNames;
+        return put.getRoles();
     }
 
     /**
-     * 선생님 개인정보 변경 서비스
+     * 선생님 개인정보 수정 서비스. 자기 자신의 정보만 수정할 수 있다.
      *
      * @param teacherId 선생님 아이디
      * @param patch     변경할 개인정보
@@ -158,9 +161,9 @@ public class TeacherCommandService {
         return getTeacher.getUuid();
     }
 
-    private static UserRole buildUserRole(Teacher teacher, Role role) {
+    private static UserRole buildUserRole(User user, Role role) {
         return UserRole.builder()
-                .user(teacher)
+                .user(user)
                 .role(role)
                 .build();
     }

@@ -1,5 +1,6 @@
 package psam.portfolio.sunder.english.domain.student.model.embeddable;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,12 +13,14 @@ import static lombok.AccessLevel.PROTECTED;
 @Embeddable
 public class Parent {
 
-    private String parentName;
-    private String parentPhone;
+    @Column(name = "parent_name")
+    private String name;
+    @Column(name = "parent_phone")
+    private String phone;
 
     @Builder
-    public Parent(String parentName, String parentPhone) {
-        this.parentName = parentName;
-        this.parentPhone = parentPhone;
+    public Parent(String name, String phone) {
+        this.name = name;
+        this.phone = phone;
     }
 }

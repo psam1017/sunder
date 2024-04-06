@@ -1,0 +1,26 @@
+count 쿼리를 생략할 수 있는 경우
+1. 페이지 시작이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때
+2. 마지막 페이지일 때(offset + 컨텐츠 사이즈)
+
+(code)
+```
+    // referred to PageableExecutionUtils.getPage(List<T> content, Pageable pageable, LongSupplier totalSupplier);
+    public long count(long contentSize, SearchCond cond) {
+        Integer page = cond.getPage();
+        Integer size = cond.getSize();
+
+        boolean isPaged = page != null && size != null && page > 0 && size > 0;
+        long offset = isPaged ? (long) (page - 1) * size : 0L;
+
+        if (!isPaged || offset == 0) {
+            if (!isPaged || size > contentSize) {
+                return contentSize;
+            }
+            return this.countQuery(cond);
+        }
+        if (contentSize != 0 && size > contentSize) {
+            return offset + contentSize;
+        }
+        return this.countQuery(cond);
+    }
+```

@@ -14,7 +14,7 @@ import static java.lang.annotation.RetentionPolicy.*;
 @Constraint(validatedBy = EnumPatternValidator.class)
 public @interface EnumPattern {
 
-    String message() default "EnumPattern";
+    String message() default "EnumPattern does not match.";
 
     Class<?>[] groups() default {};
 

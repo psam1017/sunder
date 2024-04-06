@@ -58,16 +58,16 @@ public class StudentPATCHInfo {
     @JsonIgnore
     public Parent getParent() {
         return Parent.builder()
-                .parentName(parentName)
-                .parentPhone(parentPhone)
+                .name(parentName)
+                .phone(parentPhone)
                 .build();
     }
 
     @JsonIgnore
     public School getSchool() {
         return School.builder()
-                .schoolName(schoolName)
-                .schoolGrade(schoolGrade)
+                .name(schoolName)
+                .grade(schoolGrade)
                 .build();
     }
 }

@@ -38,8 +38,8 @@ public class UserRole {
 
     @Builder
     public UserRole(User user, Role role) {
-        this.user = user;
         this.assignedDateTime = LocalDateTime.now();
+        this.user = user;
         this.role = role;
     }
 

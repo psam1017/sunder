@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.testbean.container;
+package psam.portfolio.sunder.english.others.testbean.container;
 
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
@@ -26,15 +26,15 @@ public interface InfoContainer {
 
     default School getAnySchool() {
         return School.builder()
-                .schoolName("선더초등학교")
-                .schoolGrade(3)
+                .name("선더초등학교")
+                .grade(3)
                 .build();
     }
 
     default Parent getAnyParent() {
         return Parent.builder()
-                .parentName("홍길동")
-                .parentPhone("01012345678")
+                .name("선더부모")
+                .phone("01012345678")
                 .build();
     }
 }

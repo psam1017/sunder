@@ -1,11 +1,9 @@
 package psam.portfolio.sunder.english.domain.academy.service;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import psam.portfolio.sunder.english.global.pagination.PageInfo;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.OneParamToCheckAcademyDuplException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -19,16 +17,19 @@ import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublic
 import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
+import psam.portfolio.sunder.english.global.pagination.PageInfo;
 
 import java.util.*;
 
-import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.*;
+import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.academy;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class AcademyQueryService {
+
+    private final static int PAGE_SET_AMOUNT = 10;
 
     private final AcademyQueryRepository academyQueryRepository;
     private final UserQueryRepository userQueryRepository;
@@ -86,12 +87,11 @@ public class AcademyQueryService {
 
         // 사용자가 자기 학원을 조회
         User getUser = userQueryRepository.getById(userId);
-        User entityUser = Hibernate.unproxy(getUser, User.class);
 
         Academy getAcademy;
-        if (entityUser instanceof Teacher t) {
+        if (getUser instanceof Teacher t) {
             getAcademy = t.getAcademy();
-        } else if (entityUser instanceof Student s) {
+        } else if (getUser instanceof Student s) {
             getAcademy = s.getAcademy();
         } else {
             throw new NotAUserException();
@@ -124,7 +124,7 @@ public class AcademyQueryService {
                                 }
                         ).thenComparing(Teacher::getName))
                         .toList();
-                if (entityUser instanceof Teacher) {
+                if (getUser instanceof Teacher) {
                     List<TeacherFullResponse> teacherFullResponses = sortedTeachers.stream().map(TeacherFullResponse::from).toList();
                     response.put("teachers", teacherFullResponses);
                 } else {
@@ -144,13 +144,12 @@ public class AcademyQueryService {
      * @return 학원 목록과 페이징 정보
      */
     public Map<String, Object> getPublicList(AcademyPublicSearchCond cond) {
-        List<Academy> academies = academyQueryRepository.pageBySearchCond(cond);
-        Long count = academyQueryRepository.countBySearchCond(academies, cond);
-        List<AcademyFullResponse> responses = academies.stream().map(AcademyFullResponse::from).toList();
-        PageInfo pageInfo = new PageInfo(cond.getPage(), cond.getSize(), count, 10);
+        List<Academy> academies = academyQueryRepository.findAllBySearchCond(cond);
+        long count = academyQueryRepository.countBySearchCond(academies.size(), cond);
+
         return Map.of(
-                "academies", responses,
-                "pageInfo", pageInfo
+                "academies", academies.stream().map(AcademyFullResponse::from).toList(),
+                "pageInfo", new PageInfo(cond.getPage(), cond.getSize(), count, PAGE_SET_AMOUNT)
         );
     }
 }

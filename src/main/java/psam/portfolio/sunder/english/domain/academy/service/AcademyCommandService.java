@@ -25,6 +25,7 @@ import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserExceptio
 import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
+import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
@@ -127,9 +128,9 @@ public class AcademyCommandService {
         return saveDirector.getUuid();
     }
 
-    private static UserRole buildUserRole(Teacher director, Role role) {
+    private static UserRole buildUserRole(User user, Role role) {
         return UserRole.builder()
-                .user(director)
+                .user(user)
                 .role(role)
                 .build();
     }

@@ -30,6 +30,7 @@ public class TeacherPOST {
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$")
     private String name;
 
+    @NotBlank
     @Email
     private String email;
 

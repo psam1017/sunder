@@ -17,7 +17,10 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "users")
+@Table(
+        name = "users",
+        indexes = @Index(columnList = "created_date_time")
+)
 @Entity
 public abstract class User extends BaseEntity {
 

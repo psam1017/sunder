@@ -11,7 +11,7 @@ import static com.querydsl.core.types.Order.DESC;
  * <br>
  * page 는 현재 페이지이다. -> 1
  * size 는 페이지마다 조회할 개시물 개수이며, 10 ~ 100 사이이다. -> 10
- * prop 은 정렬의 기준이다. -> "id"
+ * prop 은 정렬의 기준이다. -> id, createdDateTime 등
  * dir 은 정렬 방향이다. -> DESC
  */
 public abstract class SearchCond {
@@ -60,8 +60,7 @@ public abstract class SearchCond {
     }
 
     public long getOffset() {
-        long offset = (long) (this.getPage() - 1) * this.getSize();
-        return Math.max(offset, 0L);
+        return (long) (this.getPage() - 1) * this.getSize();
     }
 
     public int getLimit() {

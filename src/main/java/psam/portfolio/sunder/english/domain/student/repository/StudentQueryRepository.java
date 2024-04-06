@@ -1,13 +1,20 @@
 package psam.portfolio.sunder.english.domain.student.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.exception.NoSuchStudentException;
+import psam.portfolio.sunder.english.domain.student.model.request.StudentSearchCond;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,5 +67,142 @@ public class StudentQueryRepository {
                 .from(student)
                 .where(expressions)
                 .fetch();
+    }
+
+    public List<Student> findAllBySearchCond(UUID academyId, StudentSearchCond cond) {
+
+        OrderSpecifier<?> customOrder = specifyCustomOrder(cond);
+        OrderSpecifier<String> defaultOrder = specifyDefaultOrder();
+        OrderSpecifier<?>[] orders = customOrder != null ? new OrderSpecifier[]{customOrder, defaultOrder} : new OrderSpecifier[]{defaultOrder};
+
+        return query.selectDistinct(student)
+                .from(student)
+                .where(
+                        academyIdEq(academyId),
+                        addressContains(cond.getAddress()),
+                        statusEq(cond.getStatus()),
+                        studentNameContains(cond.getName()),
+                        attendanceIdContains(cond.getAttendanceId()),
+                        schoolNameContains(cond.getSchoolName()),
+                        schoolGradeEq(cond.getSchoolGrade()),
+                        parentNameContains(cond.getParentName())
+                )
+                .orderBy(orders)
+                .offset(cond.getOffset())
+                .limit(cond.getLimit())
+                .fetch();
+    }
+
+    public long countBySearchCond(long contentSize, UUID academyId, StudentSearchCond cond) {
+        int size = cond.getSize();
+        long offset = cond.getOffset();
+
+        if (offset == 0) {
+            if (size > contentSize) {
+                return contentSize;
+            }
+            return this.countBySearchCondQuery(academyId, cond);
+        }
+        if (contentSize != 0 && size > contentSize) {
+            return offset + contentSize;
+        }
+        return this.countBySearchCondQuery(academyId, cond);
+    }
+
+    private long countBySearchCondQuery(UUID academyId, StudentSearchCond cond) {
+        Long count = query.select(student.countDistinct())
+                .from(student)
+                .where(
+                        academyIdEq(academyId),
+                        addressContains(cond.getAddress()),
+                        statusEq(cond.getStatus()),
+                        studentNameContains(cond.getName()),
+                        attendanceIdContains(cond.getAttendanceId()),
+                        schoolNameContains(cond.getSchoolName()),
+                        schoolGradeEq(cond.getSchoolGrade()),
+                        parentNameContains(cond.getParentName())
+                )
+                .fetchOne();
+        return count == null ? 0L : count;
+    }
+
+    private static BooleanExpression academyIdEq(UUID academyId) {
+        return academyId != null ? student.academy.uuid.eq(academyId) : null;
+    }
+
+    private static BooleanExpression addressContains(String address) {
+        if (StringUtils.hasText(address)) {
+            StringExpression concatAddress = student.address.street
+                    .concat(student.address.detail)
+                    .concat(student.address.postalCode)
+                    .toLowerCase();
+
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", concatAddress)
+                    .contains(address.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
+    private static BooleanExpression statusEq(UserStatus status) {
+        return status != null ? student.status.eq(status) : null;
+    }
+
+    private static BooleanExpression studentNameContains(String studentName) {
+        if (StringUtils.hasText(studentName)) {
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", student.name.toLowerCase())
+                    .contains(studentName.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
+    /**
+     * attendanceId는 생성 시점에 공백이 허용되지 않음
+     */
+    private static BooleanExpression attendanceIdContains(String attendanceId) {
+        if (StringUtils.hasText(attendanceId)) {
+            return student.attendanceId.toLowerCase().contains(attendanceId.toLowerCase());
+        }
+        return null;
+    }
+
+    private static BooleanExpression schoolNameContains(String schoolName) {
+        if (StringUtils.hasText(schoolName)) {
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", student.school.name.toLowerCase())
+                    .contains(schoolName.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
+    private static BooleanExpression schoolGradeEq(Integer grade) {
+        return grade != null ? student.school.grade.eq(grade) : null;
+    }
+
+    private static BooleanExpression parentNameContains(String parentName) {
+        if (StringUtils.hasText(parentName)) {
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", student.parent.name.toLowerCase())
+                    .contains(parentName.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
+    // TODO: 2024-04-06 문서에 반영
+    private static OrderSpecifier<?> specifyCustomOrder(StudentSearchCond cond) {
+        String prop = cond.getProp();
+        Order order = cond.getDir();
+
+        return switch (prop) {
+            case "name" -> new OrderSpecifier<>(order, student.name);
+            case "status" -> new OrderSpecifier<>(order, student.status);
+            case "schoolName" -> new OrderSpecifier<>(order, student.school.name);
+            default -> null;
+        };
+    }
+
+    private static OrderSpecifier<String> specifyDefaultOrder() {
+        return student.attendanceId.asc().nullsLast();
     }
 }

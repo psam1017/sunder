@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.scheduler;
+package psam.portfolio.sunder.english.others.scheduler;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

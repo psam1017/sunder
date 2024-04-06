@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.domain.teacher.repository;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -69,15 +70,20 @@ public class TeacherQueryRepository {
                 .fetch();
     }
 
-    public List<Teacher> findAllBySearchCond(TeacherSearchCond cond) {
+    public List<Teacher> findAllBySearchCond(UUID academyId, TeacherSearchCond cond) {
         return query.selectDistinct(teacher)
                 .from(teacher)
                 .where(
+                        academyIdEq(academyId),
                         teacherNameContains(cond.getTeacherName()),
                         userStatusEq(cond.getStatus())
                 )
                 .orderBy(specifiedOrder(cond))
                 .fetch();
+    }
+
+    private static Predicate academyIdEq(UUID academyId) {
+        return academyId != null ? teacher.academy.uuid.eq(academyId) : null;
     }
 
     private BooleanExpression teacherNameContains(String teacherName) {
@@ -97,11 +103,10 @@ public class TeacherQueryRepository {
         String prop = cond.getProp();
         Order order = cond.getDir();
 
-        if (prop.equals("name")) {
-            return new OrderSpecifier<>(order, teacher.name);
-        } else if (prop.equals("status")) {
-            return new OrderSpecifier<>(order, teacher.status);
-        }
-        return new OrderSpecifier<>(order, teacher.createdDateTime);
+        return switch (prop) {
+            case "name" -> new OrderSpecifier<>(order, teacher.name);
+            case "status" -> new OrderSpecifier<>(order, teacher.status);
+            default -> new OrderSpecifier<>(order, teacher.createdDateTime);
+        };
     }
 }

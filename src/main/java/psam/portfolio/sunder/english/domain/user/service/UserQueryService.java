@@ -8,9 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
+import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
@@ -180,5 +185,23 @@ public class UserQueryService {
         Map<String, Object> claims = Map.of(PASSWORD_CHANGE.toString(), true);
         String token = jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3, claims);
         return new TokenRefreshResponse(token);
+    }
+
+    /**
+     * GET /api/user/my-info
+     *
+     * @param userId 사용자 아이디
+     * @return 자기 자신의 상세 정보
+     */
+    public Object getMyInfo(UUID userId) {
+        User getUser = userQueryRepository.getById(userId);
+
+        if (getUser instanceof Teacher t) {
+            return TeacherFullResponse.from(t);
+        } else if (getUser instanceof Student s) {
+            return StudentFullResponse.from(s, false); // 학생이 자신에 대한 note 를 볼 수 없다.
+        }
+        // TODO: 2024-04-06 admin 조회도 생성
+        throw new NotAUserException();
     }
 }

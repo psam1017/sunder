@@ -1,0 +1,8 @@
+=== 자기 정보 조회하기(학생)
+
+==== HTTP Request
+include::{snippets}/user-docs-test/get-my-info-by-student/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/user-docs-test/get-my-info-by-student/http-response.adoc[]
+include::{snippets}/user-docs-test/get-my-info-by-student/response-fields.adoc[]
