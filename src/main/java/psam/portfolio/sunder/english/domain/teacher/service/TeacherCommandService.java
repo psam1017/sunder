@@ -52,6 +52,7 @@ public class TeacherCommandService {
      */
     public UUID register(UUID teacherId, TeacherPOST teacherPOST) {
 
+        // User 회원 정보 중복 체크
         userQueryRepository.findOne(
                 user.loginId.eq(teacherPOST.getLoginId()) // NotNull
                         .or(user.email.eq(teacherPOST.getEmail())) // NotNull
@@ -62,6 +63,7 @@ public class TeacherCommandService {
             throw new DuplicateUserException();
         });
 
+        // Teacher 등록
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Academy getAcademy = getTeacher.getAcademy();
         List<Teacher> directors = teacherQueryRepository.findAll(
@@ -69,12 +71,13 @@ public class TeacherCommandService {
                 QTeacher.teacher.status.in(ACTIVE, TRIAL),
                 QTeacher.teacher.roles.any().role.name.eq(RoleName.ROLE_DIRECTOR)
         );
+        UserStatus status = directors.get(0).getStatus();
 
-        Teacher buildTeacher = teacherCommandRepository.save(teacherPOST.toEntity(getAcademy, directors.get(0).getStatus(), passwordUtils.encode(teacherPOST.getLoginPw())));
+        Teacher saveTeacher = teacherCommandRepository.save(teacherPOST.toEntity(getAcademy, status, passwordUtils.encode(teacherPOST.getLoginPw())));
         Role role = roleQueryRepository.getByName(RoleName.ROLE_TEACHER);
-        userRoleCommandRepository.save(buildUserRole(buildTeacher, role));
+        userRoleCommandRepository.save(buildUserRole(saveTeacher, role));
 
-        return buildTeacher.getUuid();
+        return saveTeacher.getUuid();
     }
 
     /**

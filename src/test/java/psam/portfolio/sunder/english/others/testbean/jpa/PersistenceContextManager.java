@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.testbean.jpa;
+package psam.portfolio.sunder.english.others.testbean.jpa;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;

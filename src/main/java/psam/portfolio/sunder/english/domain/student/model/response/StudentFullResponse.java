@@ -4,12 +4,11 @@ package psam.portfolio.sunder.english.domain.student.model.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import psam.portfolio.sunder.english.global.jpa.response.AddressResponse;
-import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +27,9 @@ public class StudentFullResponse {
     private String email;
     private Boolean emailVerified;
     private String phone;
-    private AddressResponse address;
+    private String street;
+    private String addressDetail;
+    private String postalCode;
     private UserStatus status;
     @KoreanDateTime
     private LocalDateTime lastPasswordChangeDateTime;
@@ -55,16 +56,18 @@ public class StudentFullResponse {
                 .email(student.getEmail())
                 .emailVerified(student.isEmailVerified())
                 .phone(student.getPhone())
-                .address(AddressResponse.from(student.getAddress()))
+                .street(student.getAddress().getStreet())
+                .addressDetail(student.getAddress().getDetail())
+                .postalCode(student.getAddress().getPostalCode())
                 .status(student.getStatus())
                 .lastPasswordChangeDateTime(student.getLastPasswordChangeDateTime())
                 .roles(student.getRoles().stream().map(UserRole::getRoleName).toList())
                 .attendanceId(student.getAttendanceId())
                 .note(student.getNote())
-                .schoolName(student.getSchool().getSchoolName())
-                .schoolGrade(student.getSchool().getSchoolGrade())
-                .parentName(student.getParent().getParentName())
-                .parentPhone(student.getParent().getParentPhone())
+                .schoolName(student.getSchool().getName())
+                .schoolGrade(student.getSchool().getGrade())
+                .parentName(student.getParent().getName())
+                .parentPhone(student.getParent().getPhone())
                 .academyId(student.getAcademy().getUuid())
                 .createdDateTime(student.getCreatedDateTime())
                 .modifiedDateTime(student.getModifiedDateTime())

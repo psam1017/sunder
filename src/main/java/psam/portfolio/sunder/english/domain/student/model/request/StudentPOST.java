@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
@@ -33,6 +32,7 @@ public class StudentPOST {
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$")
     private String name;
 
+    @NotBlank
     @Email
     private String email;
 
@@ -44,7 +44,7 @@ public class StudentPOST {
     @Pattern(regexp = "^[0-9]{5}$")
     private String postalCode;
 
-    @Length(min = 1, max = 127)
+    @Pattern(regexp = "^\\S{1,127}$")
     private String attendanceId;
     private String note;
 
@@ -74,12 +74,12 @@ public class StudentPOST {
                 .attendanceId(attendanceId)
                 .note(note)
                 .school(School.builder()
-                        .schoolName(schoolName)
-                        .schoolGrade(schoolGrade)
+                        .name(schoolName)
+                        .grade(schoolGrade)
                         .build())
                 .parent(Parent.builder()
-                        .parentName(parentName)
-                        .parentPhone(parentPhone)
+                        .name(parentName)
+                        .phone(parentPhone)
                         .build())
                 .academy(academy)
                 .build();

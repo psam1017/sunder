@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.testbean.data;
+package psam.portfolio.sunder.english.others.testbean.data;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import psam.portfolio.sunder.english.domain.user.repository.RoleCommandRepositor
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
-import psam.portfolio.sunder.english.testbean.container.InfoContainer;
+import psam.portfolio.sunder.english.others.testbean.container.InfoContainer;
 
 import java.util.ArrayList;
 import java.util.List;

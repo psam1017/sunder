@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.testbean.data;
+package psam.portfolio.sunder.english.others.testbean.data;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Table;

@@ -3,12 +3,11 @@ package psam.portfolio.sunder.english.domain.teacher.model.response;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import psam.portfolio.sunder.english.global.jpa.response.AddressResponse;
-import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +26,9 @@ public class TeacherFullResponse {
     private String email;
     private Boolean emailVerified;
     private String phone;
-    private AddressResponse address;
+    private String street;
+    private String addressDetail;
+    private String postalCode;
     private UserStatus status;
     private List<RoleName> roles;
     @KoreanDateTime
@@ -48,7 +49,9 @@ public class TeacherFullResponse {
                 .email(teacher.getEmail())
                 .emailVerified(teacher.isEmailVerified())
                 .phone(teacher.getPhone())
-                .address(AddressResponse.from(teacher.getAddress()))
+                .street(teacher.getAddress().getStreet())
+                .addressDetail(teacher.getAddress().getDetail())
+                .postalCode(teacher.getAddress().getPostalCode())
                 .status(teacher.getStatus())
                 .roles(teacher.getRoles().stream().map(UserRole::getRoleName).toList())
                 .lastPasswordChangeDateTime(teacher.getLastPasswordChangeDateTime())

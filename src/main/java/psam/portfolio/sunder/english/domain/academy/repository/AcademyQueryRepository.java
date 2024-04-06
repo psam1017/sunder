@@ -69,7 +69,7 @@ public class AcademyQueryRepository {
                 .fetch();
     }
 
-    public List<Academy> pageBySearchCond(AcademyPublicSearchCond cond) {
+    public List<Academy> findAllBySearchCond(AcademyPublicSearchCond cond) {
         return query.selectDistinct(academy)
                 .from(academy)
                 .where(
@@ -89,7 +89,7 @@ public class AcademyQueryRepository {
      * 1. 페이지 시작이면서 컨텐츠 사이즈가 페이지 사이즈보다 작을 때
      * 2. 마지막 페이지일 때(offset + 컨텐츠 사이즈)
      */
-    public Long countBySearchCond(List<?> content, AcademyPublicSearchCond cond) {
+    public long countBySearchCond(List<?> content, AcademyPublicSearchCond cond) {
         Integer page = cond.getPage();
         Integer size = cond.getSize();
 
@@ -111,7 +111,7 @@ public class AcademyQueryRepository {
         return this.countQuery(cond);
     }
 
-    private Long countQuery(AcademyPublicSearchCond cond) {
+    private long countQuery(AcademyPublicSearchCond cond) {
         Long count = query.select(academy.countDistinct())
                 .from(academy)
                 .where(

@@ -133,9 +133,9 @@ public class TeacherQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(teacherFullResponse.getName()).isEqualTo(director.getName());
         assertThat(teacherFullResponse.getEmail()).isEqualTo(director.getEmail());
         assertThat(teacherFullResponse.getPhone()).isEqualTo(director.getPhone());
-        assertThat(teacherFullResponse.getAddress().getStreet()).isEqualTo(director.getAddress().getStreet());
-        assertThat(teacherFullResponse.getAddress().getDetail()).isEqualTo(director.getAddress().getDetail());
-        assertThat(teacherFullResponse.getAddress().getPostalCode()).isEqualTo(director.getAddress().getPostalCode());
+        assertThat(teacherFullResponse.getStreet()).isEqualTo(academy.getAddress().getStreet());
+        assertThat(teacherFullResponse.getAddressDetail()).isEqualTo(academy.getAddress().getDetail());
+        assertThat(teacherFullResponse.getPostalCode()).isEqualTo(academy.getAddress().getPostalCode());
         assertThat(teacherFullResponse.getStatus()).isEqualTo(director.getStatus());
         assertThat(teacherFullResponse.getRoles()).containsExactlyInAnyOrder(ROLE_DIRECTOR, ROLE_TEACHER);
         assertThat(teacherFullResponse.getAcademyId()).isEqualTo(director.getAcademy().getUuid());

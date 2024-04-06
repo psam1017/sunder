@@ -10,7 +10,7 @@ public class ApiReasonDetail {
 
     public ApiReasonDetail(FieldError fieldError) {
         this.reason = fieldError.getCode() + "." + fieldError.getField();
-        message = resolveErrorMessage(fieldError);
+        this.message = fieldError.getDefaultMessage();
     }
 
     public ApiReasonDetail(ConstraintViolation<?> violation, String field, String annotation) {
@@ -23,13 +23,6 @@ public class ApiReasonDetail {
     }
 
     public String getMessage() {
-        return message;
-    }
-
-    private String resolveErrorMessage(FieldError fieldError) {
-        if ("typeMismatch".equalsIgnoreCase(fieldError.getCode())) {
-            return fieldError.getRejectedValue() + " has occurred type mismatch exception.";
-        }
         return message;
     }
 }

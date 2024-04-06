@@ -30,6 +30,8 @@ import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROL
 @Service
 public class AcademyQueryService {
 
+    private final static int PAGE_SET_AMOUNT = 10;
+
     private final AcademyQueryRepository academyQueryRepository;
     private final UserQueryRepository userQueryRepository;
 
@@ -144,13 +146,12 @@ public class AcademyQueryService {
      * @return 학원 목록과 페이징 정보
      */
     public Map<String, Object> getPublicList(AcademyPublicSearchCond cond) {
-        List<Academy> academies = academyQueryRepository.pageBySearchCond(cond);
-        Long count = academyQueryRepository.countBySearchCond(academies, cond);
-        List<AcademyFullResponse> responses = academies.stream().map(AcademyFullResponse::from).toList();
-        PageInfo pageInfo = new PageInfo(cond.getPage(), cond.getSize(), count, 10);
+        List<Academy> academies = academyQueryRepository.findAllBySearchCond(cond);
+        long count = academyQueryRepository.countBySearchCond(academies, cond);
+
         return Map.of(
-                "academies", responses,
-                "pageInfo", pageInfo
+                "academies", academies.stream().map(AcademyFullResponse::from).toList(),
+                "pageInfo", new PageInfo(cond.getPage(), cond.getSize(), count, PAGE_SET_AMOUNT)
         );
     }
 }

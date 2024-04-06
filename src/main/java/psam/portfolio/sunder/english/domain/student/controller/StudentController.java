@@ -44,30 +44,30 @@ public class StudentController {
     /**
      * 학생 등록 서비스
      *
-     * @param studentId 학원에 등록할 학생의 아이디
+     * @param teacherId 학생을 등록하는 선생님 아이디
      * @param post      등록할 학생 정보
      * @return 등록에 성공한 학생 아이디
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @PostMapping("")
-    public ApiResponse<Map<String, UUID>> registerStudent(@UserId UUID studentId,
+    public ApiResponse<Map<String, UUID>> registerStudent(@UserId UUID teacherId,
                                                           @RequestBody @Valid StudentPOST post) {
-        UUID newStudentId = studentCommandService.register(studentId, post);
+        UUID newStudentId = studentCommandService.register(teacherId, post);
         return ApiResponse.ok(Map.of("studentId", newStudentId));
     }
 
     /**
-     * 학생 목록 조회 서비스. 페이징 없이 모든 학생 목록을 반환한다.
+     * 학생 목록 조회 서비스
      *
-     * @param userId 사용자 아이디
-     * @param cond   학생 목록 조회 조건
+     * @param teacherId 학생 목록을 조회하는 선생님 아이디
+     * @param cond      학생 목록 조회 조건
      * @return 학생 목록
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @GetMapping("/list")
-    public ApiResponse<Map<String, Object>> getStudentList(@UserId UUID userId,
+    public ApiResponse<Map<String, Object>> getStudentList(@UserId UUID teacherId,
                                                            @ModelAttribute StudentSearchCond cond) {
-        Map<String, Object> response = studentQueryService.getList(userId, cond);
+        Map<String, Object> response = studentQueryService.getList(teacherId, cond);
         return ApiResponse.ok(response);
     }
 

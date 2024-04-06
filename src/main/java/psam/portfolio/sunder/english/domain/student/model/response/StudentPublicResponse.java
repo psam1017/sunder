@@ -5,13 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
-import psam.portfolio.sunder.english.global.jpa.response.AddressResponse;
-import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -26,7 +23,9 @@ public class StudentPublicResponse {
     private String name;
     private String email;
     private String phone;
-    private AddressResponse address;
+    private String street;
+    private String addressDetail;
+    private String postalCode;
     private UserStatus status;
     private String attendanceId;
     private String schoolName;
@@ -47,13 +46,15 @@ public class StudentPublicResponse {
                 .name(student.getName())
                 .email(student.getEmail())
                 .phone(student.getPhone())
-                .address(AddressResponse.from(student.getAddress()))
+                .street(student.getAddress().getStreet())
+                .addressDetail(student.getAddress().getDetail())
+                .postalCode(student.getAddress().getPostalCode())
                 .status(student.getStatus())
                 .attendanceId(student.getAttendanceId())
-                .schoolName(student.getSchool().getSchoolName())
-                .schoolGrade(student.getSchool().getSchoolGrade())
-                .parentName(student.getParent().getParentName())
-                .parentPhone(student.getParent().getParentPhone())
+                .schoolName(student.getSchool().getName())
+                .schoolGrade(student.getSchool().getGrade())
+                .parentName(student.getParent().getName())
+                .parentPhone(student.getParent().getPhone())
                 .createdDateTime(student.getCreatedDateTime())
                 .modifiedDateTime(student.getModifiedDateTime())
                 .createdBy(student.getCreatedBy())
