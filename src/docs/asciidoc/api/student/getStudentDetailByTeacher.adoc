@@ -1,0 +1,9 @@
+=== 학생 상세 조회하기
+
+==== HTTP Request
+include::{snippets}/student-docs-test/get-student-detail-by-teacher/http-request.adoc[]
+include::{snippets}/student-docs-test/get-student-detail-by-teacher/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/student-docs-test/get-student-detail-by-teacher/http-response.adoc[]
+include::{snippets}/student-docs-test/get-student-detail-by-teacher/response-fields.adoc[]

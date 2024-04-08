@@ -15,4 +15,9 @@ endif::[]
 [[Student]]
 == Student API
 
-// TODO
+include::api/student/checkDuplication.adoc[]
+include::api/student/registerStudent.adoc[]
+include::api/student/searchStudentByTeacher.adoc[]
+include::api/student/getStudentDetailByTeacher.adoc[]
+include::api/student/updateStudentInfo.adoc[]
+include::api/student/changeStudentStatus.adoc[]

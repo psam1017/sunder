@@ -1,0 +1,10 @@
+=== 학생 상태 변경하기
+
+==== HTTP Request
+include::{snippets}/student-docs-test/change-student-status/http-request.adoc[]
+include::{snippets}/student-docs-test/change-student-status/path-parameters.adoc[]
+include::{snippets}/student-docs-test/change-student-status/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/student-docs-test/change-student-status/http-response.adoc[]
+include::{snippets}/student-docs-test/change-student-status/response-fields.adoc[]

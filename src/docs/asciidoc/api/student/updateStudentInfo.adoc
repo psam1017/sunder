@@ -1,0 +1,10 @@
+=== 학생 인적사항 수정하기
+
+==== HTTP Request
+include::{snippets}/student-docs-test/update-student-info/http-request.adoc[]
+include::{snippets}/student-docs-test/update-student-info/path-parameters.adoc[]
+include::{snippets}/student-docs-test/update-student-info/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/student-docs-test/update-student-info/http-response.adoc[]
+include::{snippets}/student-docs-test/update-student-info/response-fields.adoc[]

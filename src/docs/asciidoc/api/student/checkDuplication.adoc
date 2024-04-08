@@ -1,0 +1,9 @@
+=== 학생 출석 아이디 중복 검사하기
+
+==== HTTP Request
+include::{snippets}/student-docs-test/check-duplication/http-request.adoc[]
+include::{snippets}/student-docs-test/check-duplication/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/student-docs-test/check-duplication/http-response.adoc[]
+include::{snippets}/student-docs-test/check-duplication/response-fields.adoc[]
