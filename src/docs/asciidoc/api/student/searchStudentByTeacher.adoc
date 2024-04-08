@@ -1,0 +1,9 @@
+=== 학생 목록 검색하기
+
+==== HTTP Request
+include::{snippets}/student-docs-test/search-student-by-teacher/http-request.adoc[]
+include::{snippets}/student-docs-test/search-student-by-teacher/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/student-docs-test/search-student-by-teacher/http-response.adoc[]
+include::{snippets}/student-docs-test/search-student-by-teacher/response-fields.adoc[]

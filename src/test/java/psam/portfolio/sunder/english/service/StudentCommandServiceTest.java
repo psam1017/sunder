@@ -371,7 +371,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         Student student = dataCreator.registerStudent(UserStatus.PENDING, academy);
         dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
 
-        // when
         StudentPATCHStatus patch = StudentPATCHStatus.builder()
                 .status(UserStatus.ACTIVE)
                 .build();
@@ -395,7 +394,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
 
-        // when
         StudentPATCHStatus patch = StudentPATCHStatus.builder()
                 .status(UserStatus.WITHDRAWN)
                 .build();
@@ -419,7 +417,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         Student student = dataCreator.registerStudent(UserStatus.WITHDRAWN, academy);
         dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
 
-        // when
         StudentPATCHStatus patch = StudentPATCHStatus.builder()
                 .status(UserStatus.ACTIVE)
                 .build();

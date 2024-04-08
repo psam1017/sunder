@@ -189,7 +189,6 @@ public class StudentQueryRepository {
         return null;
     }
 
-    // TODO: 2024-04-06 문서에 반영
     private static OrderSpecifier<?> specifyCustomOrder(StudentSearchCond cond) {
         String prop = cond.getProp();
         Order order = cond.getDir();
@@ -198,6 +197,7 @@ public class StudentQueryRepository {
             case "name" -> new OrderSpecifier<>(order, student.name);
             case "status" -> new OrderSpecifier<>(order, student.status);
             case "schoolName" -> new OrderSpecifier<>(order, student.school.name);
+            case "attendanceId" -> new OrderSpecifier<>(order, student.attendanceId);
             default -> null;
         };
     }
