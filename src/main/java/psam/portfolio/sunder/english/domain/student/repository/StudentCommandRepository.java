@@ -14,7 +14,7 @@ public interface StudentCommandRepository extends JpaRepository<Student, Long> {
     @Query("""
            update Student s
            set s.status = 'ACTIVE'
-           where s.academy.uuid = :academyId
+           where s.academy.id = :academyId
            """)
     void startActiveByAcademyId(@Param("academyId") UUID academyId);
 }

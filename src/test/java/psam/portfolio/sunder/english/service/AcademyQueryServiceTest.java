@@ -155,12 +155,12 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         saveTeachers.add(0, director);
 
         // when
-        Map<String, Object> result = refreshAnd(() -> sut.getDetail(director.getUuid(), "teacher"));
+        Map<String, Object> result = refreshAnd(() -> sut.getDetail(director.getId(), "teacher"));
 
         // then
         AcademyFullResponse academyFullResponse = (AcademyFullResponse) result.get("academy");
         assertThat(academyFullResponse).isNotNull();
-        assertThat(academyFullResponse.getId()).isEqualTo(academy.getUuid());
+        assertThat(academyFullResponse.getId()).isEqualTo(academy.getId());
         assertThat(academyFullResponse.getName()).isEqualTo(academy.getName());
         assertThat(academyFullResponse.getPhone()).isEqualTo(academy.getPhone());
         assertThat(academyFullResponse.getEmail()).isEqualTo(academy.getEmail());
@@ -211,12 +211,12 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
         // when
-        Map<String, Object> result = refreshAnd(() -> sut.getDetail(student.getUuid(), "teacher"));
+        Map<String, Object> result = refreshAnd(() -> sut.getDetail(student.getId(), "teacher"));
 
         // then
         AcademyFullResponse academyFullResponse = (AcademyFullResponse) result.get("academy");
         assertThat(academyFullResponse).isNotNull();
-        assertThat(academyFullResponse.getId()).isEqualTo(academy.getUuid());
+        assertThat(academyFullResponse.getId()).isEqualTo(academy.getId());
         assertThat(academyFullResponse.getName()).isEqualTo(academy.getName());
         assertThat(academyFullResponse.getPhone()).isEqualTo(academy.getPhone());
         assertThat(academyFullResponse.getEmail()).isEqualTo(academy.getEmail());
@@ -256,7 +256,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         List<AcademyFullResponse> academies = (List<AcademyFullResponse>) result.get("academies");
         assertThat(academies).hasSize(1)
                 .extracting(AcademyFullResponse::getId)
-                .containsOnly(registerAcademy.getUuid());
+                .containsOnly(registerAcademy.getId());
 
         PageInfo pageInfo = (PageInfo) result.get("pageInfo");
         assertThat(pageInfo).isNotNull();

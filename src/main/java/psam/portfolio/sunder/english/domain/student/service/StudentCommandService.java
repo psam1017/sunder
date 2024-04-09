@@ -75,12 +75,12 @@ public class StudentCommandService {
 
         // Student 중복 체크
         Academy getAcademy = academyQueryRepository.getOne(
-                QAcademy.academy.teachers.any().uuid.eq(teacherId)
+                QAcademy.academy.teachers.any().id.eq(teacherId)
         );
 
         if (StringUtils.hasText(post.getAttendanceId())) {
             studentQueryRepository.findOne(
-                    QStudent.student.academy.uuid.eq(getAcademy.getUuid()),
+                    QStudent.student.academy.id.eq(getAcademy.getId()),
                     QStudent.student.attendanceId.eq(post.getAttendanceId())
             ).ifPresent(student -> {
                 throw new DuplicateAttendanceIdException();
@@ -89,7 +89,7 @@ public class StudentCommandService {
 
         // Student 등록
         List<Teacher> directors = teacherQueryRepository.findAll(
-                QTeacher.teacher.academy.uuid.eq(getAcademy.getUuid()),
+                QTeacher.teacher.academy.id.eq(getAcademy.getId()),
                 QTeacher.teacher.status.in(ACTIVE, TRIAL),
                 QTeacher.teacher.roles.any().role.name.eq(RoleName.ROLE_DIRECTOR)
         );
@@ -99,7 +99,7 @@ public class StudentCommandService {
         Role role = roleQueryRepository.getByName(RoleName.ROLE_STUDENT);
         userRoleCommandRepository.save(buildUserRole(saveStudent, role));
 
-        return saveStudent.getUuid();
+        return saveStudent.getId();
     }
 
     /**
@@ -125,7 +125,7 @@ public class StudentCommandService {
         getStudent.setNote(patch.getNote());
         getStudent.setSchool(patch.getSchool());
         getStudent.setParent(patch.getParent());
-        return getStudent.getUuid();
+        return getStudent.getId();
     }
 
     /**

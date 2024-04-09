@@ -43,7 +43,7 @@ public class TeacherFullResponse {
 
     public static TeacherFullResponse from(Teacher teacher) {
         return TeacherFullResponse.builder()
-                .id(teacher.getUuid())
+                .id(teacher.getId())
                 .loginId(teacher.getLoginId())
                 .name(teacher.getName())
                 .email(teacher.getEmail())
@@ -55,7 +55,7 @@ public class TeacherFullResponse {
                 .status(teacher.getStatus())
                 .roles(teacher.getRoles().stream().map(UserRole::getRoleName).toList())
                 .lastPasswordChangeDateTime(teacher.getLastPasswordChangeDateTime())
-                .academyId(teacher.getAcademy().getUuid())
+                .academyId(teacher.getAcademy().getId())
                 .createdDateTime(teacher.getCreatedDateTime())
                 .modifiedDateTime(teacher.getModifiedDateTime())
                 .createdBy(teacher.getCreatedBy())

@@ -44,7 +44,7 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
 
         // when
-        boolean result = sut.checkDuplication(teacher.getUuid(), student.getAttendanceId());
+        boolean result = sut.checkDuplication(teacher.getId(), student.getAttendanceId());
 
         // then
         assertThat(result).isFalse();
@@ -72,7 +72,7 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        Map<String, Object> result = refreshAnd(() -> sut.getList(teacher.getUuid(), cond));
+        Map<String, Object> result = refreshAnd(() -> sut.getList(teacher.getId(), cond));
 
         // then
         List<StudentPublicResponse> students = (List<StudentPublicResponse>) result.get("students");
@@ -114,12 +114,12 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        Map<String, Object> result = refreshAnd(() -> sut.getList(teacher.getUuid(), cond));
+        Map<String, Object> result = refreshAnd(() -> sut.getList(teacher.getId(), cond));
 
         // then
         List<StudentPublicResponse> students = (List<StudentPublicResponse>) result.get("students");
         assertThat(students).hasSize(1);
-        assertThat(students.get(0).getId()).isEqualTo(target.getUuid());
+        assertThat(students.get(0).getId()).isEqualTo(target.getId());
         assertThat(students.get(0).getLoginId()).isEqualTo(target.getLoginId());
         assertThat(students.get(0).getName()).isEqualTo(target.getName());
         assertThat(students.get(0).getEmail()).isEqualTo(target.getEmail());
@@ -147,10 +147,10 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
         // when
-        StudentFullResponse studentFullResponse = refreshAnd(() -> sut.getDetail(teacher.getUuid(), student.getUuid()));
+        StudentFullResponse studentFullResponse = refreshAnd(() -> sut.getDetail(teacher.getId(), student.getId()));
 
         // then
-        assertThat(studentFullResponse.getId()).isEqualTo(student.getUuid());
+        assertThat(studentFullResponse.getId()).isEqualTo(student.getId());
         assertThat(studentFullResponse.getLoginId()).isEqualTo(student.getLoginId());
         assertThat(studentFullResponse.getName()).isEqualTo(student.getName());
         assertThat(studentFullResponse.getEmail()).isEqualTo(student.getEmail());
@@ -166,7 +166,7 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(studentFullResponse.getSchoolGrade()).isEqualTo(student.getSchool().getGrade());
         assertThat(studentFullResponse.getParentName()).isEqualTo(student.getParent().getName());
         assertThat(studentFullResponse.getParentPhone()).isEqualTo(student.getParent().getPhone());
-        assertThat(studentFullResponse.getAcademyId()).isEqualTo(student.getAcademy().getUuid());
+        assertThat(studentFullResponse.getAcademyId()).isEqualTo(student.getAcademy().getId());
     }
 
     @DisplayName("선생님이 다른 학원 소속의 학생 정보를 조회할 수는 없다.")
@@ -182,7 +182,7 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
         // when & then
-        assertThatThrownBy(() -> sut.getDetail(teacher.getUuid(), student.getUuid()))
+        assertThatThrownBy(() -> sut.getDetail(teacher.getId(), student.getId()))
                 .isInstanceOf(AcademyAccessDeniedException.class);
     }
 }

@@ -11,7 +11,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRoles;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
@@ -68,7 +68,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         );
 
         // when
-        UUID saveTeacherId = refreshAnd(() -> sut.register(director.getUuid(), post));
+        UUID saveTeacherId = refreshAnd(() -> sut.register(director.getId(), post));
 
         // then
         Teacher getTeacher = teacherQueryRepository.getById(saveTeacherId);
@@ -85,7 +85,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         assertThat(getTeacher.isEmailVerified()).isTrue();
 
         // 등록된 선생은 ROLE_TEACHER 권한'만' 가진다.
-        assertThat(getTeacher.getAcademy().getUuid()).isEqualTo(academy.getUuid());
+        assertThat(getTeacher.getAcademy().getId()).isEqualTo(academy.getId());
         assertThat(getTeacher.getRoles()).hasSize(1)
                 .extracting(UserRole::getRoleName)
                 .containsOnly(RoleName.ROLE_TEACHER);
@@ -118,7 +118,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         );
 
         // when
-        UUID saveTeacherId = refreshAnd(() -> sut.register(director.getUuid(), post));
+        UUID saveTeacherId = refreshAnd(() -> sut.register(director.getId(), post));
 
         // then
         Teacher getTeacher = teacherQueryRepository.getById(saveTeacherId);
@@ -156,7 +156,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> sut.register(director.getUuid(), post))
+        assertThatThrownBy(() -> sut.register(director.getId(), post))
                 .isInstanceOf(DuplicateUserException.class);
     }
 
@@ -191,7 +191,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatCode(() -> sut.register(teacher.getUuid(), post))
+        assertThatCode(() -> sut.register(teacher.getId(), post))
                 .doesNotThrowAnyException();
     }
 
@@ -209,7 +209,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.ACTIVE);
 
         // when
-        UserStatus status = refreshAnd(() -> sut.changeStatus(director.getUuid(), teacher.getUuid(), patch));
+        UserStatus status = refreshAnd(() -> sut.changeStatus(director.getId(), teacher.getId(), patch));
 
         // then
         assertThat(status).isEqualTo(UserStatus.ACTIVE);
@@ -229,7 +229,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.WITHDRAWN);
 
         // when
-        UserStatus status = refreshAnd(() -> sut.changeStatus(director.getUuid(), teacher.getUuid(), patch));
+        UserStatus status = refreshAnd(() -> sut.changeStatus(director.getId(), teacher.getId(), patch));
 
         // then
         assertThat(status).isEqualTo(UserStatus.WITHDRAWN);
@@ -249,7 +249,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.ACTIVE);
 
         // when
-        UserStatus status = refreshAnd(() -> sut.changeStatus(director.getUuid(), teacher.getUuid(), patch));
+        UserStatus status = refreshAnd(() -> sut.changeStatus(director.getId(), teacher.getId(), patch));
 
         // then
         assertThat(status).isEqualTo(UserStatus.ACTIVE);
@@ -269,13 +269,13 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_DIRECTOR);
         roles.add(RoleName.ROLE_TEACHER);
-        TeacherPUTRoles put = new TeacherPUTRoles(roles);
+        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
 
         // when
-        Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getUuid(), teacher.getUuid(), put));
+        Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getId(), teacher.getId(), put));
 
         // then
-        Teacher getTeacher = teacherQueryRepository.getById(teacher.getUuid());
+        Teacher getTeacher = teacherQueryRepository.getById(teacher.getId());
         assertThat(getTeacher.getRoles()).hasSize(2)
                 .extracting(UserRole::getRoleName)
                 .containsExactlyInAnyOrderElementsOf(saveRoles)
@@ -298,13 +298,13 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_TEACHER);
-        TeacherPUTRoles put = new TeacherPUTRoles(roles);
+        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
 
         // when
-        Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getUuid(), teacher.getUuid(), put));
+        Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getId(), teacher.getId(), put));
 
         // then
-        Teacher getTeacher = teacherQueryRepository.getById(teacher.getUuid());
+        Teacher getTeacher = teacherQueryRepository.getById(teacher.getId());
         assertThat(getTeacher.getRoles()).hasSize(1)
                 .extracting(UserRole::getRoleName)
                 .containsExactlyInAnyOrderElementsOf(saveRoles)
@@ -326,13 +326,13 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_DIRECTOR);
-        TeacherPUTRoles put = new TeacherPUTRoles(roles);
+        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
 
         // when
-        Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getUuid(), teacher.getUuid(), put));
+        Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getId(), teacher.getId(), put));
 
         // then
-        Teacher getTeacher = teacherQueryRepository.getById(teacher.getUuid());
+        Teacher getTeacher = teacherQueryRepository.getById(teacher.getId());
         assertThat(getTeacher.getRoles()).hasSize(1)
                 .extracting(UserRole::getRoleName)
                 .containsExactlyInAnyOrderElementsOf(saveRoles)
@@ -351,11 +351,11 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_TEACHER);
-        TeacherPUTRoles put = new TeacherPUTRoles(roles);
+        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
 
         // when
         // then
-        assertThatThrownBy(() -> sut.changeRoles(director.getUuid(), director.getUuid(), put))
+        assertThatThrownBy(() -> sut.changeRoles(director.getId(), director.getId(), put))
                 .isInstanceOf(SelfRoleModificationException.class);
     }
 
@@ -385,11 +385,11 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        UUID updateTeacherId = refreshAnd(() -> sut.updateInfo(teacher.getUuid(), patch));
+        UUID updateTeacherId = refreshAnd(() -> sut.updateInfo(teacher.getId(), patch));
 
         // then
         Teacher getTeacher = teacherQueryRepository.getById(updateTeacherId);
-        assertThat(getTeacher.getUuid()).isEqualTo(teacher.getUuid());
+        assertThat(getTeacher.getId()).isEqualTo(teacher.getId());
         assertThat(getTeacher.getName()).isEqualTo(newName);
         assertThat(getTeacher.getEmail()).isEqualTo(newEmail);
         assertThat(getTeacher.getPhone()).isEqualTo(newPhoneNumber);

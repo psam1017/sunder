@@ -41,7 +41,7 @@ public class StudentPublicResponse {
 
    public static StudentPublicResponse from(Student student) {
         return StudentPublicResponse.builder()
-                .id(student.getUuid())
+                .id(student.getId())
                 .loginId(student.getLoginId())
                 .name(student.getName())
                 .email(student.getEmail())

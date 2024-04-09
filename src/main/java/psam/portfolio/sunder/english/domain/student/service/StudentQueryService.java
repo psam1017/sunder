@@ -43,11 +43,11 @@ public class StudentQueryService {
      */
     public boolean checkDuplication(UUID teacherId, String attendanceId) {
         Academy getAcademy = academyQueryRepository.getOne(
-                QAcademy.academy.teachers.any().uuid.eq(teacherId)
+                QAcademy.academy.teachers.any().id.eq(teacherId)
         );
 
         Optional<Student> optStudent = studentQueryRepository.findOne(
-                QStudent.student.academy.uuid.eq(getAcademy.getUuid()),
+                QStudent.student.academy.id.eq(getAcademy.getId()),
                 QStudent.student.attendanceId.eq(attendanceId)
         );
         return optStudent.isEmpty();
@@ -62,11 +62,11 @@ public class StudentQueryService {
      */
     public Map<String, Object> getList(UUID teacherId, StudentSearchCond cond) {
         Academy getAcademy = academyQueryRepository.getOne(
-                QAcademy.academy.teachers.any().uuid.eq(teacherId)
+                QAcademy.academy.teachers.any().id.eq(teacherId)
         );
 
-        List<Student> students = studentQueryRepository.findAllBySearchCond(getAcademy.getUuid(), cond);
-        long count = studentQueryRepository.countBySearchCond(students.size(), getAcademy.getUuid(), cond);
+        List<Student> students = studentQueryRepository.findAllBySearchCond(getAcademy.getId(), cond);
+        long count = studentQueryRepository.countBySearchCond(students.size(), getAcademy.getId(), cond);
 
         return Map.of(
                 "students", students.stream().map(StudentPublicResponse::from).toList(),

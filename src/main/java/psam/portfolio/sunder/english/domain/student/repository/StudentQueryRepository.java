@@ -127,7 +127,7 @@ public class StudentQueryRepository {
     }
 
     private static BooleanExpression academyIdEq(UUID academyId) {
-        return academyId != null ? student.academy.uuid.eq(academyId) : null;
+        return academyId != null ? student.academy.id.eq(academyId) : null;
     }
 
     private static BooleanExpression addressContains(String address) {

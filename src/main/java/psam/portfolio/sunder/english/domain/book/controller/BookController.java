@@ -1,0 +1,145 @@
+package psam.portfolio.sunder.english.domain.book.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
+import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList;
+import psam.portfolio.sunder.english.domain.book.service.BookCommandService;
+import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
+import psam.portfolio.sunder.english.global.resolver.argument.UserId;
+
+import java.net.http.HttpHeaders;
+import java.util.Map;
+import java.util.UUID;
+
+@RequiredArgsConstructor
+@RequestMapping("/api/book")
+@RestController
+public class BookController {
+
+    private final BookCommandService bookCommandService;
+    private final BookQueryService bookQueryService;
+
+    /**
+     * 새 교재 등록 서비스
+     *
+     * @param userId  사용자 아이디
+     * @param replace 등록할 교재 정보
+     * @return 등록에 성공한 교재 아이디
+     */
+    @PostMapping("")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER"})
+    public ApiResponse<Map<String, UUID>> saveBook(@UserId UUID userId,
+                                                   @RequestBody BookReplace replace) {
+        UUID newBookId = bookCommandService.replaceBook(userId, null, replace);
+        return ApiResponse.ok(Map.of("bookId", newBookId));
+    }
+
+    /**
+     * 교재 정보 수정 서비스
+     *
+     * @param userId  사용자 아이디
+     * @param bookId  수정할 교재 아이디
+     * @param replace 수정할 교재 정보
+     * @return 수정에 성공한 교재 아이디
+     */
+    @PatchMapping("/{bookId}")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER"})
+    public ApiResponse<Map<String, UUID>> updateBook(@UserId UUID userId,
+                                                     @PathVariable UUID bookId,
+                                                     @RequestBody BookReplace replace) {
+        UUID updateBookId = bookCommandService.replaceBook(userId, bookId, replace);
+        return ApiResponse.ok(Map.of("bookId", updateBookId));
+    }
+
+    /**
+     * 교재에 단어 추가 서비스. JSON 형식으로 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
+     *
+     * @param userId 사용자 아이디
+     * @param bookId 교재 아이디
+     * @param post   생성/교체할 단어 목록
+     * @return 생성/교체된 단어들이 속한 교재 아이디
+     */
+    @PostMapping(
+            value = "/{bookId}/words/json",
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER"})
+    public ApiResponse<Map<String, UUID>> addWordsFromJson(@UserId UUID userId,
+                                                           @PathVariable UUID bookId,
+                                                           @RequestBody @Valid WordPOSTList post) {
+        UUID updateBookId = bookCommandService.replaceWords(userId, bookId, post);
+        return ApiResponse.ok(Map.of("bookId", updateBookId));
+    }
+
+    /**
+     * 교재에 단어 추가 서비스. 엑셀 파일을 업로드하여 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
+     *
+     * @param userId 사용자 아이디
+     * @param bookId 교재 아이디
+     * @param file 생성/교체할 단어가 입력된 엑셀 파일
+     * @return 생성/교체된 단어들이 속한 교재 아이디
+     */
+    @PostMapping(
+            value = "/{bookId}/words/excel",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER"})
+    public ApiResponse<Map<String, UUID>> addWordsFromExcel(@UserId UUID userId,
+                                                            @PathVariable UUID bookId,
+                                                            @RequestParam MultipartFile file) {
+        UUID updateBookId = bookCommandService.replaceWords(userId, bookId, file);
+        return ApiResponse.ok(Map.of("bookId", updateBookId));
+    }
+
+    /**
+     * 교재 목록 조회 서비스
+     *
+     * @param userId 사용자 아이디
+     * @param cond   교재 목록 조회 조건
+     * @return 교재 목록
+     */
+    @GetMapping("/list")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, Object>> getBookList(@UserId UUID userId,
+                                                        @ModelAttribute BookSearchCond cond) {
+        Map<String, Object> response = bookQueryService.getBookList(userId, cond);
+        return ApiResponse.ok(response);
+    }
+
+    /**
+     * 교재 상세 정보와 단어 목록 조회 서비스
+     *
+     * @param userId 사용자 아이디
+     * @param bookId 조회할 교재 아이디
+     * @return 교재 상세 정보와 단어 목록
+     */
+    @GetMapping("/{bookId}")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, Object>> getBookDetail(@UserId UUID userId,
+                                                          @PathVariable UUID bookId) {
+        Map<String, Object> response = bookQueryService.getBookDetail(userId, bookId);
+        return ApiResponse.ok(response);
+    }
+
+    /**
+     * 교재 삭제 서비스. 교재 삭제 시 단어도 함께 삭제된다.
+     *
+     * @param userId 사용자 아이디
+     * @param bookId 삭제할 교재 아이디
+     * @return 삭제된 교재 아이디
+     */
+    @DeleteMapping("/{bookId}")
+    @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER"})
+    public ApiResponse<Map<String, UUID>> deleteBook(@UserId UUID userId,
+                                                     @PathVariable UUID bookId) {
+        UUID deletedBookId = bookCommandService.deleteBook(userId, bookId);
+        return ApiResponse.ok(Map.of("bookId", deletedBookId));
+    }
+}
