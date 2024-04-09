@@ -70,7 +70,7 @@ public class AcademyCommandService {
      *
      * @param academyPOST  학원 등록 정보
      * @param directorPOST 학원장 등록 정보
-     * @return 학원장의 uuid
+     * @return 학원장의 아이디
      */
     public UUID registerDirectorWithAcademy(
             AcademyPOST academyPOST,
@@ -125,7 +125,7 @@ public class AcademyCommandService {
             throw new MailFailException();
         }
 
-        return saveDirector.getUuid();
+        return saveDirector.getId();
     }
 
     private static UserRole buildUserRole(User user, Role role) {
@@ -137,7 +137,7 @@ public class AcademyCommandService {
 
     // UUID from Academy
     private String setVerificationMailText(Academy academy) {
-        String url = messageSource.getMessage("mail.verification.academy.url", new Object[]{academy.getUuid()}, Locale.getDefault());
+        String url = messageSource.getMessage("mail.verification.academy.url", new Object[]{academy.getId()}, Locale.getDefault());
 
         Context context = new Context();
         context.setVariable("url", url);
@@ -185,7 +185,7 @@ public class AcademyCommandService {
                         .or(patch.getPhone() != null ? academy.phone.eq(patch.getPhone()) : null)
                         .or(patch.getEmail() != null ? academy.email.eq(patch.getEmail()) : null),
                 academy.status.ne(AcademyStatus.PENDING),
-                academy.uuid.ne(getAcademy.getUuid())
+                academy.id.ne(getAcademy.getId())
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
         });
@@ -198,7 +198,7 @@ public class AcademyCommandService {
         getAcademy.setEmail(patch.getEmail());
         getAcademy.setOpenToPublic(patch.getOpenToPublic());
 
-        return getAcademy.getUuid();
+        return getAcademy.getId();
     }
 
     /**
@@ -218,7 +218,7 @@ public class AcademyCommandService {
         Academy academy = director.getAcademy();
         academy.setStatus(AcademyStatus.WITHDRAWN);
         academy.setWithdrawalAt(LocalDate.now().plusDays(8).atStartOfDay());
-        return academy.getUuid();
+        return academy.getId();
     }
 
     /**
@@ -236,7 +236,7 @@ public class AcademyCommandService {
         }
         Academy academy = director.getAcademy();
         academy.setStatus(AcademyStatus.VERIFIED);
-        return academy.getUuid();
+        return academy.getId();
     }
 
     /**
@@ -267,7 +267,7 @@ public class AcademyCommandService {
             throw new IllegalStatusAcademyException(getAcademy.getStatus());
         }
 
-        UUID academyId = getAcademy.getUuid();
+        UUID academyId = getAcademy.getId();
         teacherCommandRepository.startActiveByAcademyId(academyId);
         studentCommandRepository.startActiveByAcademyId(academyId);
         return true;

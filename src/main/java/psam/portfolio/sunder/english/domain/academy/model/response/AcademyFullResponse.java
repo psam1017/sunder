@@ -33,7 +33,7 @@ public class AcademyFullResponse {
 
     public static AcademyFullResponse from(Academy academy) {
         return AcademyFullResponse.builder()
-                .id(academy.getUuid())
+                .id(academy.getId())
                 .name(academy.getName())
                 .street(academy.getAddress().getStreet())
                 .addressDetail(academy.getAddress().getDetail())

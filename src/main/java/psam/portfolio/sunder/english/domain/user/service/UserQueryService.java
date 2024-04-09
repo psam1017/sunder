@@ -122,7 +122,7 @@ public class UserQueryService {
         }
 
         // 토큰 만료 시간은 3시간
-        String token = jwtUtils.generateToken(getUser.getUuid().toString(), 1000 * 60 * 60 * 3);
+        String token = jwtUtils.generateToken(getUser.getId().toString(), 1000 * 60 * 60 * 3);
         return new LoginResult(token, getUser.isPasswordExpired());
     }
 

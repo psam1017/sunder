@@ -16,7 +16,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Table(
         name = "user_roles",
         indexes = {
-                @Index(columnList = "user_uuid"),
+                @Index(columnList = "user_id"),
                 @Index(columnList = "role_id")
         }
 )
@@ -29,7 +29,7 @@ public class UserRole {
     private LocalDateTime assignedDateTime;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)

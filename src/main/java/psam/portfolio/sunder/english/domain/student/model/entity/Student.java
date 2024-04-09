@@ -22,7 +22,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @PrimaryKeyJoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 @Table(
         name = "students",
-        indexes = @Index(columnList = "academy_uuid")
+        indexes = @Index(columnList = "academy_id")
 )
 @Entity
 public class Student extends User {
@@ -43,7 +43,7 @@ public class Student extends User {
     private Parent parent;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "academy_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
 
     @Builder

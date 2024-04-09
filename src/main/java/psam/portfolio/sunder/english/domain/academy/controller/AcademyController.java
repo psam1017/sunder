@@ -44,7 +44,7 @@ public class AcademyController {
      * 학원과 학원장을 등록하는 서비스
      *
      * @param post 학원과 학원장 정보
-     * @return 학원장 uuid
+     * @return 학원장 아이디
      */
     @PostMapping("")
     public ApiResponse<Map<String, UUID>> register(@RequestBody @Valid AcademyDirectorPOST post) {

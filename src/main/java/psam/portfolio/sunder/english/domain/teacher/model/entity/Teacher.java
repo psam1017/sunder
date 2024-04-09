@@ -21,13 +21,13 @@ import static jakarta.persistence.FetchType.LAZY;
 @DiscriminatorValue("TEACHER")
 @Table(
         name = "teachers",
-        indexes = @Index(columnList = "academy_uuid")
+        indexes = @Index(columnList = "academy_id")
 )
 @Entity
 public class Teacher extends User {
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "academy_uuid", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
 
     @Builder
@@ -41,10 +41,10 @@ public class Teacher extends User {
     }
 
     public boolean hasSameAcademy(Teacher teacher) {
-        return Objects.equals(this.getAcademy().getUuid(), teacher.getAcademy().getUuid());
+        return Objects.equals(this.getAcademy().getId(), teacher.getAcademy().getId());
     }
 
     public boolean hasSameAcademy(Student student) {
-        return Objects.equals(this.getAcademy().getUuid(), student.getAcademy().getUuid());
+        return Objects.equals(this.getAcademy().getId(), student.getAcademy().getId());
     }
 }

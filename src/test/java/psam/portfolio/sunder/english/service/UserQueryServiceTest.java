@@ -177,7 +177,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         // then
         String subject = jwtUtils.extractSubject(result.getToken());
         assertThat(result.getType()).isEqualTo("Bearer ");
-        assertThat(subject).isEqualTo(director.getUuid().toString());
+        assertThat(subject).isEqualTo(director.getId().toString());
         assertThat(result.isPasswordChangeRequired()).isFalse();
     }
 
@@ -256,11 +256,11 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getUuid()));
+        TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getId()));
 
         // then
         String subject = jwtUtils.extractSubject(response.getToken());
-        assertThat(subject).isEqualTo(director.getUuid().toString());
+        assertThat(subject).isEqualTo(director.getId().toString());
         assertThat(response.getType()).isEqualTo("Bearer ");
     }
 
@@ -294,7 +294,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        TokenRefreshResponse response = refreshAnd(() -> sut.authenticateToChangePassword(director.getUuid(), infoContainer.getRawPassword()));
+        TokenRefreshResponse response = refreshAnd(() -> sut.authenticateToChangePassword(director.getId(), infoContainer.getRawPassword()));
 
         // then
         Boolean changeable = jwtUtils.extractClaim(response.getToken(), claims -> claims.get(JwtClaim.PASSWORD_CHANGE.toString(), Boolean.class));
@@ -311,7 +311,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        Object myInfo = refreshAnd(() -> sut.getMyInfo(director.getUuid()));
+        Object myInfo = refreshAnd(() -> sut.getMyInfo(director.getId()));
 
         // then
         assertThat(myInfo instanceof TeacherFullResponse).isTrue();
@@ -326,7 +326,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
         // when
-        Object myInfo = refreshAnd(() -> sut.getMyInfo(student.getUuid()));
+        Object myInfo = refreshAnd(() -> sut.getMyInfo(student.getId()));
 
         // then
         assertThat(myInfo instanceof StudentFullResponse).isTrue();

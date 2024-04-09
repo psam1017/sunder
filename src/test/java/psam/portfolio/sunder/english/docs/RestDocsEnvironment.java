@@ -42,6 +42,6 @@ public class RestDocsEnvironment extends AbstractSunderApplicationTest {
     }
 
     protected String createToken(User user) {
-        return "Bearer " + jwtUtils.generateToken(user.getUuid().toString(), 1000 * 60);
+        return "Bearer " + jwtUtils.generateToken(user.getId().toString(), 1000 * 60);
     }
 }

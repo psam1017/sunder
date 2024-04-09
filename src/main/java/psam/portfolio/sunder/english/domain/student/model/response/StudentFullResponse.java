@@ -50,7 +50,7 @@ public class StudentFullResponse {
 
     public static StudentFullResponse from(Student student, boolean displayNote) {
         return StudentFullResponse.builder()
-                .id(student.getUuid())
+                .id(student.getId())
                 .loginId(student.getLoginId())
                 .name(student.getName())
                 .email(student.getEmail())
@@ -68,7 +68,7 @@ public class StudentFullResponse {
                 .schoolGrade(student.getSchool().getGrade())
                 .parentName(student.getParent().getName())
                 .parentPhone(student.getParent().getPhone())
-                .academyId(student.getAcademy().getUuid())
+                .academyId(student.getAcademy().getId())
                 .createdDateTime(student.getCreatedDateTime())
                 .modifiedDateTime(student.getModifiedDateTime())
                 .createdBy(student.getCreatedBy())

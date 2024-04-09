@@ -47,10 +47,10 @@ class UserCommandServiceTest extends AbstractSunderApplicationTest {
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
         // when
-        boolean result = refreshAnd(() -> sut.alterPasswordChangeLater(director.getUuid()));
+        boolean result = refreshAnd(() -> sut.alterPasswordChangeLater(director.getId()));
 
         // then
-        Teacher getDirector = teacherQueryRepository.getById(director.getUuid());
+        Teacher getDirector = teacherQueryRepository.getById(director.getId());
         assertThat(result).isTrue();
         assertThat(getDirector.isPasswordExpired()).isFalse();
     }
@@ -84,14 +84,14 @@ class UserCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getUuid(), infoContainer.getRawPassword());
+        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getId(), infoContainer.getRawPassword());
         String newPassword = "asd456$%^";
 
         // when
         boolean result = refreshAnd(() -> sut.changePassword(refresh.getToken(), newPassword));
 
         // then
-        Teacher getDirector = teacherQueryRepository.getById(director.getUuid());
+        Teacher getDirector = teacherQueryRepository.getById(director.getId());
         assertThat(result).isTrue();
         assertThat(passwordUtils.matches(newPassword, getDirector.getLoginPw())).isTrue();
     }

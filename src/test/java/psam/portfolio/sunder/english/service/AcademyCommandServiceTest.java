@@ -232,7 +232,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         assertThat(getTeacher.isEmailVerified()).isFalse();
 
-        Academy getAcademy = academyQueryRepository.getById(getTeacher.getAcademy().getUuid());
+        Academy getAcademy = academyQueryRepository.getById(getTeacher.getAcademy().getId());
         assertThat(getAcademy.isPending()).isTrue();
     }
 
@@ -309,7 +309,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         UUID teacherId = sut.registerDirectorWithAcademy(academyPOST, directorPOST);
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
-        UUID academyId = getTeacher.getAcademy().getUuid();
+        UUID academyId = getTeacher.getAcademy().getId();
 
         // when
         Boolean result = refreshAnd(() -> sut.verify(academyId));
@@ -355,7 +355,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         UUID teacherId = sut.registerDirectorWithAcademy(academyPOST, directorPOST);
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
-        UUID academyId = getTeacher.getAcademy().getUuid();
+        UUID academyId = getTeacher.getAcademy().getId();
         refreshAnd(() -> sut.verify(academyId));
 
         // when
@@ -387,7 +387,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        UUID academyId = refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH));
+        UUID academyId = refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH));
 
         // then
         Academy getAcademy = academyQueryRepository.getById(academyId);
@@ -421,7 +421,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
@@ -446,7 +446,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
@@ -471,7 +471,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
@@ -496,7 +496,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
                 .doesNotThrowAnyException();
     }
 
@@ -520,7 +520,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getUuid(), academyPATCH)))
+        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
                 .doesNotThrowAnyException();
     }
 
@@ -533,7 +533,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        UUID academyId = refreshAnd(() -> sut.withdraw(registerTeacher.getUuid()));
+        UUID academyId = refreshAnd(() -> sut.withdraw(registerTeacher.getId()));
 
         // then
         Academy getAcademy = academyQueryRepository.getById(academyId);
@@ -551,7 +551,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.withdraw(registerTeacher.getUuid())))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.withdraw(registerTeacher.getId())))
                 .isInstanceOf(RoleDirectorRequiredException.class);
     }
 
@@ -564,7 +564,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(registerTeacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        UUID academyId = refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getUuid()));
+        UUID academyId = refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getId()));
 
         // then
         Academy getAcademy = academyQueryRepository.getById(academyId);
@@ -581,7 +581,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getUuid())))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.revokeWithdrawal(registerTeacher.getId())))
                 .isInstanceOf(RoleDirectorRequiredException.class);
     }
 
@@ -602,9 +602,9 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // then
         assertThat(result).isTrue();
-        Teacher getDirector = teacherQueryRepository.getById(registerDirector.getUuid());
+        Teacher getDirector = teacherQueryRepository.getById(registerDirector.getId());
         assertThat(getDirector.getStatus()).isEqualTo(UserStatus.ACTIVE);
-        Teacher getTeacher = teacherQueryRepository.getById(registerTeacher.getUuid());
+        Teacher getTeacher = teacherQueryRepository.getById(registerTeacher.getId());
         assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 
@@ -623,7 +623,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // then
         assertThat(result).isTrue();
-        Teacher getDirector = teacherQueryRepository.getById(registerDirector.getUuid());
+        Teacher getDirector = teacherQueryRepository.getById(registerDirector.getId());
         assertThat(getDirector.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 

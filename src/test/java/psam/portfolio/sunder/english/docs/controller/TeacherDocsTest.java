@@ -12,7 +12,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRoles;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.Set;
@@ -233,7 +233,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/teacher/{teacherId}", teacher.getUuid())
+                RestDocumentationRequestBuilders.get("/api/teacher/{teacherId}", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
         );
@@ -288,7 +288,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/teacher/{teacherId}", teacher.getUuid())
+                RestDocumentationRequestBuilders.get("/api/teacher/{teacherId}", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
         );
@@ -331,7 +331,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/teacher/{teacherId}/status", teacher.getUuid())
+                RestDocumentationRequestBuilders.patch("/api/teacher/{teacherId}/status", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(patch))
@@ -368,13 +368,13 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         String token = createToken(director);
 
-        TeacherPUTRoles put = new TeacherPUTRoles(Set.of(ROLE_TEACHER, ROLE_DIRECTOR));
+        TeacherPOSTRoles put = new TeacherPOSTRoles(Set.of(ROLE_TEACHER, ROLE_DIRECTOR));
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.put("/api/teacher/{teacherId}/roles", teacher.getUuid())
+                RestDocumentationRequestBuilders.post("/api/teacher/{teacherId}/roles", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(put))

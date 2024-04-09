@@ -227,7 +227,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         UUID directorId = refreshAnd(() -> academyCommandService.registerDirectorWithAcademy(buildAcademyPOST, buildDirectorPOST));
         Teacher getDirector = teacherQueryRepository.getById(directorId);
-        UUID academyId = getDirector.getAcademy().getUuid();
+        UUID academyId = getDirector.getAcademy().getId();
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -540,7 +540,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        refreshAnd(() -> academyCommandService.withdraw(director.getUuid()));
+        refreshAnd(() -> academyCommandService.withdraw(director.getId()));
 
         String token = createToken(director);
 

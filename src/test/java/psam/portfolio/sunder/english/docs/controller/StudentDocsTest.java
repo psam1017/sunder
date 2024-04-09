@@ -242,7 +242,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/student/{studentId}", student.getUuid())
+                RestDocumentationRequestBuilders.get("/api/student/{studentId}", student.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, createToken(teacher))
         );
@@ -330,7 +330,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/student/{studentId}/personal-info", student.getUuid())
+                RestDocumentationRequestBuilders.patch("/api/student/{studentId}/personal-info", student.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, createToken(teacher))
                         .content(createJson(patch))
@@ -380,7 +380,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/student/{studentId}/status", student.getUuid())
+                RestDocumentationRequestBuilders.patch("/api/student/{studentId}/status", student.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, createToken(teacher))
                         .content(createJson(patch))

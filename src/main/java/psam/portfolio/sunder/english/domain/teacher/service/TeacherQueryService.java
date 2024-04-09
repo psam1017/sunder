@@ -37,10 +37,10 @@ public class TeacherQueryService {
         User getUser = userQueryRepository.getById(userId);
 
         if (getUser instanceof Student student) {
-            UUID academyId = student.getAcademy().getUuid();
+            UUID academyId = student.getAcademy().getId();
             return teacherQueryRepository.findAllBySearchCond(academyId, cond).stream().map(TeacherPublicResponse::from).toList();
         } else if (getUser instanceof Teacher teacher) {
-            UUID academyId = teacher.getAcademy().getUuid();
+            UUID academyId = teacher.getAcademy().getId();
             return teacherQueryRepository.findAllBySearchCond(academyId, cond).stream().map(TeacherFullResponse::from).toList();
         }
         throw new NoSuchUserException();

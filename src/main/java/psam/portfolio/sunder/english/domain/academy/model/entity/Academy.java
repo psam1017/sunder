@@ -21,7 +21,7 @@ import java.util.*;
 public class Academy extends TimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -80,7 +80,7 @@ public class Academy extends TimeEntity {
     }
 
     public boolean hasTeacher(User user) {
-        return this.teachers.stream().anyMatch(teacher -> Objects.equals(teacher.getUuid(), user.getUuid()));
+        return this.teachers.stream().anyMatch(teacher -> Objects.equals(teacher.getId(), user.getId()));
     }
 
     public void setName(String name) {

@@ -15,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeacherPUTRoles {
+public class TeacherPOSTRoles {
 
     @NotEmpty
     @UniqueElements

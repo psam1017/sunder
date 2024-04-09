@@ -86,7 +86,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         );
 
         // when
-        UUID saveStudentId = refreshAnd(() -> sut.register(teacher.getUuid(), post));
+        UUID saveStudentId = refreshAnd(() -> sut.register(teacher.getId(), post));
 
         // then
         Student getStudent = studentQueryRepository.getById(saveStudentId);
@@ -109,7 +109,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         assertThat(getStudent.isEmailVerified()).isTrue();
 
         // 등록된 학생은 ROLE_STUDENT 권한'만' 가진다.
-        assertThat(getStudent.getAcademy().getUuid()).isEqualTo(academy.getUuid());
+        assertThat(getStudent.getAcademy().getId()).isEqualTo(academy.getId());
         assertThat(getStudent.getRoles()).hasSize(1)
                 .extracting(UserRole::getRoleName)
                 .containsOnly(RoleName.ROLE_STUDENT);
@@ -152,7 +152,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         );
 
         // when
-        UUID saveStudentId = refreshAnd(() -> sut.register(teacher.getUuid(), post));
+        UUID saveStudentId = refreshAnd(() -> sut.register(teacher.getId(), post));
 
         // then
         Student getStudent = studentQueryRepository.getById(saveStudentId);
@@ -201,7 +201,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> sut.register(teacher.getUuid(), post))
+        assertThatThrownBy(() -> sut.register(teacher.getId(), post))
                 .isInstanceOf(DuplicateUserException.class);
     }
 
@@ -247,7 +247,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> sut.register(teacher.getUuid(), post))
+        assertThatThrownBy(() -> sut.register(teacher.getId(), post))
                 .isInstanceOf(DuplicateAttendanceIdException.class);
     }
 
@@ -292,7 +292,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatCode(() -> sut.register(teacher.getUuid(), post))
+        assertThatCode(() -> sut.register(teacher.getId(), post))
                 .doesNotThrowAnyException();
     }
 
@@ -343,7 +343,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        UUID updatedStudentId = refreshAnd(() -> sut.updateInfo(teacher.getUuid(), student.getUuid(), patch));
+        UUID updatedStudentId = refreshAnd(() -> sut.updateInfo(teacher.getId(), student.getId(), patch));
 
         // then
         Student getStudent = studentQueryRepository.getById(updatedStudentId);
@@ -376,10 +376,10 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        UserStatus updatedStatus = sut.changeStatus(teacher.getUuid(), student.getUuid(), patch);
+        UserStatus updatedStatus = sut.changeStatus(teacher.getId(), student.getId(), patch);
 
         // then
-        Student getStudent = studentQueryRepository.getById(student.getUuid());
+        Student getStudent = studentQueryRepository.getById(student.getId());
         assertThat(getStudent.getStatus()).isEqualTo(UserStatus.ACTIVE);
         assertThat(updatedStatus).isEqualTo(UserStatus.ACTIVE);
     }
@@ -399,10 +399,10 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        UserStatus updatedStatus = sut.changeStatus(teacher.getUuid(), student.getUuid(), patch);
+        UserStatus updatedStatus = sut.changeStatus(teacher.getId(), student.getId(), patch);
 
         // then
-        Student getStudent = studentQueryRepository.getById(student.getUuid());
+        Student getStudent = studentQueryRepository.getById(student.getId());
         assertThat(getStudent.getStatus()).isEqualTo(UserStatus.WITHDRAWN);
         assertThat(updatedStatus).isEqualTo(UserStatus.WITHDRAWN);
     }
@@ -422,10 +422,10 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        UserStatus updatedStatus = sut.changeStatus(teacher.getUuid(), student.getUuid(), patch);
+        UserStatus updatedStatus = sut.changeStatus(teacher.getId(), student.getId(), patch);
 
         // then
-        Student getStudent = studentQueryRepository.getById(student.getUuid());
+        Student getStudent = studentQueryRepository.getById(student.getId());
         assertThat(getStudent.getStatus()).isEqualTo(UserStatus.ACTIVE);
         assertThat(updatedStatus).isEqualTo(UserStatus.ACTIVE);
     }

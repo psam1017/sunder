@@ -31,7 +31,7 @@ public class TeacherPublicResponse {
 
     public static TeacherPublicResponse from(Teacher teacher) {
         return TeacherPublicResponse.builder()
-                .id(teacher.getUuid())
+                .id(teacher.getId())
                 .name(teacher.getName())
                 .status(teacher.getStatus())
                 .roles(teacher.getRoles().stream().map(UserRole::getRoleName).toList())

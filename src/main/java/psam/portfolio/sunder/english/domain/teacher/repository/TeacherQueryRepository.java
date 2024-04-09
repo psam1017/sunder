@@ -83,7 +83,7 @@ public class TeacherQueryRepository {
     }
 
     private static Predicate academyIdEq(UUID academyId) {
-        return academyId != null ? teacher.academy.uuid.eq(academyId) : null;
+        return academyId != null ? teacher.academy.id.eq(academyId) : null;
     }
 
     private BooleanExpression teacherNameContains(String teacherName) {

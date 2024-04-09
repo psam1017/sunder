@@ -27,7 +27,7 @@ public abstract class User extends BaseEntity {
     // 탈퇴일도 추가하면 좋을 듯. 하지만 지금은 modifiedDateTime 으로 대체.
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    private UUID id;
 
     @Column(nullable = false, length = 20)
     private String loginId;

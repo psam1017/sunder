@@ -343,7 +343,7 @@ public class UserDocsTest extends RestDocsEnvironment {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getUuid(), infoContainer.getRawPassword());
+        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getId(), infoContainer.getRawPassword());
         UserPATCHPassword patchPassword = new UserPATCHPassword(infoContainer.getRawPassword());
 
         refresh();
