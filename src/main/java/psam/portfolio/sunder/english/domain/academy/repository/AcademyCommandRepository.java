@@ -14,10 +14,10 @@ public interface AcademyCommandRepository extends JpaRepository<Academy, UUID> {
 
     @Modifying(clearAutomatically = true)
     @Query("""
-           delete from Academy c
-           where c.status = :status
-           and c.withdrawalAt <= :withdrawalAt
-           """)
+            delete from Academy c
+            where c.status = :status
+            and c.withdrawalAt <= :withdrawalAt
+            """)
     void deleteAllByStatusAndWithdrawalAtBefore(@Param("status") AcademyStatus status,
-                                                @Param("withdrawalAt")LocalDateTime withdrawalAt);
+                                                @Param("withdrawalAt") LocalDateTime withdrawalAt);
 }

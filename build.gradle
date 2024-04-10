@@ -79,8 +79,6 @@ dependencies {
 
 	// excel
 	implementation 'org.apache.poi:poi:5.2.2'
-	implementation 'org.apache.poi:poi-ooxml:5.2.3'
-	implementation 'commons-io:commons-io:2.11.0'
 }
 
 // 전역 변수 설정 시작

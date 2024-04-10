@@ -1,13 +1,17 @@
 package psam.portfolio.sunder.english.domain.book.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.domain.book.model.entity.Book;
+import org.springframework.util.StringUtils;
+import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchBookException;
+import psam.portfolio.sunder.english.domain.book.model.entity.Book;
+import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,5 +65,70 @@ public class BookQueryRepository {
                 .from(book)
                 .where(expressions)
                 .fetch();
+    }
+
+    public List<Book> findAllBySearchCond(UUID academyId, BookSearchCond cond) {
+        return query.selectDistinct(book)
+                .from(book)
+                .where(
+                        academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
+                        statusNe(BookStatus.DELETED),
+                        createdDateTimeYearEq(cond),
+                        matchFullTextAgainstKeyword(cond.getKeywordForAgainst())
+                )
+                .orderBy(book.createdDateTime.desc())
+                .offset(cond.getOffset())
+                .limit(cond.getSize())
+                .fetch();
+    }
+
+    public long countBySearchCond(long contentSize, UUID academyId, BookSearchCond cond) {
+        int size = cond.getSize();
+        long offset = cond.getOffset();
+
+        if (offset == 0) {
+            if (size > contentSize) {
+                return contentSize;
+            }
+            return this.countBySearchCondQuery(academyId, cond);
+        }
+        if (contentSize != 0 && size > contentSize) {
+            return offset + contentSize;
+        }
+        return this.countBySearchCondQuery(academyId, cond);
+    }
+
+    private long countBySearchCondQuery(UUID academyId, BookSearchCond cond) {
+        Long count = query.select(book.countDistinct())
+                .from(book)
+                .where(
+                        academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
+                        statusNe(BookStatus.DELETED),
+                        createdDateTimeYearEq(cond),
+                        matchFullTextAgainstKeyword(cond.getKeywordForAgainst())
+                )
+                .fetchOne();
+        return count == null ? 0 : count;
+    }
+
+    private static BooleanExpression academyIdEqOrIsNullByPrivateOnly(UUID academyId, boolean privateOnly) {
+        BooleanExpression expression = book.academy.id.eq(academyId);
+        return privateOnly ? expression : expression.or(book.academy.id.isNull());
+    }
+
+    private static BooleanExpression statusNe(BookStatus status) {
+        return status != null ? book.status.ne(status) : null;
+    }
+
+    private static BooleanExpression createdDateTimeYearEq(BookSearchCond cond) {
+        return cond.getYear() == null ? null : book.createdDateTime.year().eq(cond.getYear());
+    }
+
+    private static BooleanExpression matchFullTextAgainstKeyword(String keyword) {
+        if (StringUtils.hasText(keyword)) {
+            return Expressions
+                    .booleanTemplate("match_against({0}, {1})", book.fullText, keyword);
+        }
+        return null;
     }
 }

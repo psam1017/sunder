@@ -12,9 +12,9 @@ public interface StudentCommandRepository extends JpaRepository<Student, Long> {
 
     @Modifying(clearAutomatically = true)
     @Query("""
-           update Student s
-           set s.status = 'ACTIVE'
-           where s.academy.id = :academyId
-           """)
+            update Student s
+            set s.status = 'ACTIVE'
+            where s.academy.id = :academyId
+            """)
     void startActiveByAcademyId(@Param("academyId") UUID academyId);
 }

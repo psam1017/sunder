@@ -1,0 +1,97 @@
+조회 검색 조건으로 기존에 간단하게 사용하던 LIKE 검색 이외에도 좀 더 상세한 검색을 해보고 싶어서 그 방법을 찾오본 결과 다음과 같았다.
+
+1. 간단한 구조의 검색은 FULLTEXT 와 MATCH 기능을 사용
+2. 복잡한 구조의 검색은 ElasticSearch 를 사용
+
+이때, ElasticSearch 를 지원하는 Spring Data ElasticSearch 도 있는 것 같던데 그걸 구현하기에는 시간이 너무 오래 걸릴 것 같아서 FULLTEXT 를 사용해보기로 했다.
+
+일단, FULLTEXT, MATCH 를 사용할 때 가장 유념해야 할 것은, 이것이 특정 DB 기술에 종속된다는 점이다. 즉, DB 엔진이 달라지면 구현이 변경될 수 있다.
+이와 같은 맥락에서 커스텀하게 설정해줘야 할 게 몇 가지가 있다. 아래 설명은 MariaDB 를 기준으로 한다.
+
+1. my.ini 에서 `innodb_ft_min_token_size` 수정
+2. JPA 에서 Dialect 도 설정
+3. FULLTEXT KEY 생성
+
+(1) my.ini 에 다음과 같은 속성과 값을 추가로 명시해줘야 하는데, 자세한 내용은 아래 블로그를 참고하자.
+
+(my.ini)
+```
+innodb_ft_min_token_size=1
+```
+
+참고 블로그 : https://inpa.tistory.com/entry/MYSQL-%F0%9F%93%9A-%ED%92%80%ED%85%8D%EC%8A%A4%ED%8A%B8-%EC%9D%B8%EB%8D%B1%EC%8A%A4Full-Text-Index-%EC%82%AC%EC%9A%A9%EB%B2%95
+
+(2) 내가 사용 중인 Spring Boot 3.2.x 와 Maria DB 11.2.x 에서 Dialect 설정은 다음과 같다.
+
+(CustomMariaDBDialect.java)
+```
+package psam.portfolio.sunder.english.global.jpa.dialect;
+
+import org.hibernate.boot.model.FunctionContributions;
+import org.hibernate.dialect.MariaDBDialect;
+import org.hibernate.type.BasicType;
+import org.hibernate.type.StandardBasicTypes;
+
+// application.properties 에 `spring.jpa.properties.hibernate.dialect=psam.portfolio.sunder.english.global.jpa.dialect.CustomMariaDBDialect` 추가.
+@SuppressWarnings("unused")
+public class CustomMariaDBDialect extends MariaDBDialect {
+
+    // MariaDB my.ini 에 `innodb_ft_min_token_size=1` 추가.
+    @Override
+    public void initializeFunctionRegistry(FunctionContributions functionContributions) {
+        super.initializeFunctionRegistry(functionContributions);
+        BasicType<Boolean> booleanBasicType = functionContributions.getTypeConfiguration().getBasicTypeRegistry().resolve(StandardBasicTypes.BOOLEAN);
+
+        functionContributions.getFunctionRegistry().registerPattern(
+                "match_against",
+                "match(?1) against(?2 in boolean mode)",
+                booleanBasicType
+        );
+    }
+}
+
+```
+
+(application.properties)
+```
+spring.jpa.properties.hibernate.dialect=psam.portfolio.sunder.english.global.jpa.dialect.CustomMariaDBDialect
+```
+
+(3) 마지막 준비 작업으로 match 함수를 사용하기 위해 FULLTEXT KEY 를 생성할 차례이다.
+이때 ngram parser 와 함께 별도로 인덱스를 생성하는 경우가 많았는데, MariaDB 에는 ngram parser 가 내장되지 않은 점도 있고, jpa annotation 으로 별도의 인덱스를 생성하는 게 번거롭기도 해서 아예 별도의 검색용 필드 컬럼을 하나 추가하는 반정규화를 선택했고, 이 컬럼에 대하여 FULLTEXT KEY 를 생성했다.
+
+(Book.java)
+```
+    @Column(name = "full_text", columnDefinition = "VARCHAR(1023) NULL, FULLTEXT KEY `ft_books_full_text` (`full_text`)")
+    private String fullText;
+```
+
+준비 작업이 모두 마무리되었으면, 이제 match ~ against 문법에 맞게 쿼리를 작성하면 되는데, 나는 아래와 같이 구현했을 때 제대로 작동했다.
+
+(BookQueryRepository.java)
+```
+    private static BooleanExpression matchFullTextAgainstKeyword(String keyword) {
+        if (StringUtils.hasText(keyword)) {
+            return Expressions
+                    .booleanTemplate("match_against({0}, {1})", book.fullText, keyword);
+        }
+        return null;
+    }
+```
+
+위 메소드에 전달되는 파라미터는 다음과 같이 전달한다.
+
+(BookSearchCond.java)
+```
+    public String getKeywordForAgainst() {
+        if (StringUtils.hasText(keyword)) {
+            return Arrays.stream(keyword.split(" "))
+                    .map(s -> "+" + s + "*")
+                    .collect(Collectors.joining(" "));
+        }
+        return null;
+    }
+```
+
+위와 같이, 검색어를 공백으로 나누어서 각 단어에 +, * 을 앞뒤로 붙여서 전달하는 이유는 against 문법 때문인데, 위 문자열이 의미하는 것은, split 된 각 단어가 포함되어야 한다는 의미이다.
+인터넷에서 이와 관련하여 검색하면 이것보다 더 많은 문법을 찾을 수 있을 것이다.

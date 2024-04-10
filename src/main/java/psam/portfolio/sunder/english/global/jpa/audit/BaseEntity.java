@@ -31,4 +31,12 @@ public abstract class BaseEntity {
 
     @LastModifiedBy
     private UUID modifiedBy;
+
+    public void setModifiedDateTime(LocalDateTime modifiedDateTime) {
+        this.modifiedDateTime = modifiedDateTime;
+    }
+
+    public void setModifiedBy(UUID modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
 }
