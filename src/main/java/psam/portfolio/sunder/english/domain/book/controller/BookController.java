@@ -14,6 +14,7 @@ import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -92,7 +93,7 @@ public class BookController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     public ApiResponse<Map<String, UUID>> replaceWordsByExcel(@UserId UUID teacherId,
                                                               @PathVariable UUID bookId,
-                                                              @RequestParam MultipartFile file) {
+                                                              @RequestParam MultipartFile file) throws IOException {
         UUID updateBookId = bookCommandService.replaceWords(teacherId, bookId, file);
         return ApiResponse.ok(Map.of("bookId", updateBookId));
     }

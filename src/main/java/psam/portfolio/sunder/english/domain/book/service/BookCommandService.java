@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.enumeration.WordStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
@@ -15,7 +16,9 @@ import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
 import psam.portfolio.sunder.english.domain.book.repository.WordCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
+import psam.portfolio.sunder.english.infrastructure.excel.ExcelUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +32,8 @@ public class BookCommandService {
     private final WordCommandRepository wordCommandRepository;
 
     private final TeacherQueryRepository teacherQueryRepository;
+
+    private final ExcelUtils excelUtils;
 
     /**
      * 교재 정보 수정 서비스. id 가 없으면 신규 생성, id 가 있다면 수정한다.
@@ -92,8 +97,29 @@ public class BookCommandService {
      * @param file      생성/교체할 단어가 입력된 엑셀 파일
      * @return 생성/교체된 단어들이 속한 교재 아이디
      */
-    public UUID replaceWords(UUID teacherId, UUID bookId, MultipartFile file) {
-        return null;
+    public UUID replaceWords(UUID teacherId, UUID bookId, MultipartFile file) throws IOException {
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        Book getBook = bookQueryRepository.getOne(
+                QBook.book.id.eq(bookId),
+                QBook.book.academy.eq(getTeacher.getAcademy())
+        );
+        wordCommandRepository.updateStatusByBookId(WordStatus.DELETED, getBook.getId());
+
+        Book refreshBook = bookQueryRepository.getById(getBook.getId());
+        List<Word> words = excelUtils.readExcel(file, "english", "korean").stream()
+                .map(w -> Word.builder()
+                        .english(w.get(0))
+                        .korean(w.get(1))
+                        .book(refreshBook)
+                        .build())
+                .toList();
+        List<Word> saveWords = wordCommandRepository.saveAll(words);
+        refreshBook.getWords().addAll(saveWords);
+
+        // 단어 목록의 수정은 실질적으로 교재의 수정이므로 교재의 수정 시간을 강제로 갱신한다.
+        refreshBook.updateModifiedDateTimeForcibly();
+
+        return refreshBook.getId();
     }
 
     /**
@@ -104,6 +130,15 @@ public class BookCommandService {
      * @return 삭제된 교재 아이디
      */
     public UUID deleteBook(UUID teacherId, UUID bookId) {
-        return null;
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        Book getBook = bookQueryRepository.getOne(
+                QBook.book.id.eq(bookId),
+                QBook.book.academy.eq(getTeacher.getAcademy())
+        );
+
+        // 반드시 book 을 먼저 삭제할 것. 영속성 컨텍스트가 초기화됨.
+        getBook.setStatus(BookStatus.DELETED);
+        wordCommandRepository.updateStatusByBookId(WordStatus.DELETED, getBook.getId());
+        return bookId;
     }
 }
