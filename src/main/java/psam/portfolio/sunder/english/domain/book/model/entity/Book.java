@@ -13,6 +13,7 @@ import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -63,6 +64,10 @@ public class Book extends BaseEntity {
         this.openToPublic = openToPublic;
     }
 
+    public void setStatus(BookStatus status) {
+        this.status = status;
+    }
+
     public void setPublisher(String publisher) {
         this.publisher = publisher;
     }
@@ -93,5 +98,9 @@ public class Book extends BaseEntity {
             fullText.append(s.replaceAll(" ", ""));
         }
         this.fullText = fullText.toString().toLowerCase();
+    }
+
+    public boolean isSameAcademyOrPublic(UUID academyId) {
+        return openToPublic || this.academy == null || Objects.equals(this.academy.getId(), academyId);
     }
 }

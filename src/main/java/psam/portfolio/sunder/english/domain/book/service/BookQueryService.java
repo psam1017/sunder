@@ -3,9 +3,11 @@ package psam.portfolio.sunder.english.domain.book.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import psam.portfolio.sunder.english.domain.book.exception.BookAccessDeniedException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
+import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -37,7 +39,7 @@ public class BookQueryService {
      */
     public Map<String, Object> getBookList(UUID userId, BookSearchCond cond) {
         User getUser = userQueryRepository.getById(userId);
-        UUID academyId = getAcademyId(cond.isPrivateOnly(), getUser);
+        UUID academyId = getAcademyIdFromUser(getUser);
 
         List<Book> books = bookQueryRepository.findAllBySearchCond(academyId, cond);
         long count = bookQueryRepository.countBySearchCond(books.size(), academyId, cond);
@@ -56,16 +58,25 @@ public class BookQueryService {
      * @return 교재 상세 정보와 단어 목록
      */
     public Map<String, Object> getBookDetail(UUID userId, UUID bookId) {
-        return null;
+        User getUser = userQueryRepository.getById(userId);
+        UUID academyId = getAcademyIdFromUser(getUser);
+
+        Book getBook = bookQueryRepository.getById(bookId);
+        if (!getBook.isSameAcademyOrPublic(academyId)) {
+            throw new BookAccessDeniedException();
+        }
+
+        return Map.of(
+                "book", BookFullResponse.from(getBook),
+                "words", getBook.getWords().stream().map(WordFullResponse::from).toList()
+        );
     }
 
-    private static UUID getAcademyId(boolean privateOnly, User getUser) {
-        if (privateOnly) {
-            if (getUser instanceof Teacher teacher) {
-                return teacher.getAcademy().getId();
-            } else if (getUser instanceof Student student) {
-                return student.getAcademy().getId();
-            }
+    private static UUID getAcademyIdFromUser(User getUser) {
+        if (getUser instanceof Teacher teacher) {
+            return teacher.getAcademy().getId();
+        } else if (getUser instanceof Student student) {
+            return student.getAcademy().getId();
         }
         throw new NotAUserException();
     }

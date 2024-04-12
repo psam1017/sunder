@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface WordCommandRepository extends JpaRepository<Word, UUID> {
 
-    @Modifying(clearAutomatically = true)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("""
             update Word w
             set w.status = :status
