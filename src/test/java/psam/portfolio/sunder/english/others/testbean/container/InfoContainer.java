@@ -4,6 +4,8 @@ import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
 
+import java.util.UUID;
+
 public interface InfoContainer {
 
     String getUniqueLoginId();
@@ -11,8 +13,14 @@ public interface InfoContainer {
     String getUniquePhoneNumber();
     String getUniqueAcademyName();
     String getUniqueAttendanceId();
+    default String getUniqueWordEnglish() {
+        return "eng" + UUID.randomUUID().toString().substring(0, 8);
+    };
+    default String getUniqueWordKorean() {
+        return "한" + UUID.randomUUID().toString().substring(0, 8);
+    };
 
-    default String getRawPassword() {
+    default String getAnyRawPassword() {
         return "qwe123!@#";
     }
 

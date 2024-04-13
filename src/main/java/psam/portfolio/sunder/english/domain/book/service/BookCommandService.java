@@ -51,14 +51,15 @@ public class BookCommandService {
         } else {
             Book getBook = bookQueryRepository.getOne(
                     QBook.book.id.eq(bookId),
-                    QBook.book.academy.eq(getTeacher.getAcademy())
+                    QBook.book.academy.eq(getTeacher.getAcademy()),
+                    QBook.book.status.ne(BookStatus.DELETED)
             );
             getBook.setOpenToPublic(replace.getOpenToPublic());
             getBook.setPublisher(replace.getPublisher());
             getBook.setBookName(replace.getBookName());
             getBook.setChapter(replace.getChapter());
             getBook.setSubject(replace.getSubject());
-            getBook.updateFullText();
+            getBook.updateSearchText();
             return getBook.getId();
         }
     }
@@ -75,7 +76,8 @@ public class BookCommandService {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Book getBook = bookQueryRepository.getOne(
                 QBook.book.id.eq(bookId),
-                QBook.book.academy.eq(getTeacher.getAcademy())
+                QBook.book.academy.eq(getTeacher.getAcademy()),
+                QBook.book.status.ne(BookStatus.DELETED)
         );
         wordCommandRepository.updateStatusByBookId(WordStatus.DELETED, getBook.getId());
 
@@ -101,7 +103,8 @@ public class BookCommandService {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Book getBook = bookQueryRepository.getOne(
                 QBook.book.id.eq(bookId),
-                QBook.book.academy.eq(getTeacher.getAcademy())
+                QBook.book.academy.eq(getTeacher.getAcademy()),
+                QBook.book.status.ne(BookStatus.DELETED)
         );
         wordCommandRepository.updateStatusByBookId(WordStatus.DELETED, getBook.getId());
 
@@ -133,7 +136,8 @@ public class BookCommandService {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Book getBook = bookQueryRepository.getOne(
                 QBook.book.id.eq(bookId),
-                QBook.book.academy.eq(getTeacher.getAcademy())
+                QBook.book.academy.eq(getTeacher.getAcademy()),
+                QBook.book.status.ne(BookStatus.DELETED)
         );
 
         // 반드시 book 을 먼저 삭제할 것. 영속성 컨텍스트가 초기화됨.

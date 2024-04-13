@@ -1,18 +1,17 @@
 package psam.portfolio.sunder.english.domain.book.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchBookException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,7 +73,7 @@ public class BookQueryRepository {
                         academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
                         statusNe(BookStatus.DELETED),
                         createdDateTimeYearEq(cond),
-                        matchFullTextAgainstKeyword(cond.getKeywordForAgainst())
+                        searchTextContains(cond.getSplitKeyword())
                 )
                 .orderBy(book.createdDateTime.desc())
                 .offset(cond.getOffset())
@@ -105,7 +104,7 @@ public class BookQueryRepository {
                         academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
                         statusNe(BookStatus.DELETED),
                         createdDateTimeYearEq(cond),
-                        matchFullTextAgainstKeyword(cond.getKeywordForAgainst())
+                        searchTextContains(cond.getSplitKeyword())
                 )
                 .fetchOne();
         return count == null ? 0 : count;
@@ -124,11 +123,13 @@ public class BookQueryRepository {
         return cond.getYear() == null ? null : book.createdDateTime.year().eq(cond.getYear());
     }
 
-    private static BooleanExpression matchFullTextAgainstKeyword(String keyword) {
-        if (StringUtils.hasText(keyword)) {
-            return Expressions
-                    .booleanTemplate("match_against({0}, {1})", book.fullText, keyword);
+    private static BooleanExpression searchTextContains(String[] keywords) {
+        if (keywords == null || keywords.length == 0) {
+            return null;
         }
-        return null;
+        return Arrays.stream(keywords)
+                .map(book.searchText::contains)
+                .reduce(BooleanExpression::and)
+                .orElse(null);
     }
 }

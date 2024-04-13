@@ -58,6 +58,14 @@ public class StandaloneInfoContainer implements InfoContainer {
         return uniqueAttendanceIdList.get(attendanceIdIndex++ % size);
     }
 
+    public String getAnyWordEnglish() {
+        return "eng" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    public String getAnyWordKorean() {
+        return "한" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
     private List<String> generateUniqueIds(int numberOfIds, int length) {
         List<String> uniqueIds = new ArrayList<>();
         while (uniqueIds.size() < numberOfIds) {

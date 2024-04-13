@@ -128,7 +128,7 @@ public class UserDocsTest extends RestDocsEnvironment {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -307,7 +307,7 @@ public class UserDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         String token = createToken(director);
-        UserPATCHPassword patch = new UserPATCHPassword(infoContainer.getRawPassword());
+        UserPATCHPassword patch = new UserPATCHPassword(infoContainer.getAnyRawPassword());
 
         refresh();
 
@@ -343,8 +343,8 @@ public class UserDocsTest extends RestDocsEnvironment {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getId(), infoContainer.getRawPassword());
-        UserPATCHPassword patchPassword = new UserPATCHPassword(infoContainer.getRawPassword());
+        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword());
+        UserPATCHPassword patchPassword = new UserPATCHPassword(infoContainer.getAnyRawPassword());
 
         refresh();
 

@@ -3,6 +3,7 @@ package psam.portfolio.sunder.english.domain.book.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.exception.BookAccessDeniedException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
@@ -39,7 +40,7 @@ public class BookQueryService {
      */
     public Map<String, Object> getBookList(UUID userId, BookSearchCond cond) {
         User getUser = userQueryRepository.getById(userId);
-        UUID academyId = getAcademyIdFromUser(getUser);
+        UUID academyId = getAcademyIdFromUser(getUser).getId();
 
         List<Book> books = bookQueryRepository.findAllBySearchCond(academyId, cond);
         long count = bookQueryRepository.countBySearchCond(books.size(), academyId, cond);
@@ -59,10 +60,10 @@ public class BookQueryService {
      */
     public Map<String, Object> getBookDetail(UUID userId, UUID bookId) {
         User getUser = userQueryRepository.getById(userId);
-        UUID academyId = getAcademyIdFromUser(getUser);
+        Academy academy = getAcademyIdFromUser(getUser);
 
         Book getBook = bookQueryRepository.getById(bookId);
-        if (!getBook.isSameAcademyOrPublic(academyId)) {
+        if (!getBook.isSameAcademyOrPublic(academy)) {
             throw new BookAccessDeniedException();
         }
 
@@ -72,11 +73,11 @@ public class BookQueryService {
         );
     }
 
-    private static UUID getAcademyIdFromUser(User getUser) {
+    private static Academy getAcademyIdFromUser(User getUser) {
         if (getUser instanceof Teacher teacher) {
-            return teacher.getAcademy().getId();
+            return teacher.getAcademy();
         } else if (getUser instanceof Student student) {
-            return student.getAcademy().getId();
+            return student.getAcademy();
         }
         throw new NotAUserException();
     }

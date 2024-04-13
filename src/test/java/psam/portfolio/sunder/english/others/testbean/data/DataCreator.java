@@ -5,6 +5,10 @@ import org.springframework.stereotype.Component;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
+import psam.portfolio.sunder.english.domain.book.model.entity.Book;
+import psam.portfolio.sunder.english.domain.book.model.entity.Word;
+import psam.portfolio.sunder.english.domain.book.repository.BookCommandRepository;
+import psam.portfolio.sunder.english.domain.book.repository.WordCommandRepository;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
@@ -34,12 +38,14 @@ public class DataCreator {
     private final InfoContainer uic;
     private final PasswordUtils passwordUtils;
 
-    private final RoleCommandRepository roleCommandRepository;
     private final RoleQueryRepository roleQueryRepository;
+    private final RoleCommandRepository roleCommandRepository;
     private final UserRoleCommandRepository userRoleCommandRepository;
     private final StudentCommandRepository studentCommandRepository;
     private final TeacherCommandRepository teacherCommandRepository;
     private final AcademyCommandRepository academyCommandRepository;
+    private final BookCommandRepository bookCommandRepository;
+    private final WordCommandRepository wordCommandRepository;
 
     public void createAllRoles() {
         RoleName[] roles = RoleName.values();
@@ -79,7 +85,7 @@ public class DataCreator {
         String uniqueId = uic.getUniqueLoginId();
         Teacher teacher = Teacher.builder()
                 .loginId(uniqueId)
-                .loginPw(passwordUtils.encode(uic.getRawPassword()))
+                .loginPw(passwordUtils.encode(uic.getAnyRawPassword()))
                 .name("사용자" + uniqueId.substring(0, 3))
                 .email(uic.getUniqueEmail())
                 .emailVerified(true)
@@ -97,7 +103,7 @@ public class DataCreator {
         String uniqueId = uic.getUniqueLoginId();
         Teacher teacher = Teacher.builder()
                 .loginId(uniqueId)
-                .loginPw(passwordUtils.encode(uic.getRawPassword()))
+                .loginPw(passwordUtils.encode(uic.getAnyRawPassword()))
                 .name(name)
                 .email(uic.getUniqueEmail())
                 .emailVerified(true)
@@ -115,7 +121,7 @@ public class DataCreator {
         String uniqueId = uic.getUniqueLoginId();
         Student student = Student.builder()
                 .loginId(uniqueId)
-                .loginPw(passwordUtils.encode(uic.getRawPassword()))
+                .loginPw(passwordUtils.encode(uic.getAnyRawPassword()))
                 .name("사용자" + uniqueId.substring(0, 3))
                 .email(uic.getUniqueEmail())
                 .emailVerified(true)
@@ -136,7 +142,7 @@ public class DataCreator {
     public Student registerStudent(String name, String attendanceId, Address address, School school, Parent parent, UserStatus status, Academy academy) {
         Student student = Student.builder()
                 .loginId(uic.getUniqueLoginId())
-                .loginPw(passwordUtils.encode(uic.getRawPassword()))
+                .loginPw(passwordUtils.encode(uic.getAnyRawPassword()))
                 .name(name)
                 .email(uic.getUniqueEmail())
                 .emailVerified(true)
@@ -167,5 +173,34 @@ public class DataCreator {
 
         List<UserRole> saveUserRoles = userRoleCommandRepository.saveAll(buildUserRoles);
         user.getRoles().addAll(saveUserRoles);
+    }
+
+    public Book registerAnyBook(Academy academy) {
+        return registerBook(false, "publisher", "bookName", "chapter", "subject", academy);
+    }
+
+    public Book registerBook(boolean openToPublic, String publisher, String bookName, String chapter, String subject, Academy academy) {
+        Book book = Book.builder()
+                .openToPublic(openToPublic)
+                .publisher(publisher)
+                .bookName(bookName)
+                .chapter(chapter)
+                .subject(subject)
+                .academy(academy)
+                .build();
+        Book saveBook = bookCommandRepository.save(book);
+        academy.getBooks().add(saveBook);
+        return saveBook;
+    }
+
+    public Word registerWord(String english, String korean, Book book) {
+        Word word = Word.builder()
+                .english(english)
+                .korean(korean)
+                .book(book)
+                .build();
+        Word saveWord = wordCommandRepository.save(word);
+        book.getWords().add(saveWord);
+        return saveWord;
     }
 }

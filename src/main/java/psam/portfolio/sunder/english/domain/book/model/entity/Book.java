@@ -20,7 +20,10 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "books",
-        indexes = @Index(columnList = "academy_id")
+        indexes = {
+                @Index(columnList = "academy_id"),
+                @Index(columnList = "search_text")
+        }
 )
 @Entity
 public class Book extends BaseEntity {
@@ -36,15 +39,14 @@ public class Book extends BaseEntity {
     private String bookName;
     private String chapter;
     private String subject;
-
-    @Column(name = "full_text", columnDefinition = "VARCHAR(1023) NULL, FULLTEXT KEY `ft_books_full_text` (`full_text`)")
-    private String fullText;
+    private String searchText;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
 
     @SQLRestriction(value = "status != 'DELETED'")
+    @OrderBy("id asc")
     @OneToMany(mappedBy = "book")
     private List<Word> words = new ArrayList<>();
 
@@ -57,7 +59,7 @@ public class Book extends BaseEntity {
         this.chapter = chapter;
         this.subject = subject;
         this.academy = academy;
-        updateFullText();
+        updateSearchText();
     }
 
     public void setOpenToPublic(boolean openToPublic) {
@@ -88,19 +90,19 @@ public class Book extends BaseEntity {
         super.setModifiedDateTime(LocalDateTime.now());
     }
 
-    public void updateFullText() {
-        updateFullText(publisher, bookName, chapter, subject);
+    public void updateSearchText() {
+        updateSearchText(publisher, bookName, chapter, subject);
     }
 
-    private void updateFullText(String... strings) {
-        StringBuilder fullText = new StringBuilder();
+    private void updateSearchText(String... strings) {
+        StringBuilder searchText = new StringBuilder();
         for (String s : strings) {
-            fullText.append(s.replaceAll(" ", ""));
+            searchText.append(s.replaceAll(" ", ""));
         }
-        this.fullText = fullText.toString().toLowerCase();
+        this.searchText = searchText.toString().toLowerCase();
     }
 
-    public boolean isSameAcademyOrPublic(UUID academyId) {
-        return openToPublic || this.academy == null || Objects.equals(this.academy.getId(), academyId);
+    public boolean isSameAcademyOrPublic(Academy academy) {
+        return openToPublic || this.academy == null || Objects.equals(this.academy.getId(), academy.getId());
     }
 }

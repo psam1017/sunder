@@ -595,7 +595,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.TRIAL, registerAcademy);
         dataCreator.createUserRoles(registerTeacher, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         Boolean result = refreshAnd(() -> sut.endTrial(loginForm));
@@ -616,7 +616,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher registerDirector = dataCreator.registerTeacher(UserStatus.TRIAL_END, registerAcademy);
         dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         Boolean result = refreshAnd(() -> sut.endTrial(loginForm));
@@ -635,7 +635,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher registerDirector = dataCreator.registerTeacher(UserStatus.TRIAL, registerAcademy);
         dataCreator.createUserRoles(registerDirector, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         // then
@@ -651,7 +651,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
         dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         // then
@@ -667,7 +667,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher registerDirector = dataCreator.registerTeacher(UserStatus.TRIAL, registerAcademy);
         dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(registerDirector.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         // then

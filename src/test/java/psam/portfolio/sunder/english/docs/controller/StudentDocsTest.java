@@ -74,7 +74,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         String loginId = infoContainer.getUniqueLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "선더학생";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();

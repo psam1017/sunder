@@ -50,7 +50,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
 
         String loginId = infoContainer.getUniqueLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "name";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
@@ -100,7 +100,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
 
         String loginId = infoContainer.getUniqueLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "name";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
@@ -137,7 +137,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         // teacher 와 loginId 가 중복된다.
         String loginId = teacher.getLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "name";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
@@ -172,7 +172,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         // teacher 와 loginId 가 중복되지만 teacher 의 상태가 PENDING 이므로 중복 검사에서 제외된다.
         String loginId = teacher.getLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "name";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();

@@ -1,0 +1,9 @@
+=== 학원 교재 목록 검색하기
+
+==== HTTP Request
+include::{snippets}/book-docs-test/get-book-list/http-request.adoc[]
+include::{snippets}/book-docs-test/get-book-list/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/get-book-list/http-response.adoc[]
+include::{snippets}/book-docs-test/get-book-list/response-fields.adoc[]

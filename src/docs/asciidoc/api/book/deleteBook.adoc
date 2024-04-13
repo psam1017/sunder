@@ -1,0 +1,9 @@
+=== 학원 교재 삭제하기
+
+==== HTTP Request
+include::{snippets}/book-docs-test/delete-book/http-request.adoc[]
+include::{snippets}/book-docs-test/delete-book/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/delete-book/http-response.adoc[]
+include::{snippets}/book-docs-test/delete-book/response-fields.adoc[]

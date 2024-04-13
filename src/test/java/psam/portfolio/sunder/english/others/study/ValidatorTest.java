@@ -3,24 +3,16 @@ package psam.portfolio.sunder.english.others.study;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Validator;
-import psam.portfolio.sunder.english.others.testconfig.TestConfig;
+import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
-@Import(TestConfig.class)
-@ActiveProfiles("test")
-@SpringBootTest
-public class ValidatorTest {
+public class ValidatorTest extends AbstractSunderApplicationTest {
 
     @Autowired
     Validator validator;

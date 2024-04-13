@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
@@ -47,6 +48,9 @@ public class Academy extends TimeEntity {
 
     @OneToMany(mappedBy = "academy")
     private List<Student> students = new ArrayList<>();
+
+    @OneToMany(mappedBy = "academy")
+    private List<Book> books = new ArrayList<>();
 
     @Builder
     public Academy(String name, Address address, String phone, String email, boolean openToPublic, AcademyStatus status) {

@@ -58,7 +58,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(teacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         String loginId = infoContainer.getUniqueLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "선더학생";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
@@ -124,7 +124,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(teacher, ROLE_DIRECTOR, ROLE_TEACHER);
 
         String loginId = infoContainer.getUniqueLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "선더학생";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
@@ -172,7 +172,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         // student 와 loginId 가 중복된다.
         String loginId = student.getLoginId();
 
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "선더학생";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
@@ -219,7 +219,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         String attendanceId = student.getAttendanceId();
 
         String loginId = infoContainer.getUniqueLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "선더학생";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
@@ -263,7 +263,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
 
         // student 와 loginId 가 중복되지만 student 의 상태가 PENDING 이므로 중복 검사에서 제외된다.
         String loginId = student.getLoginId();
-        String password = infoContainer.getRawPassword();
+        String password = infoContainer.getAnyRawPassword();
         String name = "선더학생";
         String email = infoContainer.getUniqueEmail();
         String phoneNumber = infoContainer.getUniquePhoneNumber();
