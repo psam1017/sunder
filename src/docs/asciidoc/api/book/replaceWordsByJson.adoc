@@ -1,0 +1,10 @@
+=== 교재 단어 목록 등록하기(json)
+
+==== HTTP Request
+include::{snippets}/book-docs-test/replace-words-by-json/http-request.adoc[]
+include::{snippets}/book-docs-test/replace-words-by-json/path-parameters.adoc[]
+include::{snippets}/book-docs-test/replace-words-by-json/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/replace-words-by-json/http-response.adoc[]
+include::{snippets}/book-docs-test/replace-words-by-json/response-fields.adoc[]

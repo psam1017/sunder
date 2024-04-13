@@ -21,6 +21,9 @@ endif::[]
 [[Student]]
 == link:student.html[Student API]
 
+[[Book]]
+== link:book.html[Book API]
+
 [[Guide]]
 == API Guide
 

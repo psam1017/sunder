@@ -1,0 +1,10 @@
+=== 교재 단어 목록 등록하기(excel)
+
+==== HTTP Request
+include::{snippets}/book-docs-test/replace-words-by-excel/http-request.adoc[]
+include::{snippets}/book-docs-test/replace-words-by-excel/path-parameters.adoc[]
+include::{snippets}/book-docs-test/replace-words-by-excel/request-parts.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/replace-words-by-excel/http-response.adoc[]
+include::{snippets}/book-docs-test/replace-words-by-excel/response-fields.adoc[]

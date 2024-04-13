@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
@@ -19,6 +21,13 @@ public class BookFullResponse {
     private String chapter;
     private String subject;
     private UUID academyId;
+    private boolean openToPublic;
+    @KoreanDateTime
+    private LocalDateTime createdDateTime;
+    @KoreanDateTime
+    private LocalDateTime modifiedDateTime;
+    private UUID createdBy;
+    private UUID modifiedBy;
 
     public static BookFullResponse from(Book book) {
         return BookFullResponse.builder()
@@ -28,6 +37,11 @@ public class BookFullResponse {
                 .chapter(book.getChapter())
                 .subject(book.getSubject())
                 .academyId(book.getAcademy().getId())
+                .openToPublic(book.isOpenToPublic())
+                .createdDateTime(book.getCreatedDateTime())
+                .modifiedDateTime(book.getModifiedDateTime())
+                .createdBy(book.getCreatedBy())
+                .modifiedBy(book.getModifiedBy())
                 .build();
     }
 }

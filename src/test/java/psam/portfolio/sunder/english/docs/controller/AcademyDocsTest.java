@@ -571,7 +571,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         String token = createToken(director);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
 
         refresh();
 

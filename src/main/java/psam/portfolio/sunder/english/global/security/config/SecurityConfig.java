@@ -2,7 +2,6 @@ package psam.portfolio.sunder.english.global.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -27,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.security.filter.AuthenticationFailureHandlerImplFilter;
 import psam.portfolio.sunder.english.global.security.filter.JwtAuthenticationFilter;
 import psam.portfolio.sunder.english.global.security.handler.AccessDeniedHandlerImpl;
@@ -34,15 +34,12 @@ import psam.portfolio.sunder.english.global.security.handler.AuthenticationEntry
 import psam.portfolio.sunder.english.global.security.handler.AuthenticationFailureHandlerImpl;
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceImpl;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
-import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 
 @RequiredArgsConstructor
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 @EnableWebSecurity
 public class SecurityConfig {
-
-    // TODO: 2024-01-14 OAUTH2
 
     @Bean
     public SecurityFilterChain securityFilterChain(

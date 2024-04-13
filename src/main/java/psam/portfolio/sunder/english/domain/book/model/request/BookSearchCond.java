@@ -7,9 +7,6 @@ import lombok.Setter;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.global.pagination.SearchCond;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,16 +19,29 @@ public class BookSearchCond extends SearchCond {
     @Builder
     public BookSearchCond(Integer page, Integer size, String prop, String dir, String keyword, Boolean privateOnly, Integer year) {
         super(page, size, prop, dir);
-        this.keyword = keyword;
+        keyword = substring20(keyword);
+        this.keyword = removeTwoWhiteSpaces(keyword);
         this.privateOnly = privateOnly == null || privateOnly;
         this.year = year;
     }
 
-    public String getKeywordForAgainst() {
+    private String substring20(String str) {
+        if (StringUtils.hasText(str) && str.length() > 20) {
+            return str.substring(0, 20);
+        }
+        return str;
+    }
+
+    private String removeTwoWhiteSpaces(String str) {
+        if (StringUtils.hasText(str)) {
+            return str.trim().replaceAll("\\s{2,}", " ");
+        }
+        return str;
+    }
+
+    public String[] getSplitKeyword() {
         if (StringUtils.hasText(keyword)) {
-            return Arrays.stream(keyword.split(" "))
-                    .map(s -> "+" + s + "*")
-                    .collect(Collectors.joining(" "));
+            return keyword.toLowerCase().split(" ");
         }
         return null;
     }

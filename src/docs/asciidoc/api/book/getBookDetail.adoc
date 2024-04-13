@@ -1,0 +1,9 @@
+=== 학원 교재 및 단어목록 조회하기
+
+==== HTTP Request
+include::{snippets}/book-docs-test/get-book-detail/http-request.adoc[]
+include::{snippets}/book-docs-test/get-book-detail/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/get-book-detail/http-response.adoc[]
+include::{snippets}/book-docs-test/get-book-detail/response-fields.adoc[]

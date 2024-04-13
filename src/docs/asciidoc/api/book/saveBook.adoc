@@ -1,0 +1,9 @@
+=== 학원 교재 등록하기
+
+==== HTTP Request
+include::{snippets}/book-docs-test/save-book/http-request.adoc[]
+include::{snippets}/book-docs-test/save-book/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/save-book/http-response.adoc[]
+include::{snippets}/book-docs-test/save-book/response-fields.adoc[]

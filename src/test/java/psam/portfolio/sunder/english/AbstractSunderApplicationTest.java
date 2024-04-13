@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.docs.RestDocsConfig;
+import psam.portfolio.sunder.english.infrastructure.excel.ExcelUtils;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.others.testbean.container.InfoContainer;
 import psam.portfolio.sunder.english.others.testbean.data.DataCleaner;
@@ -33,6 +34,12 @@ import java.util.function.Supplier;
 @SpringBootTest
 public class AbstractSunderApplicationTest {
 
+	@MockBean
+	protected MailUtils mailUtils;
+
+	@MockBean
+	protected ExcelUtils excelUtils;
+
 	@Autowired
 	protected InfoContainer infoContainer;
 
@@ -50,9 +57,6 @@ public class AbstractSunderApplicationTest {
 
 	@Autowired
 	protected ObjectMapper objectMapper;
-
-	@MockBean
-	protected MailUtils mailUtils;
 
 	@BeforeEach
 	void setUp() {

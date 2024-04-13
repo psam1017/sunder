@@ -1,0 +1,10 @@
+=== 학원 교재 정보 수정하기
+
+==== HTTP Request
+include::{snippets}/book-docs-test/update-book/http-request.adoc[]
+include::{snippets}/book-docs-test/update-book/path-parameters.adoc[]
+include::{snippets}/book-docs-test/update-book/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/update-book/http-response.adoc[]
+include::{snippets}/book-docs-test/update-book/response-fields.adoc[]

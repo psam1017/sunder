@@ -169,7 +169,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         LoginResult result = refreshAnd(() -> sut.login(loginForm));
@@ -189,7 +189,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId().substring(3), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId().substring(3), infoContainer.getAnyRawPassword());
 
         // when
         // then
@@ -205,7 +205,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword().substring(3));
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword().substring(3));
 
         // when
         // then
@@ -221,7 +221,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         Teacher director = dataCreator.registerTeacher(UserStatus.FORBIDDEN, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         // then
@@ -238,7 +238,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
-        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getRawPassword());
+        UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
 
         // when
         LoginResult result = refreshAnd(() -> sut.login(loginForm));
@@ -294,7 +294,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         // when
-        TokenRefreshResponse response = refreshAnd(() -> sut.authenticateToChangePassword(director.getId(), infoContainer.getRawPassword()));
+        TokenRefreshResponse response = refreshAnd(() -> sut.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword()));
 
         // then
         Boolean changeable = jwtUtils.extractClaim(response.getToken(), claims -> claims.get(JwtClaim.PASSWORD_CHANGE.toString(), Boolean.class));
