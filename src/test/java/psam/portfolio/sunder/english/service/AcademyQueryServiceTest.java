@@ -155,7 +155,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         saveTeachers.add(0, director);
 
         // when
-        Map<String, Object> result = refreshAnd(() -> sut.getDetail(director.getId(), "teacher"));
+        Map<String, Object> result = refreshAnd(() -> sut.getDetail(academy.getId(), director.getId(), "teacher"));
 
         // then
         AcademyFullResponse academyFullResponse = (AcademyFullResponse) result.get("academy");
@@ -211,7 +211,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
         // when
-        Map<String, Object> result = refreshAnd(() -> sut.getDetail(student.getId(), "teacher"));
+        Map<String, Object> result = refreshAnd(() -> sut.getDetail(academy.getId(), student.getId(), "teacher"));
 
         // then
         AcademyFullResponse academyFullResponse = (AcademyFullResponse) result.get("academy");

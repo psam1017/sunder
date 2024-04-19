@@ -10,23 +10,23 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginPwForm;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPATCHPassword;
-import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
-import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
+import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
@@ -34,7 +34,7 @@ import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 public class UserDocsTest extends RestDocsEnvironment {
 
     @Autowired
-    UserQueryService userQueryService;
+    UserCommandService userCommandService;
 
     @DisplayName("user 의 loginId 중복체크를 할 수 있다.")
     @Test
@@ -44,7 +44,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/user/check-dupl")
+                get("/api/users/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("loginId", loginId)
         );
@@ -72,7 +72,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/user/check-dupl")
+                get("/api/users/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("email", email)
         );
@@ -100,7 +100,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/user/check-dupl")
+                get("/api/users/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("phone", phone)
         );
@@ -132,7 +132,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/user/login")
+                post("/api/users/login")
                         .contentType(APPLICATION_JSON)
                         .content(createJson(loginForm))
         );
@@ -147,8 +147,8 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("loginPw").type(STRING).description("비밀번호")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.type").type(STRING).description("토큰 타입. 항상 'Bearer ' 로 응답. request header 에 `Authorization: 'Bearer xxx.yyy.zzz'` 처럼 추가할 것."),
-                                        fieldWithPath("data.token").type(STRING).description("로그인하고 발급 받은 액세스 토큰"),
+                                        fieldWithPath("data.accessToken").type(STRING).description("발급된 액세스 토큰(1시간). Authorization 헤더에 추가하여 사용"),
+                                        fieldWithPath("data.refreshToken").type(STRING).description("발급된 리프레시 토큰(12시간). 액세스 토큰 만료 시 재발급에 사용"),
                                         fieldWithPath("data.passwordChangeRequired").type(BOOLEAN).description("비밀번호 변경 주기인지 여부")
                                 )
                         )
@@ -164,13 +164,13 @@ public class UserDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/user/password/alert-later")
+                post("/api/users/password/alert-later")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -195,13 +195,13 @@ public class UserDocsTest extends RestDocsEnvironment {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/user/token/refresh")
+                post("/api/users/token/refresh")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -212,8 +212,8 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 relaxedResponseFields(
-                                        fieldWithPath("data.type").type(STRING).description("토큰 타입. 항상 'Bearer ' 로 응답. request header 에 `Authorization: 'Bearer xxx.yyy.zzz'` 처럼 추가할 것."),
-                                        fieldWithPath("data.token").type(STRING).description("새로 발급한 액세스 토큰")
+                                        fieldWithPath("data.accessToken").type(STRING).description("새로 발급한 액세스 토큰(1시간). Authorization 헤더에 추가하여 사용"),
+                                        fieldWithPath("data.refreshToken").type(STRING).description("새로 발급한 리프레시 토큰(12시간). 액세스 토큰 만료 시 재발급에 사용")
                                 )
                         )
                 );
@@ -237,7 +237,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/user/login-id/find")
+                post("/api/users/login-id/find")
                         .contentType(APPLICATION_JSON)
                         .content(createJson(lostIdForm))
         );
@@ -276,7 +276,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/user/password/new")
+                post("/api/users/password/new")
                         .contentType(APPLICATION_JSON)
                         .content(createJson(lostPwForm))
         );
@@ -306,14 +306,14 @@ public class UserDocsTest extends RestDocsEnvironment {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
         UserPATCHPassword patch = new UserPATCHPassword(infoContainer.getAnyRawPassword());
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/user/password/change-auth")
+                post("/api/users/password/change-auth")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(patch))
@@ -328,8 +328,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("loginPw").type(STRING).description("기존 비밀번호")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.type").type(STRING).description("토큰 타입. 항상 'Bearer ' 로 응답. request header 에 `Authorization: 'Bearer xxx.yyy.zzz'` 처럼 추가할 것."),
-                                        fieldWithPath("data.token").type(STRING).description("비밀번호 변경을 인가하는 토큰")
+                                        fieldWithPath("data.passwordChangeAllowedAmount").type(NUMBER).description("비밀번호 변경 유효 시간")
                                 )
                         )
                 );
@@ -343,16 +342,16 @@ public class UserDocsTest extends RestDocsEnvironment {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword());
+        userCommandService.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword());
         UserPATCHPassword patchPassword = new UserPATCHPassword(infoContainer.getAnyRawPassword());
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/user/password/change-new")
+                patch("/api/users/password/change-new")
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, refresh.getType() + refresh.getToken())
+                        .header(AUTHORIZATION, createBearerToken(director))
                         .content(createJson(patchPassword))
         );
 
@@ -362,7 +361,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 requestFields(
-                                        fieldWithPath("loginPw").type(STRING).description("기존 비밀번호")
+                                        fieldWithPath("loginPw").type(STRING).description("변경을 위해 새로 입력한 비밀번호")
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.newPassword").type(BOOLEAN).description("비밀번호 변경 성공 여부")
@@ -381,9 +380,9 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/user/me")
+                get("/api/users/me")
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(director))
+                        .header(AUTHORIZATION, createBearerToken(director))
         );
 
         // then
@@ -424,9 +423,9 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/user/me")
+                get("/api/users/me")
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(student))
+                        .header(AUTHORIZATION, createBearerToken(student))
         );
 
         // then

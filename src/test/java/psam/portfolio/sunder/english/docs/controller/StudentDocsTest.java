@@ -23,8 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
@@ -44,9 +43,9 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/student/check-dupl")
+                get("/api/students/check-dupl")
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(teacher))
+                        .header(AUTHORIZATION, createBearerToken(teacher))
                         .param("attendanceId", attendanceId)
         );
 
@@ -103,9 +102,9 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/student")
+                post("/api/students")
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(director))
+                        .header(AUTHORIZATION, createBearerToken(director))
                         .content(createJson(post))
         );
 
@@ -155,9 +154,9 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/student/list")
+                get("/api/students")
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(director))
+                        .header(AUTHORIZATION, createBearerToken(director))
                         .param("page", "1")
                         .param("size", "10")
                         .param("prop", "name")
@@ -242,9 +241,9 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/student/{studentId}", student.getId())
+                RestDocumentationRequestBuilders.get("/api/students/{studentId}", student.getId())
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(teacher))
+                        .header(AUTHORIZATION, createBearerToken(teacher))
         );
 
         // then
@@ -330,9 +329,9 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/student/{studentId}/personal-info", student.getId())
+                RestDocumentationRequestBuilders.patch("/api/students/{studentId}/personal-info", student.getId())
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(teacher))
+                        .header(AUTHORIZATION, createBearerToken(teacher))
                         .content(createJson(patch))
         );
 
@@ -380,9 +379,9 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/student/{studentId}/status", student.getId())
+                RestDocumentationRequestBuilders.patch("/api/students/{studentId}/status", student.getId())
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createToken(teacher))
+                        .header(AUTHORIZATION, createBearerToken(teacher))
                         .content(createJson(patch))
         );
 

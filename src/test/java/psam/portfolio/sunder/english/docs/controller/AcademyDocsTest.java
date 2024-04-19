@@ -3,7 +3,6 @@ package psam.portfolio.sunder.english.docs.controller;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
@@ -26,10 +25,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
@@ -50,7 +49,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/academy/check-dupl")
+                get("/api/academies/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("name", name)
         );
@@ -78,7 +77,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/academy/check-dupl")
+                get("/api/academies/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("phone", phone)
         );
@@ -106,7 +105,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/academy/check-dupl")
+                get("/api/academies/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("email", email)
         );
@@ -161,7 +160,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/academy")
+                post("/api/academies")
                         .contentType(APPLICATION_JSON)
                         .content(createJson(post))
         );
@@ -231,7 +230,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/api/academy/{academyId}/verify", academyId.toString())
+                post("/api/academies/{academyId}/verify", academyId.toString())
                         .contentType(APPLICATION_JSON)
         );
 
@@ -258,13 +257,13 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(teacher, ROLE_TEACHER);
-        String token = createToken(teacher);
+        String token = createBearerToken(teacher);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/academy")
+                get("/api/academies/{academyId}", academy.getId().toString())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .param("select", "teacher")
@@ -275,6 +274,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                                pathParameters(
+                                        parameterWithName("academyId").description("조회할 학원 아이디")
+                                ),
                                 queryParameters(
                                         parameterWithName("select").description("""
                                                 같이 조회할 정보 옵션 +
@@ -342,13 +344,13 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(student, ROLE_STUDENT);
-        String token = createToken(student);
+        String token = createBearerToken(student);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/academy")
+                get("/api/academies/{academyId}", academy.getId().toString())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .param("select", "teacher")
@@ -359,6 +361,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                                pathParameters(
+                                        parameterWithName("academyId").description("조회할 학원 아이디")
+                                ),
                                 queryParameters(
                                         parameterWithName("select").description("""
                                                 같이 조회할 정보 옵션 +
@@ -395,7 +400,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         Academy academy = dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         refresh();
 
@@ -411,7 +416,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academy")
+                patch("/api/academies")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(academyPATCH))
@@ -448,7 +453,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/academy/list")
+                get("/api/academies")
                         .contentType(APPLICATION_JSON)
                         .param("page", "1")
                         .param("size", "10")
@@ -510,13 +515,13 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         Academy academy = dataCreator.registerAcademy(true, AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/academy")
+                delete("/api/academies")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -542,11 +547,11 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         refreshAnd(() -> academyCommandService.withdraw(director.getId()));
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academy/revoke")
+                patch("/api/academies/revoke")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -569,7 +574,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
 
@@ -577,7 +582,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academy/end-trial")
+                patch("/api/academies/end-trial")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(loginForm))

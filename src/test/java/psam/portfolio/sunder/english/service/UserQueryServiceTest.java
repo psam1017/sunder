@@ -175,8 +175,9 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         LoginResult result = refreshAnd(() -> sut.login(loginForm));
 
         // then
-        String subject = jwtUtils.extractSubject(result.getToken());
-        assertThat(result.getType()).isEqualTo("Bearer ");
+        String subject = jwtUtils.extractSubject(result.getAccessToken().replaceAll("Bearer ", ""));
+        assertThat(result.getAccessToken()).startsWith("Bearer ");
+        assertThat(result.getRefreshToken()).startsWith("Bearer ");
         assertThat(subject).isEqualTo(director.getId().toString());
         assertThat(result.isPasswordChangeRequired()).isFalse();
     }
@@ -259,9 +260,12 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getId()));
 
         // then
-        String subject = jwtUtils.extractSubject(response.getToken());
-        assertThat(subject).isEqualTo(director.getId().toString());
-        assertThat(response.getType()).isEqualTo("Bearer ");
+        String accessTokenSubject = jwtUtils.extractSubject(response.getAccessToken().replaceAll("Bearer ", ""));
+        String refreshTokenSubject = jwtUtils.extractSubject(response.getRefreshToken().replaceAll("Bearer ", ""));
+        assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
+        assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
+        assertThat(response.getAccessToken()).startsWith("Bearer ");
+        assertThat(response.getRefreshToken()).startsWith("Bearer ");
     }
 
     @DisplayName("사용자의 이메일과 이름으로 로그인 아이디를 이메일로 전송할 수 있다.")
@@ -283,23 +287,6 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
         // then
         assertThat(result).isTrue();
-    }
-
-    @DisplayName("비밀번호를 변경하기 위해 기존 비밀번호를 입력하고 비밀번호 변경을 인가하는 토큰을 받을 수 있다.")
-    @Test
-    void requestPasswordChange() {
-        // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
-        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
-
-        // when
-        TokenRefreshResponse response = refreshAnd(() -> sut.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword()));
-
-        // then
-        Boolean changeable = jwtUtils.extractClaim(response.getToken(), claims -> claims.get(JwtClaim.PASSWORD_CHANGE.toString(), Boolean.class));
-        assertThat(changeable).isTrue();
-        assertThat(response.getType()).isEqualTo("Bearer ");
     }
 
     @DisplayName("선생이 자기 자신의 정보를 조회할 수 있다.")

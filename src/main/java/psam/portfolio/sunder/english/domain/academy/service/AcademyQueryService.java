@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.exception.OneParamToCheckAcademyDuplException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicSearchCond;
@@ -78,23 +79,20 @@ public class AcademyQueryService {
     /**
      * 학원 상세 정보 조회 서비스. 학원에 소속된 사용자가 자기 학원의 정보만 조회할 수 있다.
      *
-     * @param userId 조회할 사용자 아이디
-     * @param select 같이 조회할 정보 = {teacher}
+     * @param academyId 조회할 학원 아이디
+     * @param userId    조회할 사용자 아이디
+     * @param select    같이 조회할 정보 = {teacher}
      * @return 학원 상세 정보 + (선생님 목록)
      * @apiNote 학생이 요청할 때와 선생이 요청할 때 응답스펙이 다르다.
      */
-    public Map<String, Object> getDetail(UUID userId, String select) {
+    public Map<String, Object> getDetail(UUID academyId, UUID userId, String select) {
+        
+        Academy getAcademy = academyQueryRepository.getById(academyId);
 
-        // 사용자가 자기 학원을 조회
+        // 사용자의 소속 확인
         User getUser = userQueryRepository.getById(userId);
-
-        Academy getAcademy;
-        if (getUser instanceof Teacher t) {
-            getAcademy = t.getAcademy();
-        } else if (getUser instanceof Student s) {
-            getAcademy = s.getAcademy();
-        } else {
-            throw new NotAUserException();
+        if (!getAcademy.hasUser(getUser)) {
+            throw new AcademyAccessDeniedException();
         }
 
         // 응답값 구성

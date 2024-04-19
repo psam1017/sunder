@@ -30,7 +30,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
         log.warn("[AccessDeniedException handle] request uri = {}", request.getRequestURI());
 
         String message = "Your authority is insufficient.";
-        sendError(response, ApiResponse.<Object>error(ApiStatus.FORBIDDEN, User.class, "AUTHORITY", message));
+        sendError(response, ApiResponse.error(ApiStatus.FORBIDDEN, User.class, "AUTHORITY", message));
     }
 
     private void sendError(HttpServletResponse response, ApiResponse<?> responseBody) throws IOException {

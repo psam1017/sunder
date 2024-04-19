@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/teacher")
+@RequestMapping("/api/teachers")
 @RestController
 public class TeacherController {
 
@@ -48,7 +48,7 @@ public class TeacherController {
      * @return 선생님 목록
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    @GetMapping("/list")
+    @GetMapping("")
     public ApiResponse<Map<String, List<?>>> getTeacherList(@UserId UUID userId,
                                                             @ModelAttribute TeacherSearchCond cond) {
         List<?> teachers = teacherQueryService.getList(userId, cond);

@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/book")
+@RequestMapping("/api/books")
 @RestController
 public class BookController {
 
@@ -105,7 +105,7 @@ public class BookController {
      * @param cond   교재 목록 조회 조건
      * @return 교재 목록과 페이지 정보
      */
-    @GetMapping("/list")
+    @GetMapping("")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     public ApiResponse<Map<String, Object>> getBookList(@UserId UUID userId,
                                                         @ModelAttribute BookSearchCond cond
