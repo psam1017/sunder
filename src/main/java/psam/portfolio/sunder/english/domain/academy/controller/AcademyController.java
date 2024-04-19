@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/academy")
+@RequestMapping("/api/academies")
 @RestController
 public class AcademyController {
 
@@ -70,7 +70,7 @@ public class AcademyController {
      * @param cond 학원 검색 조건
      * @return 학원 목록
      */
-    @GetMapping("/list")
+    @GetMapping("")
     public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute @Valid AcademyPublicSearchCond cond) {
         Map<String, Object> response = academyQueryService.getPublicList(cond);
         return ApiResponse.ok(response);
@@ -84,11 +84,12 @@ public class AcademyController {
      * @return 학원 상세 정보 + (선생님 목록)
      * @apiNote 학생이 요청할 때와 선생이 요청할 때 응답스펙이 다르다.
      */
-    @GetMapping("")
+    @GetMapping("/{academyId}")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     public ApiResponse<Map<String, Object>> getDetail(@UserId UUID userId,
+                                                      @PathVariable UUID academyId,
                                                       @RequestParam(required = false) String select) {
-        Map<String, Object> responseData = academyQueryService.getDetail(userId, select);
+        Map<String, Object> responseData = academyQueryService.getDetail(academyId, userId, select);
         return ApiResponse.ok(responseData);
     }
 

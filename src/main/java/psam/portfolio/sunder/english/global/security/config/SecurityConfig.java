@@ -32,7 +32,8 @@ import psam.portfolio.sunder.english.global.security.filter.JwtAuthenticationFil
 import psam.portfolio.sunder.english.global.security.handler.AccessDeniedHandlerImpl;
 import psam.portfolio.sunder.english.global.security.handler.AuthenticationEntryPointImpl;
 import psam.portfolio.sunder.english.global.security.handler.AuthenticationFailureHandlerImpl;
-import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceImpl;
+import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceJwt;
+import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceRepo;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
 @RequiredArgsConstructor
@@ -91,8 +92,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsService userDetailsService, JwtUtils jwtUtils) {
-        return new JwtAuthenticationFilter(userDetailsService, jwtUtils);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsServiceJwt userDetailsServiceJwt, JwtUtils jwtUtils) {
+        return new JwtAuthenticationFilter(userDetailsServiceJwt, jwtUtils);
     }
 
     @Bean
@@ -104,7 +105,12 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(UserQueryRepository userQueryRepository) {
-        return new UserDetailsServiceImpl(userQueryRepository);
+        return new UserDetailsServiceRepo(userQueryRepository);
+    }
+
+    @Bean
+    public UserDetailsServiceJwt userDetailsServiceJwt(JwtUtils jwtUtils, ObjectMapper objectMapper) {
+        return new UserDetailsServiceJwt(jwtUtils, objectMapper);
     }
 
     @Bean

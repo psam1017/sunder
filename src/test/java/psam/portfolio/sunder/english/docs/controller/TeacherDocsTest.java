@@ -22,8 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
@@ -49,11 +48,11 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                 .postalCode(infoContainer.getAnyAddress().getPostalCode())
                 .build();
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/teacher")
+                post("/api/teachers")
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(post))
@@ -95,13 +94,13 @@ public class TeacherDocsTest extends RestDocsEnvironment {
         Teacher teacher3 = dataCreator.registerTeacher("Adam", UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(teacher3, ROLE_TEACHER);
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/teacher/list")
+                get("/api/teachers")
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .param("prop", "name")
@@ -170,13 +169,13 @@ public class TeacherDocsTest extends RestDocsEnvironment {
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
-        String token = createToken(student);
+        String token = createBearerToken(student);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                get("/api/teacher/list")
+                get("/api/teachers")
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .param("prop", "name")
@@ -227,13 +226,13 @@ public class TeacherDocsTest extends RestDocsEnvironment {
         Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(teacher, ROLE_TEACHER);
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/teacher/{teacherId}", teacher.getId())
+                RestDocumentationRequestBuilders.get("/api/teachers/{teacherId}", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
         );
@@ -282,13 +281,13 @@ public class TeacherDocsTest extends RestDocsEnvironment {
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
-        String token = createToken(student);
+        String token = createBearerToken(student);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/teacher/{teacherId}", teacher.getId())
+                RestDocumentationRequestBuilders.get("/api/teachers/{teacherId}", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
         );
@@ -323,7 +322,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
         Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(teacher, ROLE_TEACHER);
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.WITHDRAWN);
 
@@ -331,7 +330,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/teacher/{teacherId}/status", teacher.getId())
+                RestDocumentationRequestBuilders.patch("/api/teachers/{teacherId}/status", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(patch))
@@ -366,7 +365,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
         Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(teacher, ROLE_TEACHER);
 
-        String token = createToken(director);
+        String token = createBearerToken(director);
 
         TeacherPOSTRoles put = new TeacherPOSTRoles(Set.of(ROLE_TEACHER, ROLE_DIRECTOR));
 
@@ -374,7 +373,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/api/teacher/{teacherId}/roles", teacher.getId())
+                RestDocumentationRequestBuilders.post("/api/teachers/{teacherId}/roles", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(put))
@@ -415,13 +414,13 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                 .postalCode(infoContainer.getAnyAddress().getPostalCode())
                 .build();
 
-        String token = createToken(teacher);
+        String token = createBearerToken(teacher);
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/teacher/personal-info")
+                RestDocumentationRequestBuilders.patch("/api/teachers/personal-info")
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(patch))

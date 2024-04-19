@@ -5,13 +5,13 @@ import lombok.Getter;
 @Getter
 public class LoginResult {
 
-    private String type;
-    private String token;
-    private boolean passwordChangeRequired;
+    private final String refreshToken;
+    private final String accessToken;
+    private final boolean passwordChangeRequired;
 
-    public LoginResult(String token, boolean passwordChangeRequired) {
-        this.type = "Bearer ";
-        this.token = token;
+    public LoginResult(String accessToken, String refreshToken, boolean passwordChangeRequired) {
+        this.accessToken = "Bearer " + accessToken;
+        this.refreshToken = "Bearer " + refreshToken;
         this.passwordChangeRequired = passwordChangeRequired;
     }
 }

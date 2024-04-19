@@ -1,5 +1,7 @@
 package psam.portfolio.sunder.english.domain.user.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -18,6 +20,7 @@ import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
+import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
@@ -27,14 +30,11 @@ import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
-import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.PASSWORD_CHANGE;
+import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,14 +42,15 @@ import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.PASSWORD
 public class UserQueryService {
 
     private final UserQueryRepository userQueryRepository;
+
     private final JwtUtils jwtUtils;
     private final PasswordUtils passwordUtils;
     private final MailUtils mailUtils;
     private final MessageSource messageSource;
     private final TemplateEngine templateEngine;
+    private final ObjectMapper objectMapper;
 
     /**
-     * GET /api/user/check-dupl?loginId={loginId}&email={email}&phone={phone}
      * 아이디, 이메일, 연락처 중복 체크 서비스
      * - 단, PENDING 과 TRIAL 은 중복체크에서 제외
      * - 아직 email 인증을 하지 않은 경우도 중복체크에서 제외
@@ -100,19 +101,18 @@ public class UserQueryService {
     }
 
     /**
-     * POST /api/user/login
      * 로그인 서비스
      *
-     * @param loginLoginInfo 로그인 정보
+     * @param form 로그인 정보
      * @return 인증한 사용자에게 발급하는 토큰과 함께 비밀번호 변경 알림 여부를 반환
      */
-    public LoginResult login(UserLoginForm loginLoginInfo) {
+    public LoginResult login(UserLoginForm form) {
 
         User getUser = userQueryRepository.findOne(
-                user.loginId.eq(loginLoginInfo.getLoginId())
+                user.loginId.eq(form.getLoginId())
         ).orElseThrow(LoginFailException::new);
 
-        if (!passwordUtils.matches(loginLoginInfo.getLoginPw(), getUser.getLoginPw())) {
+        if (!passwordUtils.matches(form.getLoginPw(), getUser.getLoginPw())) {
             throw new LoginFailException();
         }
 
@@ -121,26 +121,40 @@ public class UserQueryService {
             throw new IllegalStatusUserException(status);
         }
 
-        // 토큰 만료 시간은 3시간
-        String token = jwtUtils.generateToken(getUser.getId().toString(), 1000 * 60 * 60 * 3);
-        return new LoginResult(token, getUser.isPasswordExpired());
+        Map<String, Object> claims = Map.of(
+                PASSWORD.toString(), getUser.getLoginPw(),
+                USER_STATUS.toString(), getUser.getStatus().toString(),
+                LAST_PASSWORD_CHANGE_DATE_TIME.toString(), getUser.getLastPasswordChangeDateTime().toString(),
+                ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList())
+        );
+        return new LoginResult(
+                jwtUtils.generateToken(getUser.getId().toString(), 3600000, claims), // accessToken 만료 시간은 1시간
+                jwtUtils.generateToken(getUser.getId().toString(), 43200000), // refreshToken 만료 시간은 12시간
+                getUser.isPasswordExpired()
+        );
     }
 
     /**
-     * POST /api/user/new-token
      * 토큰 재발급 서비스
      *
      * @param userId 사용자 아이디
      * @return 새로 발급한 토큰
      */
     public TokenRefreshResponse refreshToken(UUID userId) {
-        // 토큰 만료 시간은 3시간
-        String token = jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3);
-        return new TokenRefreshResponse(token);
+        User getUser = userQueryRepository.getById(userId);
+        Map<String, Object> claims = Map.of(
+                PASSWORD.toString(), getUser.getLoginPw(),
+                USER_STATUS.toString(), getUser.getStatus().toString(),
+                LAST_PASSWORD_CHANGE_DATE_TIME.toString(), getUser.getLastPasswordChangeDateTime().toString(),
+                ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList())
+        );
+        return new TokenRefreshResponse(
+                jwtUtils.generateToken(getUser.getId().toString(), 3600000, claims), // accessToken 만료 시간은 1시간
+                jwtUtils.generateToken(getUser.getId().toString(), 43200000) // refreshToken 만료 시간은 12시간
+        );
     }
 
     /**
-     * POST /api/user/find-login-id
      * 로그인 아이디를 분실한 경우 가입 여부를 확인하는 서비스
      *
      * @param userInfo 로그인 아이디를 분실한 가입자 정보
@@ -170,25 +184,6 @@ public class UserQueryService {
     }
 
     /**
-     * POST /api/user/request-password-change
-     *
-     * @param userId 비밀번호 변경 요청을 하려는 사용자 아이디
-     * @param loginPw 기존 비밀번호
-     * @return 패스워드 변경이 가능한 토큰
-     */
-    public TokenRefreshResponse authenticateToChangePassword(UUID userId, String loginPw) {
-        User getUser = userQueryRepository.getById(userId);
-        if (!passwordUtils.matches(loginPw, getUser.getLoginPw())) {
-            throw new LoginFailException();
-        }
-
-        Map<String, Object> claims = Map.of(PASSWORD_CHANGE.toString(), true);
-        String token = jwtUtils.generateToken(userId.toString(), 1000 * 60 * 60 * 3, claims);
-        return new TokenRefreshResponse(token);
-    }
-
-    /**
-     * GET /api/user/my-info
      *
      * @param userId 사용자 아이디
      * @return 자기 자신의 상세 정보
@@ -203,5 +198,21 @@ public class UserQueryService {
         }
         // TODO: 2024-04-06 admin 조회도 생성
         throw new NotAUserException();
+    }
+
+    /**
+     * 객체를 JSON 문자열로 변환.
+     * JWT claims 는 기본적으로 간단한 타입만을 변환할 수 있고,
+     * 그것이 이미 json 일 것을 가정하고 있기에 claims 를 생성할 때 복잡합 타입의 객체는 json 으로 변환하여 넣어준다.
+     *
+     * @param obj 변환할 객체
+     * @return JSON 문자열
+     */
+    private String createJson(Object obj) {
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

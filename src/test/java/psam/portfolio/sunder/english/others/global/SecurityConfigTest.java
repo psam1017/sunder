@@ -15,7 +15,7 @@ public class SecurityConfigTest extends AbstractSunderApplicationTest {
     @Test
     void corsCrossOriginNotAllowed() throws Exception {
         // given
-        String url = "/api/user/check-dupl?loginId=uid";
+        String url = "/api/users/check-dupl?loginId=uid";
 
         // when
         ResultActions resultActions = mockMvc.perform(
@@ -34,7 +34,7 @@ public class SecurityConfigTest extends AbstractSunderApplicationTest {
     @Test
     void corsCrossOriginFrontEndAllowed() throws Exception {
         // given
-        String url = "/api/user/check-dupl?loginId=uid";
+        String url = "/api/users/check-dupl?loginId=uid";
 
         // when
         ResultActions resultActions = mockMvc.perform(

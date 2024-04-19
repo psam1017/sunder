@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
@@ -83,8 +84,14 @@ public class Academy extends TimeEntity {
         return this.status == AcademyStatus.WITHDRAWN;
     }
 
-    public boolean hasTeacher(User user) {
-        return this.teachers.stream().anyMatch(teacher -> Objects.equals(teacher.getId(), user.getId()));
+    public boolean hasUser(User proxy) {
+        User user = Hibernate.unproxy(proxy, User.class);
+        if (user instanceof Teacher t) {
+            return Objects.equals(t.getAcademy().getId(), this.id);
+        } else if (user instanceof Student s) {
+            return Objects.equals(s.getAcademy().getId(), this.id);
+        }
+        return false;
     }
 
     public void setName(String name) {

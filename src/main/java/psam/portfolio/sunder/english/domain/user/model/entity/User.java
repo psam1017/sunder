@@ -54,6 +54,8 @@ public abstract class User extends BaseEntity {
 
     private LocalDateTime lastPasswordChangeDateTime;
 
+    private LocalDateTime passwordChangeAllowedDateTime;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles = new HashSet<>();
 
@@ -66,7 +68,9 @@ public abstract class User extends BaseEntity {
         this.phone = phone;
         this.address = address;
         this.status = status;
-        this.lastPasswordChangeDateTime = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.lastPasswordChangeDateTime = now;
+        this.passwordChangeAllowedDateTime = now;
     }
 
     public void verifyEmail(boolean verified) {
@@ -131,5 +135,13 @@ public abstract class User extends BaseEntity {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public void setPasswordChangeAllowedDateTime(LocalDateTime passwordChangeAllowedDateTime) {
+        this.passwordChangeAllowedDateTime = passwordChangeAllowedDateTime;
+    }
+
+    public boolean isPasswordChangeAllowed() {
+        return this.passwordChangeAllowedDateTime.isAfter(LocalDateTime.now());
     }
 }

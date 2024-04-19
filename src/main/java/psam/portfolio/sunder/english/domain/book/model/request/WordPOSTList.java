@@ -31,9 +31,9 @@ public class WordPOSTList {
     public static class WordPOST {
 
         @NotBlank
-        private String korean;
-        @NotBlank
         private String english;
+        @NotBlank
+        private String korean;
 
         public Word toEntity(Book book) {
             return Word.builder()

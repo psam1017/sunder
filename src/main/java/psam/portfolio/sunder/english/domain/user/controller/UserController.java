@@ -13,14 +13,16 @@ import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResp
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 import psam.portfolio.sunder.english.global.resolver.argument.Token;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @RestController
 public class UserController {
 
@@ -121,31 +123,28 @@ public class UserController {
      *
      * @param userId   비밀번호 변경 요청을 하려는 사용자 아이디
      * @param password 기존 패스워드
-     * @return 패스워드 변경이 가능한 토큰
-     * @apiNote 응답하는 token 의 calim 에는 PASSWORD_CHANGE 가 포함되어야 한다.
+     * @return 비밀번호 변경이 유효한 시간
      */
     @PostMapping("/password/change-auth")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<TokenRefreshResponse> authenticateToChangePassword(@UserId UUID userId,
-                                                                          @RequestBody @Valid UserPATCHPassword password) {
-        TokenRefreshResponse response = userQueryService.authenticateToChangePassword(userId, password.getLoginPw());
-        return ApiResponse.ok(response);
+    public ApiResponse<Map<String, Object>> authenticateToChangePassword(@UserId UUID userId,
+                                                                         @RequestBody @Valid UserPATCHPassword password) {
+        int passwordChangeAllowedAmount = userCommandService.authenticateToChangePassword(userId, password.getLoginPw());
+        return ApiResponse.ok(Map.of("passwordChangeAllowedAmount", passwordChangeAllowedAmount));
     }
 
     /**
      * 재인증에 성공하고 비밀번호를 변경하는 서비스
      *
-     * @param token 비밀번호을 변경하는 사용자의 토큰
+     * @param userId   변경한 비밀번호로 수정하려는 사용자 아이디
      * @param password 변경할 패스워드
      * @return 변경 성공 여부
-     *
-     * @apiNote 전달된 token 의 calim 에는 PASSWORD_CHANGE 가 포함되어야 한다.
      */
     @PatchMapping("/password/change-new")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Map<String, Boolean>> changePassword(@Token String token,
+    public ApiResponse<Map<String, Boolean>> changePassword(@UserId UUID userId,
                                                             @RequestBody @Valid UserPATCHPassword password) {
-        boolean result = userCommandService.changePassword(token, password.getLoginPw());
+        boolean result = userCommandService.changePassword(userId, password.getLoginPw());
         return ApiResponse.ok(Map.of("newPassword", result));
     }
 }

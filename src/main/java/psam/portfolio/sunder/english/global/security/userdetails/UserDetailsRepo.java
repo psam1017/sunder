@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsRepo implements UserDetails {
 
     private final User user;
 

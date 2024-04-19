@@ -10,16 +10,14 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginPwForm;
-import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
-import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.anyString;
+import static org.mockito.BDDMockito.given;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
@@ -27,9 +25,6 @@ class UserCommandServiceTest extends AbstractSunderApplicationTest {
 
     @Autowired
     UserCommandService sut; // system under test
-
-    @Autowired
-    UserQueryService userQueryService;
 
     @Autowired
     TeacherQueryRepository teacherQueryRepository;
@@ -76,6 +71,22 @@ class UserCommandServiceTest extends AbstractSunderApplicationTest {
         assertThat(result).isTrue();
     }
 
+    @DisplayName("비밀번호를 변경하기 위해 기존 비밀번호를 입력하고 비밀번호 변경을 인가하는 토큰을 받을 수 있다.")
+    @Test
+    void requestPasswordChange() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        // when
+        Integer passwordChangeAllowedAmount = refreshAnd(() -> sut.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword()));
+
+        // then
+        // 비밀번호 변경이 유효한 시간은 3분이다.
+        assertThat(passwordChangeAllowedAmount).isEqualTo(3);
+    }
+
     @DisplayName("비밀번호 변경을 인가하는 토큰으로 비밀번호를 변경할 수 있다.")
     @Test
     void changePassword() {
@@ -84,11 +95,11 @@ class UserCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
-        TokenRefreshResponse refresh = userQueryService.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword());
+        sut.authenticateToChangePassword(director.getId(), infoContainer.getAnyRawPassword());
         String newPassword = "asd456$%^";
 
         // when
-        boolean result = refreshAnd(() -> sut.changePassword(refresh.getToken(), newPassword));
+        boolean result = refreshAnd(() -> sut.changePassword(director.getId(), newPassword));
 
         // then
         Teacher getDirector = teacherQueryRepository.getById(director.getId());
