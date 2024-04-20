@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.global.security.config;
+package psam.portfolio.sunder.english.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

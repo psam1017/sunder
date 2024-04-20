@@ -157,9 +157,6 @@ public class StudentQueryRepository {
         return null;
     }
 
-    /**
-     * attendanceId는 생성 시점에 공백이 허용되지 않음
-     */
     private static BooleanExpression attendanceIdContains(String attendanceId) {
         if (StringUtils.hasText(attendanceId)) {
             return student.attendanceId.toLowerCase().contains(attendanceId.toLowerCase());

@@ -1,5 +1,8 @@
 package psam.portfolio.sunder.english.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +14,11 @@ import psam.portfolio.sunder.english.domain.student.model.response.StudentFullRe
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
+import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
@@ -24,11 +29,14 @@ import psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.*;
 import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.ROLE_NAMES;
 
 @SuppressWarnings("ConstantValue")
 class UserQueryServiceTest extends AbstractSunderApplicationTest {
@@ -163,23 +171,33 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
     @DisplayName("사용자가 로그인하고 토큰을 발급받을 수 있다.")
     @Test
-    void loginAndGetToken() {
+    void loginAndGetToken() throws JsonProcessingException {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
+        String remoteIp = "127.0.0.1";
 
         // when
-        LoginResult result = refreshAnd(() -> sut.login(loginForm));
+        LoginResult result = refreshAnd(() -> sut.login(loginForm, remoteIp));
 
         // then
-        String subject = jwtUtils.extractSubject(result.getAccessToken().replaceAll("Bearer ", ""));
         assertThat(result.getAccessToken()).startsWith("Bearer ");
         assertThat(result.getRefreshToken()).startsWith("Bearer ");
-        assertThat(subject).isEqualTo(director.getId().toString());
-        assertThat(result.isPasswordChangeRequired()).isFalse();
+        String accessToken = result.getAccessToken().replaceAll("Bearer ", "");
+        String accessTokenSubject = jwtUtils.extractSubject(accessToken);
+        String refreshTokenSubject = jwtUtils.extractSubject(result.getRefreshToken().replaceAll("Bearer ", ""));
+        assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
+        assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
+        Claims claims = jwtUtils.extractAllClaims(accessToken);
+        assertThat(claims.get(JwtClaim.PASSWORD.toString(), String.class)).isEqualTo(director.getLoginPw());
+        assertThat(claims.get(JwtClaim.USER_STATUS.toString(), String.class)).isEqualTo(UserStatus.ACTIVE.toString());
+        assertThat(claims.get(JwtClaim.REMOTE_IP.toString(), String.class)).isEqualTo(remoteIp);
+
+        List<RoleName> roleNames = objectMapper.readValue(claims.get(ROLE_NAMES.toString(), String.class), new TypeReference<>() {});
+        assertThat(roleNames).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
     }
 
     @DisplayName("사용자 로그인 아이디가 틀리면 로그인할 수 없다.")
@@ -191,10 +209,11 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId().substring(3), infoContainer.getAnyRawPassword());
+        String remoteIp = "127.0.0.1";
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm, remoteIp)))
                 .isInstanceOf(LoginFailException.class);
     }
 
@@ -207,10 +226,11 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword().substring(3));
+        String remoteIp = "127.0.0.1";
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm, remoteIp)))
                 .isInstanceOf(LoginFailException.class);
     }
 
@@ -223,10 +243,11 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
+        String remoteIp = "127.0.0.1";
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.login(loginForm, remoteIp)))
                 .isInstanceOf(ApiException.class);
     }
 
@@ -240,9 +261,10 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         director.setLastPasswordChangeDateTime(LocalDateTime.now().minusMonths(4));
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
+        String remoteIp = "127.0.0.1";
 
         // when
-        LoginResult result = refreshAnd(() -> sut.login(loginForm));
+        LoginResult result = refreshAnd(() -> sut.login(loginForm, remoteIp));
 
         // then
         assertThat(result.isPasswordChangeRequired()).isTrue();
@@ -250,22 +272,32 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
     @DisplayName("사용자에게 새로운 토큰을 발급할 수 있다.")
     @Test
-    void refreshToken() {
+    void refreshToken() throws JsonProcessingException {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+        String remoteIp = "127.0.0.1";
 
         // when
-        TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getId()));
+        TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getId(), remoteIp));
 
         // then
-        String accessTokenSubject = jwtUtils.extractSubject(response.getAccessToken().replaceAll("Bearer ", ""));
+        assertThat(response.getAccessToken()).startsWith("Bearer ");
+        assertThat(response.getRefreshToken()).startsWith("Bearer ");
+        String accessToken = response.getAccessToken().replaceAll("Bearer ", "");
+        String accessTokenSubject = jwtUtils.extractSubject(accessToken);
         String refreshTokenSubject = jwtUtils.extractSubject(response.getRefreshToken().replaceAll("Bearer ", ""));
         assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
         assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
-        assertThat(response.getAccessToken()).startsWith("Bearer ");
-        assertThat(response.getRefreshToken()).startsWith("Bearer ");
+
+        Claims claims = jwtUtils.extractAllClaims(accessToken);
+        assertThat(claims.get(JwtClaim.PASSWORD.toString(), String.class)).isEqualTo(director.getLoginPw());
+        assertThat(claims.get(JwtClaim.USER_STATUS.toString(), String.class)).isEqualTo(UserStatus.ACTIVE.toString());
+        assertThat(claims.get(JwtClaim.REMOTE_IP.toString(), String.class)).isEqualTo(remoteIp);
+
+        List<RoleName> roleNames = objectMapper.readValue(claims.get(ROLE_NAMES.toString(), String.class), new TypeReference<>() {});
+        assertThat(roleNames).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
     }
 
     @DisplayName("사용자의 이메일과 이름으로 로그인 아이디를 이메일로 전송할 수 있다.")

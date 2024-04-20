@@ -34,7 +34,6 @@ public class UserDetailsServiceJwt {
                     jwtUtils.extractSubject(token),
                     claims.get(PASSWORD.toString(), String.class),
                     claims.get(USER_STATUS.toString(), String.class),
-                    claims.get(LAST_PASSWORD_CHANGE_DATE_TIME.toString(), String.class),
                     objectMapper.readValue(claims.get(ROLE_NAMES.toString(), String.class), new TypeReference<>() {})
             );
         } catch (JwtException | JacksonException e) {

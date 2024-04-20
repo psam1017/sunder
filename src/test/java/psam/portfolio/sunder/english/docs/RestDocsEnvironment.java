@@ -51,7 +51,6 @@ public class RestDocsEnvironment extends AbstractSunderApplicationTest {
         Map<String, Object> claims = Map.of(
                 PASSWORD.toString(), user.getLoginPw(),
                 USER_STATUS.toString(), user.getStatus().toString(),
-                LAST_PASSWORD_CHANGE_DATE_TIME.toString(), user.getLastPasswordChangeDateTime().toString(),
                 ROLE_NAMES.toString(), createJson(user.getRoles().stream().map(UserRole::getRoleName).toList())
         );
         return "Bearer " + jwtUtils.generateToken(user.getId().toString(), 1000 * 60, claims);

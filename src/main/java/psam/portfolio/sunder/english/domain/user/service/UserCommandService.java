@@ -36,6 +36,7 @@ public class UserCommandService {
     private static final int PASSWORD_CHANGE_ALLOWED_AMOUNT = 3;
 
     /**
+     * 비밀번호 변경 지연 서비스
      *
      * @param userId 비밀번호 변경 지연을 요청한 사용자 아이디
      * @return 지연 성공 여부
@@ -47,6 +48,7 @@ public class UserCommandService {
     }
 
     /**
+     * 비밀번호 새로 발급하는 서비스
      *
      * @param userInfo 비밀번호를 분실한 가입자 정보
      * @return 이메일 발송 여부

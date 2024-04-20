@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import psam.portfolio.sunder.english.infrastructure.excel.ExcelUtils;
+import psam.portfolio.sunder.english.infrastructure.ip.ClientIpHolder;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
@@ -33,5 +34,10 @@ public class InfrastructureConfig {
     @Bean
     public ExcelUtils excelUtils() {
         return new ExcelUtils();
+    }
+
+    @Bean
+    public ClientIpHolder remoteIpHolder() {
+        return new ClientIpHolder();
     }
 }

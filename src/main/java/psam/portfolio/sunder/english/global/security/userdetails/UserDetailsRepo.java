@@ -46,7 +46,7 @@ public class UserDetailsRepo implements UserDetails {
     // 인증 정보(credentials) 만료 여부
     @Override
     public boolean isCredentialsNonExpired() {
-        return user.isPasswordExpired();
+        return true;
     }
 
     // 계정 잠김 여부

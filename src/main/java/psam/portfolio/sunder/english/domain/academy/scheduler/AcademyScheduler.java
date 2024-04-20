@@ -20,7 +20,7 @@ public class AcademyScheduler {
 
     private final AcademyCommandRepository academyCommandRepository;
 
-    // TODO CASCADE 를 하지 않으므로 엔티티가 모두 만들어지면, 학원 소속 엔티티들 모두 삭제
+    // TODO 학원 소속의 모든 엔티티들 모두 삭제
     /**
      * 매일 0시 1분에 탈퇴 요청 후 7일 이상 지난 학원은 삭제
      */

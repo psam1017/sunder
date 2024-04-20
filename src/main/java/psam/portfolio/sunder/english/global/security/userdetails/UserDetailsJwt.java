@@ -16,14 +16,12 @@ public class UserDetailsJwt implements UserDetails {
     private final String username;
     private final String password;
     private final UserStatus status;
-    private final LocalDateTime lastPasswordChangeDateTime;
     private final List<RoleName> roles;
 
-    public UserDetailsJwt(String username, String password, String status, String lastPasswordChangeDateTime, List<RoleName> roles) {
+    public UserDetailsJwt(String username, String password, String status, List<RoleName> roles) {
         this.username = username;
         this.password = password;
         this.status = UserStatus.ofNullable(status);
-        this.lastPasswordChangeDateTime = LocalDateTime.parse(lastPasswordChangeDateTime);
         this.roles = roles;
     }
 
@@ -59,7 +57,7 @@ public class UserDetailsJwt implements UserDetails {
     // 인증 정보(credentials) 만료 여부
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.lastPasswordChangeDateTime.plusMonths(3).isAfter(LocalDateTime.now());
+        return true;
     }
 
     // 계정 잠김 여부
