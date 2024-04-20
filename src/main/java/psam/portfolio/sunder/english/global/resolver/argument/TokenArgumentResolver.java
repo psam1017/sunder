@@ -39,8 +39,8 @@ public class TokenArgumentResolver implements HandlerMethodArgumentResolver {
         String authorization = request.getHeader(AUTHORIZATION);
 
         String token = authorization.replaceAll("^Bearer( )*", "");
-        jwtUtils.hasInvalidStatus(token).ifPresent(js -> {
-            log.error("error occured at TokenArgumentResolver. authorization = {}, status = {}", authorization, js.name());
+        jwtUtils.hasInvalidStatus(token).ifPresent(status -> {
+            log.error("error occured at TokenArgumentResolver. authorization = {}, status = {}", authorization, status.name());
             throw new IllegalTokenException();
         });
         return token;

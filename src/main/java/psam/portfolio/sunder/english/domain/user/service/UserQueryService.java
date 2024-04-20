@@ -104,9 +104,10 @@ public class UserQueryService {
      * 로그인 서비스
      *
      * @param form 로그인 정보
+     * @param remoteIp 사용자 IP
      * @return 인증한 사용자에게 발급하는 토큰과 함께 비밀번호 변경 알림 여부를 반환
      */
-    public LoginResult login(UserLoginForm form) {
+    public LoginResult login(UserLoginForm form, String remoteIp) {
 
         User getUser = userQueryRepository.findOne(
                 user.loginId.eq(form.getLoginId())
@@ -124,11 +125,11 @@ public class UserQueryService {
         Map<String, Object> claims = Map.of(
                 PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
-                LAST_PASSWORD_CHANGE_DATE_TIME.toString(), getUser.getLastPasswordChangeDateTime().toString(),
+                REMOTE_IP.toString(), remoteIp,
                 ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList())
         );
         return new LoginResult(
-                jwtUtils.generateToken(getUser.getId().toString(), 3600000, claims), // accessToken 만료 시간은 1시간
+                jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims), // accessToken 만료 시간은 3시간
                 jwtUtils.generateToken(getUser.getId().toString(), 43200000), // refreshToken 만료 시간은 12시간
                 getUser.isPasswordExpired()
         );
@@ -138,18 +139,19 @@ public class UserQueryService {
      * 토큰 재발급 서비스
      *
      * @param userId 사용자 아이디
+     * @param remoteIp 사용자 IP
      * @return 새로 발급한 토큰
      */
-    public TokenRefreshResponse refreshToken(UUID userId) {
+    public TokenRefreshResponse refreshToken(UUID userId, String remoteIp) {
         User getUser = userQueryRepository.getById(userId);
         Map<String, Object> claims = Map.of(
                 PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
-                LAST_PASSWORD_CHANGE_DATE_TIME.toString(), getUser.getLastPasswordChangeDateTime().toString(),
+                REMOTE_IP.toString(), remoteIp,
                 ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList())
         );
         return new TokenRefreshResponse(
-                jwtUtils.generateToken(getUser.getId().toString(), 3600000, claims), // accessToken 만료 시간은 1시간
+                jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims), // accessToken 만료 시간은 3시간
                 jwtUtils.generateToken(getUser.getId().toString(), 43200000) // refreshToken 만료 시간은 12시간
         );
     }
@@ -184,6 +186,7 @@ public class UserQueryService {
     }
 
     /**
+     * 자기 정보 조회 서비스
      *
      * @param userId 사용자 아이디
      * @return 자기 자신의 상세 정보

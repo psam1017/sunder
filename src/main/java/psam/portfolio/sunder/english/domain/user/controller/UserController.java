@@ -14,6 +14,7 @@ import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
 import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
+import psam.portfolio.sunder.english.global.resolver.argument.RemoteIp;
 import psam.portfolio.sunder.english.global.resolver.argument.Token;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
@@ -48,12 +49,14 @@ public class UserController {
     /**
      * 로그인 서비스
      *
+     * @param remoteIp  로그인한 사용자의 IP 주소
      * @param loginInfo 로그인 정보
      * @return 인증한 사용자에게 발급하는 토큰
      */
     @PostMapping("/login")
-    public ApiResponse<LoginResult> login(@RequestBody @Valid UserLoginForm loginInfo) {
-        LoginResult result = userQueryService.login(loginInfo);
+    public ApiResponse<LoginResult> login(@RemoteIp String remoteIp,
+                                          @RequestBody @Valid UserLoginForm loginInfo) {
+        LoginResult result = userQueryService.login(loginInfo, remoteIp);
         return ApiResponse.ok(result);
     }
 
@@ -72,12 +75,15 @@ public class UserController {
     /**
      * 토큰 재발급 서비스
      *
+     * @param remoteIp 로그인한 사용자의 IP 주소
+     * @param userId   토큰을 재발급할 사용자 아이디
      * @return 새로 발급한 토큰
      */
     @PostMapping("/token/refresh")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<TokenRefreshResponse> refreshToken(@UserId UUID userId) {
-        TokenRefreshResponse response = userQueryService.refreshToken(userId);
+    public ApiResponse<TokenRefreshResponse> refreshToken(@RemoteIp String remoteIp,
+                                                          @UserId UUID userId) {
+        TokenRefreshResponse response = userQueryService.refreshToken(userId, remoteIp);
         return ApiResponse.ok(response);
     }
 

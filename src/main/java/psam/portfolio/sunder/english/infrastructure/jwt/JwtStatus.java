@@ -7,5 +7,6 @@ public enum JwtStatus {
     EXPIRED,
     MALFORMED,
     UNSUPPORTED,
-    FORBIDDEN
+    FORBIDDEN,
+    ILLEGAL_IP_ACCESS
 }
