@@ -230,7 +230,7 @@ public class AcademyCommandService {
     public UUID revokeWithdrawal(UUID directorId) {
         Teacher director = teacherQueryRepository.getById(directorId);
 
-        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄는 신중한 조치가 필요하므로 한 번 더 검증한다.
+        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄 취소는 신중한 조치가 필요하므로 한 번 더 검증한다.
         if (!director.isDirector()) {
             throw new RoleDirectorRequiredException();
         }
