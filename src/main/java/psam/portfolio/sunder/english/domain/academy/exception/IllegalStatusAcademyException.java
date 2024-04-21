@@ -1,6 +1,6 @@
 package psam.portfolio.sunder.english.domain.academy.exception;
 
-import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.global.api.v1.ApiException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;

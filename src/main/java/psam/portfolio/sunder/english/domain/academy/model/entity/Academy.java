@@ -5,11 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.SQLRestriction;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
@@ -51,6 +52,7 @@ public class Academy extends TimeEntity {
     private List<Student> students = new ArrayList<>();
 
     @OneToMany(mappedBy = "academy")
+    @SQLRestriction(value = "status != 'DELETED'")
     private List<Book> books = new ArrayList<>();
 
     @Builder

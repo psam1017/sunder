@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
+import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 
 import java.time.LocalDateTime;

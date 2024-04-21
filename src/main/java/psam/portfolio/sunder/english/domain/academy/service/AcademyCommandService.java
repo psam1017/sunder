@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
 import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -41,9 +41,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.academy;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
-import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.PENDING;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.PENDING;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor
@@ -230,7 +230,7 @@ public class AcademyCommandService {
     public UUID revokeWithdrawal(UUID directorId) {
         Teacher director = teacherQueryRepository.getById(directorId);
 
-        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄는 신중한 조치가 필요하므로 한 번 더 검증한다.
+        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄 취소는 신중한 조치가 필요하므로 한 번 더 검증한다.
         if (!director.isDirector()) {
             throw new RoleDirectorRequiredException();
         }

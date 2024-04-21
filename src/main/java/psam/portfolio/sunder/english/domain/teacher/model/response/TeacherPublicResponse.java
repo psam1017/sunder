@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 
 import java.time.LocalDateTime;

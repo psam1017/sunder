@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
-import psam.portfolio.sunder.english.domain.book.enumeration.WordStatus;
+import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
+import psam.portfolio.sunder.english.domain.book.model.enumeration.WordStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
@@ -45,13 +46,16 @@ public class BookCommandService {
      */
     public UUID replaceBook(UUID teacherId, UUID bookId, BookReplace replace) {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        Academy getAcademy = getTeacher.getAcademy();
 
         if (bookId == null) {
-            return bookCommandRepository.save(replace.toEntity(getTeacher.getAcademy())).getId();
+            Book saveBook = bookCommandRepository.save(replace.toEntity(getAcademy));
+            getAcademy.getBooks().add(saveBook);
+            return saveBook.getId();
         } else {
             Book getBook = bookQueryRepository.getOne(
                     QBook.book.id.eq(bookId),
-                    QBook.book.academy.eq(getTeacher.getAcademy()),
+                    QBook.book.academy.eq(getAcademy),
                     QBook.book.status.ne(BookStatus.DELETED)
             );
             getBook.setOpenToPublic(replace.getOpenToPublic());
@@ -81,6 +85,7 @@ public class BookCommandService {
         );
         wordCommandRepository.updateStatusByBookId(WordStatus.DELETED, getBook.getId());
 
+        // persistence context is cleared automatically after update bulk-query
         Book refreshBook = bookQueryRepository.getById(getBook.getId());
         List<Word> saveWords = wordCommandRepository.saveAll(postList.getWords().stream().map(w -> w.toEntity(refreshBook)).toList());
         refreshBook.getWords().addAll(saveWords);
