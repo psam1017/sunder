@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.domain.exam.entity;
+package psam.portfolio.sunder.english.domain.study.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -6,9 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.exam.enumeration.ExamType;
+import psam.portfolio.sunder.english.domain.study.model.enumeration.ExamType;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 
 import java.util.ArrayList;
 import java.util.List;

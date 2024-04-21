@@ -1,11 +1,10 @@
-package psam.portfolio.sunder.english.domain.practice.entity;
+package psam.portfolio.sunder.english.domain.study.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

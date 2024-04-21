@@ -14,7 +14,7 @@ import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
-import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
@@ -32,7 +32,7 @@ import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.*;
 
-import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.*;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.*;
 

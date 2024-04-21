@@ -30,7 +30,10 @@ public abstract class Study extends TimeEntity {
     private String bookName;
     private String chapter;
     private String subject;
+
+    // 반정규 필드
     private int score;
+    private int total;
 
     private LocalDateTime submitDateTime;
 
@@ -38,7 +41,7 @@ public abstract class Study extends TimeEntity {
     @JoinColumn(name = "student_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Student student;
 
-    // 반정규화 필드
+    // 반정규 필드
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
@@ -51,10 +54,15 @@ public abstract class Study extends TimeEntity {
         this.student = student;
         this.academy = academy;
         this.score = 0;
+        this.total = 0; // score 입력 시점에 같이 입력
     }
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 
     public void updateSubmitDateTime() {

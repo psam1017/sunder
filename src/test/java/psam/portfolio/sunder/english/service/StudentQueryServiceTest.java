@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
-import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
@@ -15,7 +15,7 @@ import psam.portfolio.sunder.english.domain.student.model.response.StudentFullRe
 import psam.portfolio.sunder.english.domain.student.model.response.StudentPublicResponse;
 import psam.portfolio.sunder.english.domain.student.service.StudentQueryService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.*;
 
 @SuppressWarnings("unchecked")
 public class StudentQueryServiceTest extends AbstractSunderApplicationTest {

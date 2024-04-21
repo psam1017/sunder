@@ -4,18 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.exception.OneParamToCheckAcademyDuplException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicSearchCond;
 import psam.portfolio.sunder.english.domain.academy.model.response.AcademyFullResponse;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepository;
-import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
-import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.pagination.PageInfo;
@@ -23,7 +21,7 @@ import psam.portfolio.sunder.english.global.pagination.PageInfo;
 import java.util.*;
 
 import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.academy;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

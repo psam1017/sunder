@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
 import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -41,9 +41,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.academy;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
-import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.PENDING;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.PENDING;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor

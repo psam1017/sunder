@@ -15,8 +15,8 @@ import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
@@ -28,7 +28,7 @@ import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.*;
 
-import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.*;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor

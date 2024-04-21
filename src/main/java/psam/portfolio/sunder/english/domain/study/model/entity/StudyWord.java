@@ -17,16 +17,16 @@ public class StudyWord {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String studentAnswer;
-    private String korean;
-    private String english;
+    private String submit;
+    private String question;
+    private String answer;
     private boolean correct;
     private String incorrectReason;
 
-    protected StudyWord(String studentAnswer, String korean, String english, boolean correct, String incorrectReason) {
-        this.studentAnswer = studentAnswer;
-        this.korean = korean;
-        this.english = english;
+    protected StudyWord(String submit, String question, String answer, boolean correct, String incorrectReason) {
+        this.submit = submit;
+        this.question = question;
+        this.answer = answer;
         this.correct = correct;
         this.incorrectReason = incorrectReason;
     }
