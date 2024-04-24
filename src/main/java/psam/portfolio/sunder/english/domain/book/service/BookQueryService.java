@@ -40,7 +40,7 @@ public class BookQueryService {
      */
     public Map<String, Object> getBookList(UUID userId, BookSearchCond cond) {
         User getUser = userQueryRepository.getById(userId);
-        UUID academyId = getAcademyIdFromUser(getUser).getId();
+        UUID academyId = getAcademyFromUser(getUser).getId();
 
         List<Book> books = bookQueryRepository.findAllBySearchCond(academyId, cond);
         long count = bookQueryRepository.countBySearchCond(books.size(), academyId, cond);
@@ -60,7 +60,7 @@ public class BookQueryService {
      */
     public Map<String, Object> getBookDetail(UUID userId, UUID bookId) {
         User getUser = userQueryRepository.getById(userId);
-        Academy academy = getAcademyIdFromUser(getUser);
+        Academy academy = getAcademyFromUser(getUser);
 
         Book getBook = bookQueryRepository.getById(bookId);
         if (!getBook.isSameAcademyOrPublic(academy)) {
@@ -73,7 +73,7 @@ public class BookQueryService {
         );
     }
 
-    private static Academy getAcademyIdFromUser(User getUser) {
+    private static Academy getAcademyFromUser(User getUser) {
         if (getUser instanceof Teacher teacher) {
             return teacher.getAcademy();
         } else if (getUser instanceof Student student) {
