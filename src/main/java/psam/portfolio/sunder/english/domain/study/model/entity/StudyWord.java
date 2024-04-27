@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
         name = "study_words"
 )
 @Entity
-public class StudyWord {
+public abstract class StudyWord {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
