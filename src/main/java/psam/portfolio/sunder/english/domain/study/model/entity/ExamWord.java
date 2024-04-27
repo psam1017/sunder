@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("EXAM_WORD")
-@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 @Table(
         name = "exam_words",
         indexes = @Index(columnList = "exam_id")

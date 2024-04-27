@@ -15,7 +15,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("PRACTICE")
-@PrimaryKeyJoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 @Table(
         name = "practice"
 )

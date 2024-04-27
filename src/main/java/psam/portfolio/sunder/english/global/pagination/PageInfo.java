@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PageInfo {
 
-    protected final int page;
-    protected final int size;
-    protected final long total;
-    protected final int lastPage;
-    protected final int start;
-    protected final int end;
+    protected int page;
+    protected int size;
+    protected long total;
+    protected int lastPage;
+    protected int start;
+    protected int end;
 
     @JsonProperty("hasPrev")
     protected final boolean hasPrev;
@@ -27,6 +27,9 @@ public class PageInfo {
             this.end = page;
         } else {
             this.start = ((page - 1) / pageSetAmount) * pageSetAmount + 1;
+            if (lastPage == 0) {
+                lastPage = 1;
+            }
             this.end = Math.min(start + pageSetAmount - 1, lastPage);
         }
         this.hasPrev = start != 1;
