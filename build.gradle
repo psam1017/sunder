@@ -117,7 +117,7 @@ bootJar {
 // rest docs 추가 끝
 
 // query dsl 추가 시작
-def generated = 'src/main/generated'
+def generated = 'build/generated'
 
 tasks.withType(JavaCompile).configureEach {
 	options.getGeneratedSourceOutputDirectory().set(file(generated))

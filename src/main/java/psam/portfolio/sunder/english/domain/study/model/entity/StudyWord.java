@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(
-        name = "study_words"
+        name = "study_words",
+        indexes = {
+                @Index(columnList = "practice_id"),
+                @Index(columnList = "exam_id")
+        }
 )
 @Entity
 public abstract class StudyWord {

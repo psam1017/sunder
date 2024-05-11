@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.ExamType;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.study.model.enumeration.ExamType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +15,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorValue("EXAM")
-@Table(
-        name = "exam"
-)
 @Entity
 public class Exam extends Study {
 
