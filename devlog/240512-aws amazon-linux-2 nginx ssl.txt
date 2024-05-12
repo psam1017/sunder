@@ -1,0 +1,59 @@
+// 참고 사이트
+- https://longtermsad.tistory.com/11
+- https://velog.io/@jjonggang/Spring-Boot-Nginx%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%98%EC%97%AC-Spring-Boot%EB%A5%BC-80%EB%B2%88-%ED%8F%AC%ED%8A%B8%EB%A1%9C-%ED%94%84%EB%A1%9D%EC%8B%9C%ED%95%98%EA%B8%B0
+- https://dev-jwblog.tistory.com/57
+
+// nginx 설치
+- amazon-linux-extras list | grep nginx
+	-> nginx1 을 발견
+- sudo amazon-linux-extras install nginx1
+- nginx -v
+- sudo service nginx start
+	-> 브라우저에서 접속하여 "Welcom to nginx" 문구 확인
+
+// nginx 포워딩
+- sudo vi /etc/nginx/nginx.conf
+	-> 아래 코드를 입력(http 의 경우)
+```
+http {
+    server {
+        ...
+        server_name {domain};
+        ...
+        location / {
+            proxy_pass http://localhost:8080;
+            proxy_set_header X-Real_IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $http_host;
+        }
+        ...
+    }
+}
+```
+	-> 브라우저에 접속하면 백엔드 서버 api 호출 가능
+
+// 자동 실행 설정
+- sudo systemctl enable nginx
+
+// log 접근권한 부여
+- sudo chmod -R 755 /var/log/nginx;
+
+// log 로테이션 관리
+-> 서버에 logrotate 가 설치되어 있다면 자동으로 로테이션 관리를 수행한다. amazon linux 2 에는 logrotate 가 기본적으로 설치되어 있다.
+
+// Let's Encrypt, certbot 설치
+- sudo wget -r --no-parent -A 'epel-release-*.rpm' http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/
+- sudo rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-*.rpm
+- sudo yum-config-manager --enable epel*
+- sudo yum install -y certbot python2-certbot-apache
+- sudo yum install certbot-nginx
+
+// ssl 적용
+- sudo certbot --nginx
+	-> ndinx.conf 에서 server_name 을 지정하지 않았다면 server_name(도메인)을 직접 입력
+
+// ssl 자동 갱신
+- sudo vi /etc/crontab
+	-> 0 0,12 * * * root certbot renew --no-self-upgrade
+		-> 매일 0시, 12시에 실행. certbot 개발자는 최소한 매일 두 번 명령을 실행할 것을 제안한다고 함.
+- sudo systemctl restart crond
