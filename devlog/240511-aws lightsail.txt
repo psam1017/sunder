@@ -50,6 +50,9 @@ FLUSH PRIVILEGES;
 SHOW GRANTS FOR `username`@`localhost`;
 ```
 
+// mariadb 자동 실행
+- sudo systemctl enable mariadb
+
 // jar 실행
 filezilla 를 열어서 새 사이트 추가
 	-> SFTP, 인스턴스의 고정 IP, 포트는 공란, 로그온 유형=키 파일, 사용자는 ec2-user, 키 파일은 인스턴스-연결 탭 아래쪽에서 다운로드한 것을 첨부
