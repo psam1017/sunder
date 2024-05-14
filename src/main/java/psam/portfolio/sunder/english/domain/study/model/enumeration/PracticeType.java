@@ -7,10 +7,10 @@ package psam.portfolio.sunder.english.domain.study.model.enumeration;
  */
 public enum PracticeType {
 
-    KOREAN_TRACING,
-    ENGLISH_TRACING,
-    KOREAN_CHOICE,
-    ENGLISH_CHOICE,
-    KOREAN_WRITING,
-    ENGLISH_WRITING
+    PRAC_K_TRACING,
+    PRAC_E_TRACING,
+    PRAC_K_CHOICE,
+    PRAC_E_CHOICE,
+    PRAC_K_WRITING,
+    PRAC_E_WRITING
 }

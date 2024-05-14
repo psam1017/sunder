@@ -22,4 +22,12 @@ public class WordFullResponse {
                 .english(word.getEnglish())
                 .build();
     }
+
+    public void setKorean(String korean) {
+        this.korean = korean;
+    }
+
+    public void setEnglish(String english) {
+        this.english = english;
+    }
 }

@@ -1,20 +1,26 @@
 package psam.portfolio.sunder.english.domain.book.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
 import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList;
+import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.service.BookCommandService;
 import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,6 +31,7 @@ public class BookController {
 
     private final BookCommandService bookCommandService;
     private final BookQueryService bookQueryService;
+    private final ObjectMapper objectMapper;
 
     /**
      * 새 교재 등록 서비스
@@ -123,9 +130,28 @@ public class BookController {
      */
     @GetMapping("/{bookId}")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Map<String, Object>> getBookDetail(@UserId UUID userId,
-                                                          @PathVariable UUID bookId) {
-        Map<String, Object> response = bookQueryService.getBookDetail(userId, bookId);
+    public ApiResponse<Object> getBookDetail(@UserId UUID userId,
+                                             @PathVariable UUID bookId,
+                                             @RequestParam(required = false) Boolean enc,
+                                             @RequestParam(required = false) String empty) throws JsonProcessingException {
+        BookAndWordFullResponse response = bookQueryService.getBookDetail(userId, bookId);
+
+        // empty 여부
+        if (StringUtils.hasText(empty)) {
+            empty = empty.toLowerCase();
+            if (empty.contains("korean")) {
+                response.getWords().forEach(w -> w.setKorean(null));
+            }
+            if (empty.contains("english")) {
+                response.getWords().forEach(w -> w.setEnglish(null));
+            }
+        }
+
+        // encoding 여부
+        if (enc != null && enc) {
+            String jsonString = objectMapper.writeValueAsString(response);
+            return ApiResponse.ok(Base64.getEncoder().encodeToString(jsonString.getBytes(StandardCharsets.UTF_8)));
+        }
         return ApiResponse.ok(response);
     }
 

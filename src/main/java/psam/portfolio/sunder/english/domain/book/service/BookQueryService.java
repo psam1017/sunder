@@ -7,6 +7,7 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.exception.BookAccessDeniedException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
@@ -19,6 +20,7 @@ import psam.portfolio.sunder.english.global.pagination.PageInfo;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -58,7 +60,7 @@ public class BookQueryService {
      * @param bookId 조회할 교재 아이디
      * @return 교재 상세 정보와 단어 목록
      */
-    public Map<String, Object> getBookDetail(UUID userId, UUID bookId) {
+    public BookAndWordFullResponse getBookDetail(UUID userId, UUID bookId) {
         User getUser = userQueryRepository.getById(userId);
         Academy academy = getAcademyFromUser(getUser);
 
@@ -67,10 +69,10 @@ public class BookQueryService {
             throw new BookAccessDeniedException();
         }
 
-        return Map.of(
-                "book", BookFullResponse.from(getBook),
-                "words", getBook.getWords().stream().map(WordFullResponse::from).toList()
-        );
+        return BookAndWordFullResponse.builder()
+                .book(BookFullResponse.from(getBook))
+                .words(getBook.getWords().stream().map(WordFullResponse::from).toList())
+                .build();
     }
 
     private static Academy getAcademyFromUser(User getUser) {

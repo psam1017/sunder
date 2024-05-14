@@ -3,6 +3,7 @@ package psam.portfolio.sunder.english.domain.book.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
@@ -115,6 +116,7 @@ public class BookCommandService {
 
         Book refreshBook = bookQueryRepository.getById(getBook.getId());
         List<Word> words = excelUtils.readExcel(file, "english", "korean").stream()
+                .filter(w -> StringUtils.hasText(w.get(0)) && StringUtils.hasText(w.get(1)))
                 .map(w -> Word.builder()
                         .english(w.get(0))
                         .korean(w.get(1))

@@ -6,25 +6,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import psam.portfolio.sunder.english.infrastructure.ip.ClientIpHolder;
+import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
 
 @Slf4j
 @RequiredArgsConstructor
 public class AccessLogInterceptor implements HandlerInterceptor {
 
-    private final ClientIpHolder clientIpHolder;
+    private final ClientUsernameHolder clientUsernameHolder;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         try {
             if (handler instanceof HandlerMethod) {
-                log.info("Remote Ip : {}", clientIpHolder.getClientIp());
-                log.info("Access Log : {} {}", request.getMethod(), request.getRequestURI());
+                log.info("\n{} : {} {}", clientUsernameHolder.getClientUsername(), request.getMethod(), request.getRequestURI());
             }
             return true;
         } catch (Exception e) {
-            log.error("TokenIpCheckInterceptor error", e);
+            log.error("AccessLogInterceptor error", e);
             return true;
         }
     }

@@ -5,10 +5,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.WordStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction(value = "status != 'DELETED'")
 @Table(
         name = "words",
         indexes = @Index(columnList = "book_id")

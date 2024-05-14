@@ -1,8 +1,17 @@
-package psam.portfolio.sunder.english.infrastructure.ip;
+package psam.portfolio.sunder.english.infrastructure.username;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
-public class ClientIpHolder {
+import java.util.Optional;
+import java.util.UUID;
+
+@RequiredArgsConstructor
+public class ClientUsernameHolder {
 
     private final ThreadLocal<String> local = new ThreadLocal<>();
 
@@ -14,15 +23,19 @@ public class ClientIpHolder {
             "HTTP_X_FORWARDED_FOR"
     };
 
-    public String getClientIp() {
+    public String getClientUsername() {
         return local.get();
     }
 
-    public void syncClientIp(HttpServletRequest request) {
+    public void syncClientUsername(HttpServletRequest request) {
         local.set(extractClientIp(request));
     }
 
-    public void releaseClientIp() {
+    public void syncClientUsername(String username) {
+        local.set(username);
+    }
+
+    public void releaseClientUsername() {
         local.remove();
     }
 

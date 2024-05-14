@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
-import psam.portfolio.sunder.english.infrastructure.ip.ClientIpHolder;
+import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
 import psam.portfolio.sunder.english.infrastructure.jwt.IllegalTokenException;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtStatus;
@@ -31,7 +31,7 @@ import static psam.portfolio.sunder.english.infrastructure.jwt.JwtStatus.ILLEGAL
 public class JwtIpAuthenticationInterceptor implements HandlerInterceptor {
 
     private final JwtUtils jwtUtils;
-    private final ClientIpHolder clientIpHolder;
+    private final ClientUsernameHolder clientUsernameHolder;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -41,11 +41,11 @@ public class JwtIpAuthenticationInterceptor implements HandlerInterceptor {
         if(StringUtils.hasText(authorization) && Pattern.matches("^Bearer .*", authorization)) {
             String token = authorization.replaceAll("^Bearer( )*", "");
             jwtUtils.hasInvalidStatus(token).ifPresent(status -> {
-                log.error("error occured at TokenIpCheckInterceptor. authorization = {}, status = {}", authorization, status.name());
+                log.error("error occurred at JwtIpAuthenticationInterceptor. authorization = {}, status = {}", authorization, status.name());
                 throw new IllegalTokenException();
             });
             String tokenIp = jwtUtils.extractClaim(token, c -> c.get(JwtClaim.REMOTE_IP.toString(), String.class));
-            String remoteIp = clientIpHolder.getClientIp();
+            String remoteIp = clientUsernameHolder.getClientUsername();
 
             if (!Objects.equals(tokenIp, remoteIp)) {
                 log.error("Illegal Ip Access. subject : {}, tokenIp: {}, remoteIp: {}", jwtUtils.extractSubject(token), tokenIp, remoteIp);

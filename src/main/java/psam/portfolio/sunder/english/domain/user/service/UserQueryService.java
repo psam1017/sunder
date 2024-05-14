@@ -123,6 +123,7 @@ public class UserQueryService {
         }
 
         Map<String, Object> claims = Map.of(
+                LOGIN_ID.toString(), getUser.getLoginId(),
                 PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
                 REMOTE_IP.toString(), remoteIp,
@@ -145,6 +146,7 @@ public class UserQueryService {
     public TokenRefreshResponse refreshToken(UUID userId, String remoteIp) {
         User getUser = userQueryRepository.getById(userId);
         Map<String, Object> claims = Map.of(
+                LOGIN_ID.toString(), getUser.getLoginId(),
                 PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
                 REMOTE_IP.toString(), remoteIp,
