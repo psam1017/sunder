@@ -28,7 +28,7 @@ import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleNa
 @Service
 public class AcademyQueryService {
 
-    private final static int PAGE_SET_AMOUNT = 10;
+    private static final int PAGE_SET_AMOUNT = 10;
 
     private final AcademyQueryRepository academyQueryRepository;
     private final UserQueryRepository userQueryRepository;

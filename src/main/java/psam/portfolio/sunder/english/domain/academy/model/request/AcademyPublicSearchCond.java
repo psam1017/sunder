@@ -10,8 +10,8 @@ public class AcademyPublicSearchCond extends SearchCond {
     private final String academyName;
 
     @Builder
-    public AcademyPublicSearchCond(Integer page, Integer size, String prop, String order, String academyName) {
-        super(page, size, prop, order);
+    public AcademyPublicSearchCond(Integer page, Integer size, String prop, String dir, String academyName) {
+        super(page, size, prop, dir);
         this.academyName = academyName;
     }
 }

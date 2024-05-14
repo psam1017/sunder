@@ -24,13 +24,13 @@ public class StandaloneInfoContainer implements InfoContainer {
     private final List<String> uniqueAttendanceIdList;
 
     @Builder
-    public StandaloneInfoContainer(int numberOfCollection, int loginIdLen, int emailLen, String emailDomain, int academyNameMinLen, int academyNameMaxLen, int attendateIdLen) {
+    public StandaloneInfoContainer(int numberOfCollection, int loginIdLen, int emailLen, String emailDomain, int academyNameMinLen, int academyNameMaxLen, int attendanceIdLen) {
         size = numberOfCollection;
         uniqueIdList = generateUniqueIds(numberOfCollection, loginIdLen);
         uniqueEmailList = generateUniqueEmails(numberOfCollection, emailLen, emailDomain);
         uniquePhoneNumberList = generateUniquePhoneNumbers(numberOfCollection);
         uniqueAcademyNameList = generateUniqueAcademyNames(numberOfCollection, academyNameMinLen, academyNameMaxLen);
-        uniqueAttendanceIdList = generateUniqueAttendanceIds(numberOfCollection, attendateIdLen);
+        uniqueAttendanceIdList = generateUniqueAttendanceIds(numberOfCollection, attendanceIdLen);
     }
 
     @Override

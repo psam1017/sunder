@@ -28,7 +28,7 @@ import java.util.UUID;
 @Service
 public class BookQueryService {
 
-    private final static int PAGE_SET_AMOUNT = 10;
+    private static final int PAGE_SET_AMOUNT = 10;
 
     private final BookQueryRepository bookQueryRepository;
     private final UserQueryRepository userQueryRepository;

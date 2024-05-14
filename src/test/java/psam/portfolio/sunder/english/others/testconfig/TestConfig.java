@@ -23,7 +23,7 @@ public class TestConfig {
                 .emailDomain("sunder.edu")
                 .academyNameMinLen(4)
                 .academyNameMaxLen(8)
-                .attendateIdLen(8)
+                .attendanceIdLen(8)
                 .build();
     }
 
