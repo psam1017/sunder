@@ -245,7 +245,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
                 .page(1)
                 .size(10)
                 .prop("name")
-                .order("asc")
+                .dir("asc")
                 .academyName(registerAcademy.getName())
                 .build();
 
@@ -283,7 +283,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
                 .page(2)
                 .size(10)
                 .prop("name")
-                .order("asc")
+                .dir("asc")
                 .build();
 
         // when
