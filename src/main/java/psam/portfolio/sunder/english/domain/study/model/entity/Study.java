@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
 import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public abstract class Study extends TimeEntity {
     private String bookName;
     private String chapter;
     private String subject;
+    private StudyStatus status;
 
     // 반정규 필드
     private int score;
@@ -53,6 +55,7 @@ public abstract class Study extends TimeEntity {
         this.subject = subject;
         this.student = student;
         this.academy = academy;
+        this.status = StudyStatus.CREATED;
         this.score = 0;
         this.total = 0; // score 입력 시점에 같이 입력
     }

@@ -6,8 +6,8 @@ package psam.portfolio.sunder.english.domain.study.model.enumeration;
  */
 public enum ExamType {
 
-    KOREAN_CHOICE,
-    ENGLISH_CHOICE,
-    KOREAN_WRITING,
-    ENGLISH_WRITING
+    EXAM_K_CHOICE,
+    EXAM_E_CHOICE,
+    EXAM_K_WRITING,
+    EXAM_E_WRITING
 }

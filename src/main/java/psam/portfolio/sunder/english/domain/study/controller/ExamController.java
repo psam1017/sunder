@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ExamController {
 
-    // 시험지 출력 기능은 프론트에서 해야 할 듯
-    // SSR 을 할까 했지만 굳이 필요해보이진 않는다. 정답 체크는 id 를 받아서 db 랑 비교하자.
+    // book id 와 함께 word 들의 결과를 전달하기. 채점 후 성적 등을 history 로 기록한다.
+    // 시험 성적 조회하기. 학생은 본인만, 선생 이상은 학원 내 성적만 조회할 수 있다. 슬라이싱으로 구현한다.
+    // 시험 성적 삭제하기. 선생님 이상만 가능하다.
 }

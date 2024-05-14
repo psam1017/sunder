@@ -18,6 +18,7 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction(value = "status != 'DELETED'")
 @Table(
         name = "books",
         indexes = {
@@ -45,7 +46,6 @@ public class Book extends BaseEntity {
     @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
 
-    @SQLRestriction(value = "status != 'DELETED'")
     @OrderBy("id asc")
     @OneToMany(mappedBy = "book")
     private List<Word> words = new ArrayList<>();

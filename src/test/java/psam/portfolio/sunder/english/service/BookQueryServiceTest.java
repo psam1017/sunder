@@ -8,7 +8,9 @@ import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademySta
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
+import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
@@ -71,10 +73,10 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.registerWord("cherry", "체리", book);
 
         // when
-        Map<String, Object> result = refreshAnd(() -> sut.getBookDetail(teacher.getId(), academy.getBooks().get(0).getId()));
+        BookAndWordFullResponse result = refreshAnd(() -> sut.getBookDetail(teacher.getId(), academy.getBooks().get(0).getId()));
 
         // then
-        BookFullResponse getBook = (BookFullResponse) result.get("book");
+        BookFullResponse getBook = result.getBook();
         assertThat(getBook.getPublisher()).isEqualTo(book.getPublisher());
         assertThat(getBook.getBookName()).isEqualTo(book.getBookName());
         assertThat(getBook.getChapter()).isEqualTo(book.getChapter());
@@ -82,7 +84,7 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(getBook.getAcademyId()).isEqualTo(book.getAcademy().getId());
         assertThat(getBook.isOpenToPublic()).isEqualTo(book.isOpenToPublic());
 
-        List<Map<String, Object>> words = (List<Map<String, Object>>) result.get("words");
+        List<WordFullResponse> words = result.getWords();
         assertThat(words).hasSize(3)
                 .extracting("korean", "english")
                 .containsExactly(

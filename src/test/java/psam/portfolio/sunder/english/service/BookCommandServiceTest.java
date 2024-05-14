@@ -20,6 +20,7 @@ import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -218,8 +219,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         UUID bookId = refreshAnd(() -> sut.deleteBook(teacher.getId(), book.getId()));
 
         // then
-        Book getBook = bookQueryRepository.getById(bookId);
-        assertThat(getBook.getStatus()).isEqualTo(BookStatus.DELETED);
-        assertThat(getBook.getWords()).isEmpty();
+        Optional<Book> optBook = bookQueryRepository.findById(bookId);
+        assertThat(optBook.isEmpty()).isTrue();
     }
 }

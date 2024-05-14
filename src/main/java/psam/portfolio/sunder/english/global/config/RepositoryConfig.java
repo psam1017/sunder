@@ -42,9 +42,8 @@ public class RepositoryConfig {
 
             if (authentication != null
                     && authentication.isAuthenticated()
-                    && authentication.getPrincipal() instanceof UserDetails) {
+                    && authentication.getPrincipal() instanceof UserDetails userDetails) {
 
-                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
                 return Optional.of(UUID.fromString(userDetails.getUsername()));
             }
             return Optional.empty();

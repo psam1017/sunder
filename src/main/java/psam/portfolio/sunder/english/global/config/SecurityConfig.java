@@ -35,6 +35,7 @@ import psam.portfolio.sunder.english.global.security.handler.AuthenticationFailu
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceJwt;
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceRepo;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
+import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
 
 @RequiredArgsConstructor
 @Configuration
@@ -82,7 +83,9 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000");
+        // TODO: 2024-05-14 프론트 개발 종료 후 origin 을 localhost:3000 으로 변경한다.
+//        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOriginPattern("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
@@ -92,8 +95,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsServiceJwt userDetailsServiceJwt, JwtUtils jwtUtils) {
-        return new JwtAuthenticationFilter(userDetailsServiceJwt, jwtUtils);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsServiceJwt userDetailsServiceJwt, JwtUtils jwtUtils, ClientUsernameHolder clientUsernameHolder) {
+        return new JwtAuthenticationFilter(userDetailsServiceJwt, jwtUtils, clientUsernameHolder);
     }
 
     @Bean
