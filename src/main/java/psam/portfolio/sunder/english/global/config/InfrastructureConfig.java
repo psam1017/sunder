@@ -27,8 +27,8 @@ public class InfrastructureConfig {
     }
 
     @Bean
-    public MailUtils mailUtils(JavaMailSender javaMailSender) {
-        return new MailUtils(javaMailSender);
+    public MailUtils mailUtils(JavaMailSender javaMailSender, @Value("${spring.mail.username}") String fromEmail) {
+        return new MailUtils(javaMailSender, fromEmail);
     }
 
     @Bean

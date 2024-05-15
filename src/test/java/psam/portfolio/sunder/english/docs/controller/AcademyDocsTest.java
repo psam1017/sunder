@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
@@ -230,7 +230,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/academies/{academyId}/verify", academyId.toString())
+                patch("/api/academies/{academyId}/verify", academyId.toString())
                         .contentType(APPLICATION_JSON)
         );
 

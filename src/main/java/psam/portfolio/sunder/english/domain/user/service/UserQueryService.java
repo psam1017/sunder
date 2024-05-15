@@ -132,7 +132,9 @@ public class UserQueryService {
         return new LoginResult(
                 jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims), // accessToken 만료 시간은 3시간
                 jwtUtils.generateToken(getUser.getId().toString(), 43200000), // refreshToken 만료 시간은 12시간
-                getUser.isPasswordExpired()
+                getUser.isPasswordExpired(),
+                getUser.getId().toString(),
+                getUser.getRoles().stream().map(UserRole::getRoleName).toList()
         );
     }
 
