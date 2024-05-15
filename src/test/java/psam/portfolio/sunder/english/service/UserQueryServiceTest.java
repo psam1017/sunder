@@ -195,8 +195,8 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(claims.get(JwtClaim.USER_STATUS.toString(), String.class)).isEqualTo(UserStatus.ACTIVE.toString());
         assertThat(claims.get(JwtClaim.REMOTE_IP.toString(), String.class)).isEqualTo(remoteIp);
 
-        List<RoleName> roleNames = objectMapper.readValue(claims.get(ROLE_NAMES.toString(), String.class), new TypeReference<>() {});
-        assertThat(roleNames).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
+        assertThat(result.getUserId()).isEqualTo(director.getId().toString());
+        assertThat(result.getRoleNames()).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
     }
 
     @DisplayName("사용자 로그인 아이디가 틀리면 로그인할 수 없다.")

@@ -11,7 +11,7 @@
 - sudo service nginx start
 	-> 브라우저에서 접속하여 "Welcom to nginx" 문구 확인
 
-// nginx 포워딩
+// nginx 연동
 - sudo vi /etc/nginx/nginx.conf
 	-> 아래 코드를 입력(http 의 경우)
 ```
@@ -50,10 +50,10 @@ http {
 
 // ssl 적용
 - sudo certbot --nginx
-	-> ndinx.conf 에서 server_name 을 지정하지 않았다면 server_name(도메인)을 직접 입력
+	-> nginx.conf 에서 server_name 을 지정하지 않았다면 server_name(도메인)을 직접 입력
 
 // ssl 자동 갱신
 - sudo vi /etc/crontab
-	-> 0 0,12 * * * root certbot renew --no-self-upgrade
-		-> 매일 0시, 12시에 실행. certbot 개발자는 최소한 매일 두 번 명령을 실행할 것을 제안한다고 함.
+	-> 0 0 1 */2 * root certbot renew --no-self-upgrade
+	    -> 최소 2달에 한 번씩 갱신을 권장함.
 - sudo systemctl restart crond
