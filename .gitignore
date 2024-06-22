@@ -8,7 +8,6 @@ build/
 ### Project ###
 **/application-prod.properties
 **/application-stg.properties
-src/main/generated
 logs/
 
 ### STS ###

@@ -26,7 +26,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
 
-        String message = "You need to log in to access this page.";
+        String message = "You need to sign in to access this page.";
         sendError(response, ApiResponse.error(ApiStatus.UNAUTHORIZED, User.class, message));
     }
 

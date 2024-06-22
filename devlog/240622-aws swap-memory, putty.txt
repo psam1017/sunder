@@ -1,0 +1,37 @@
+// swap memory 설정
+
+공식 가이드 : https://repost.aws/ko/knowledge-center/ec2-memory-swap-file
+
+스왑 파일 생성
+1. dd 명령을 사용하여 루트 파일 시스템에 스왑 파일을 생성합니다. 명령에서 bs는 블록 크기이고 count는 블록 수입니다. 스왑 파일의 크기는 dd 명령의 블록 크기 옵션에 count 옵션을 곱한 값입니다. 이 값을 조정하여 원하는 스왑 파일 크기를 결정합니다.
+지정한 블록 크기는 인스턴스의 사용 가능한 메모리보다 작아야 합니다. 그렇지 않으면 "memory exhausted" 오류가 발생합니다.
+이 dd 명령 예제에서 스왑 파일은 4GB(128MB x 32)입니다.
+$ sudo dd if=/dev/zero of=/swapfile bs=128M count=32
+
+```
+(인스턴스 사용 가능 메모리가 2GB 일 때)
+$ sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+```
+
+2. 스왑 파일의 읽기 및 쓰기 권한을 업데이트합니다.
+$ sudo chmod 600 /swapfile
+
+3. Linux 스왑 영역을 설정합니다.
+$ sudo mkswap /swapfile
+
+4. 스왑 공간에 스왑 파일을 추가하여 스왑 파일을 즉시 사용할 수 있도록 합니다.
+$ sudo swapon /swapfile
+
+5. 절차가 성공적으로 완료되었는지 확인합니다.
+$ sudo swapon -s
+
+6. 부팅 시 /etc/fstab 파일을 편집하여 스왑 파일을 시작합니다.
+편집기에서 파일을 엽니다.
+$ sudo vi /etc/fstab
+
+파일 끝에 다음 새 줄을 추가하고 파일을 저장한 다음 종료합니다.
+/swapfile swap swap defaults 0 0
+
+// aws putty 접속 설정(PuTTY, PuTTYgen 필요)
+
+공식 가이드 : https://docs.aws.amazon.com/ko_kr/lightsail/latest/userguide/lightsail-how-to-set-up-putty-to-connect-using-ssh.html

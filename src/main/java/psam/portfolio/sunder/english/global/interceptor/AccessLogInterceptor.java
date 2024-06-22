@@ -19,7 +19,7 @@ public class AccessLogInterceptor implements HandlerInterceptor {
 
         try {
             if (handler instanceof HandlerMethod) {
-                log.info("\n{} : {} {}", clientUsernameHolder.getClientUsername(), request.getMethod(), request.getRequestURI());
+                log.info("{} : {} {}", clientUsernameHolder.getClientUsername(), request.getMethod(), request.getRequestURI());
             }
             return true;
         } catch (Exception e) {

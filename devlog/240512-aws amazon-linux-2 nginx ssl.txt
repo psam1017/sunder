@@ -20,11 +20,15 @@ http {
         ...
         server_name {domain};
         ...
-        location / {
+        location ~ ^/(api|docs|logs)/ { // api, docs, logs 는 외부에서 접근 가능하도록 하는 정규표현식
             proxy_pass http://localhost:8080;
             proxy_set_header X-Real_IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header Host $http_host;
+        }
+
+        location / { // 나머지는 모두 차단
+            deny all;
         }
         ...
     }
