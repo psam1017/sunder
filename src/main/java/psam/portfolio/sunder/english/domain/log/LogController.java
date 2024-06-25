@@ -5,7 +5,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -18,7 +17,6 @@ public class LogController {
     private String LOG_FILE_PATH;
 
     @Secured("ROLE_ADMIN")
-    @ResponseBody
     @GetMapping("/api/log")
     public String getLog(@RequestParam(defaultValue = "<br>") String lineBreak,
                          @RequestParam(defaultValue = "200") Integer maxLogLines

@@ -147,10 +147,11 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("loginPw").type(STRING).description("비밀번호")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.accessToken").type(STRING).description("발급된 액세스 토큰(1시간). Authorization 헤더에 추가하여 사용"),
-                                        fieldWithPath("data.refreshToken").type(STRING).description("발급된 리프레시 토큰(12시간). 액세스 토큰 만료 시 재발급에 사용"),
+                                        fieldWithPath("data.accessToken").type(STRING).description("발급된 액세스 토큰. Authorization 헤더에 추가하여 사용"),
+                                        fieldWithPath("data.refreshToken").type(STRING).description("발급된 리프레시 토큰. 액세스 토큰 만료 시 재발급에 사용"),
                                         fieldWithPath("data.passwordChangeRequired").type(BOOLEAN).description("비밀번호 변경 주기인지 여부"),
                                         fieldWithPath("data.userId").type(STRING).description("사용자 아이디"),
+                                        fieldWithPath("data.academyId").type(STRING).description("(학원 소속인 경우)학원 아이디"),
                                         fieldWithPath("data.roleNames").type(ARRAY).description("사용자가 가진 권한 목록")
                                 )
                         )

@@ -113,6 +113,13 @@ public class UserQueryService {
                 user.loginId.eq(form.getLoginId())
         ).orElseThrow(LoginFailException::new);
 
+        String academyId = null;
+        if (getUser instanceof Teacher t) {
+            academyId = t.getAcademy().getId().toString();
+        } else if (getUser instanceof Student s) {
+            academyId = s.getAcademy().getId().toString();
+        }
+
         if (!passwordUtils.matches(form.getLoginPw(), getUser.getLoginPw())) {
             throw new LoginFailException();
         }
@@ -134,6 +141,7 @@ public class UserQueryService {
                 jwtUtils.generateToken(getUser.getId().toString(), 43200000), // refreshToken 만료 시간은 12시간
                 getUser.isPasswordExpired(),
                 getUser.getId().toString(),
+                academyId,
                 getUser.getRoles().stream().map(UserRole::getRoleName).toList()
         );
     }

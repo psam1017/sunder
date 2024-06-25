@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.global.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -33,6 +34,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
+import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
 
 import java.util.Objects;
 
@@ -48,6 +50,8 @@ import static org.springframework.http.HttpStatus.*;
 @RestControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+
+    private final ClientUsernameHolder clientUsernameHolder;
     private final ObjectMapper objectMapper;
 
     /**
@@ -183,8 +187,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[NoResourceFoundException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
-        System.out.println(ex.getMessage());
+        HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
+
+        log.error("[NoResourceFoundException handle] request uri = {} {} {}", clientUsernameHolder.getClientUsername(), httpServletRequest.getMethod(), httpServletRequest.getRequestURI());
 
         String message = "There is no API(or resource) for " + ex.getHttpMethod() + " /" + ex.getResourcePath();
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.NOT_FOUND, message);

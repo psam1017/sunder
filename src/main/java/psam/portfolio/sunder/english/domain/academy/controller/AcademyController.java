@@ -58,7 +58,7 @@ public class AcademyController {
      * @param academyId 학원 아이디
      * @return 학원 승인 여부
      */
-    @PatchMapping("/{academyId}/verify")
+    @GetMapping("/{academyId}/verify")
     public ApiResponse<Map<String, Boolean>> verify(@PathVariable String academyId) {
         boolean result = academyCommandService.verify(UUID.fromString(academyId));
         return ApiResponse.ok(Map.of("verified", result));
