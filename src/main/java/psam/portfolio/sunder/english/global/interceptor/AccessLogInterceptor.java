@@ -4,22 +4,25 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
+import psam.portfolio.sunder.english.infrastructure.clientinfo.ClientInfoHolder;
 
 @Slf4j
 @RequiredArgsConstructor
 public class AccessLogInterceptor implements HandlerInterceptor {
-
-    private final ClientUsernameHolder clientUsernameHolder;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         try {
             if (handler instanceof HandlerMethod) {
-                log.info("{} : {} {}", clientUsernameHolder.getClientUsername(), request.getMethod(), request.getRequestURI());
+                String access = ClientInfoHolder.getUsername();
+                if (!StringUtils.hasText(access)) {
+                    access = ClientInfoHolder.getRemoteIp();
+                }
+                log.info("{} -> {} {}", access, request.getMethod(), request.getRequestURI());
             }
             return true;
         } catch (Exception e) {

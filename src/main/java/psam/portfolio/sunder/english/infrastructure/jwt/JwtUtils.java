@@ -79,6 +79,7 @@ public class JwtUtils {
             return Optional.of(BLANK);
         }
         try {
+            System.out.println("token = " + token);
             extractSubject(token);
         } catch (ExpiredJwtException e) {
             return Optional.of(EXPIRED);

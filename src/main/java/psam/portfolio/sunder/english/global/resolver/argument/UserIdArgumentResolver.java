@@ -35,9 +35,9 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String authorization = request.getHeader(AUTHORIZATION);
 
-        String token = authorization.replaceAll("^Bearer( )*", "");
+        String token = authorization.replaceFirst("^Bearer ", "");
         jwtUtils.hasInvalidStatus(token).ifPresent(js -> {
-            log.error("error occured at UserIdArgumentResolver. authorization = {}, status = {}", authorization, js.name());
+            log.error("An error occurred at UserIdArgumentResolver. authorization = {}, status = {}", authorization, js.name());
             throw new IllegalTokenException();
         });
         return UUID.fromString(jwtUtils.extractSubject(token));

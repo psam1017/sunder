@@ -13,42 +13,42 @@ import java.io.RandomAccessFile;
 @RestController
 public class LogController {
 
-    @Value("${sunder.log.path}")
-    private String LOG_FILE_PATH;
-
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/api/log")
-    public String getLog(@RequestParam(defaultValue = "<br>") String lineBreak,
-                         @RequestParam(defaultValue = "200") Integer maxLogLines
-    ) {
-        try (RandomAccessFile file = new RandomAccessFile(LOG_FILE_PATH, "r")) {
-            long fileLength = file.length();
-            long pointer = fileLength - 1;
-            int lineCount = 0;
-            StringBuilder sb = new StringBuilder();
-
-            file.seek(pointer);
-            for (long i = pointer; i >= 0; i--) {
-                file.seek(i);
-                char c = (char) file.read();
-                if (c == '\n') {
-                    lineCount++;
-                    if (lineCount > maxLogLines) {
-                        break;
-                    }
-                }
-                sb.append(c);
-            }
-
-            // Reverse the content since we read from the end
-            if (StringUtils.hasText(lineBreak)) {
-                return sb.reverse().toString().replace("\n", lineBreak);
-            } else {
-                return sb.reverse().toString();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "ERROR OCCURRED WHILE READING LOG FILE";
-        }
-    }
+//    @Value("${sunder.log.path}")
+//    private String LOG_FILE_PATH;
+//
+//    @Secured("ROLE_ADMIN")
+//    @GetMapping("/api/log")
+//    public String getLog(@RequestParam(defaultValue = "<br>") String lineBreak,
+//                         @RequestParam(defaultValue = "200") Integer maxLogLines
+//    ) {
+//        try (RandomAccessFile file = new RandomAccessFile(LOG_FILE_PATH, "r")) {
+//            long fileLength = file.length();
+//            long pointer = fileLength - 1;
+//            int lineCount = 0;
+//            StringBuilder sb = new StringBuilder();
+//
+//            file.seek(pointer);
+//            for (long i = pointer; i >= 0; i--) {
+//                file.seek(i);
+//                char c = (char) file.read();
+//                if (c == '\n') {
+//                    lineCount++;
+//                    if (lineCount > maxLogLines) {
+//                        break;
+//                    }
+//                }
+//                sb.append(c);
+//            }
+//
+//            // Reverse the content since we read from the end
+//            if (StringUtils.hasText(lineBreak)) {
+//                return sb.reverse().toString().replace("\n", lineBreak);
+//            } else {
+//                return sb.reverse().toString();
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return "ERROR OCCURRED WHILE READING LOG FILE";
+//        }
+//    }
 }

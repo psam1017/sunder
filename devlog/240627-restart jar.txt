@@ -1,0 +1,24 @@
+# 왜인지 진짜 이유를 알 수 없으나, shebang 을 넣으면 스크립트가 kill 이후부터 실행되지 않는다.
+
+# chmod +x restart-jar.sh
+
+# check arguments
+if [ "$#" -ne 2 ]; then
+    echo "Usage : ./restart-jar.sh <jar_name> <profile>"
+    exit 1
+fi
+
+JAR_NAME=$1
+PROFILE=$2
+
+# shut down
+PID=$(ps -ef | grep $JAR_NAME | grep -v grep | awk '{print $2}')
+
+if [ ! -z "$PID" ]; then
+    echo "$JAR_NAME stopped. (PID : $PID)"
+    kill -9 $PID
+fi
+
+# start up
+nohup java -jar $JAR_NAME --spring.profiles.active=$PROFILE >/dev/null 2>&1 &
+echo "$JAR_NAME started with profile $PROFILE."

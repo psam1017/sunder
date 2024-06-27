@@ -215,8 +215,8 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 relaxedResponseFields(
-                                        fieldWithPath("data.accessToken").type(STRING).description("새로 발급한 액세스 토큰(1시간). Authorization 헤더에 추가하여 사용"),
-                                        fieldWithPath("data.refreshToken").type(STRING).description("새로 발급한 리프레시 토큰(12시간). 액세스 토큰 만료 시 재발급에 사용")
+                                        fieldWithPath("data.accessToken").type(STRING).description("새로 발급한 액세스 토큰. Authorization 헤더에 추가하여 사용"),
+                                        fieldWithPath("data.refreshToken").type(STRING).description("새로 발급한 리프레시 토큰. 액세스 토큰 만료 시 재발급에 사용")
                                 )
                         )
                 );

@@ -35,7 +35,6 @@ import psam.portfolio.sunder.english.global.security.handler.AuthenticationFailu
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceJwt;
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceRepo;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
-import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
 
 @RequiredArgsConstructor
 @Configuration
@@ -95,8 +94,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsServiceJwt userDetailsServiceJwt, JwtUtils jwtUtils, ClientUsernameHolder clientUsernameHolder) {
-        return new JwtAuthenticationFilter(userDetailsServiceJwt, jwtUtils, clientUsernameHolder);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsServiceJwt userDetailsServiceJwt, JwtUtils jwtUtils) {
+        return new JwtAuthenticationFilter(userDetailsServiceJwt, jwtUtils);
     }
 
     @Bean

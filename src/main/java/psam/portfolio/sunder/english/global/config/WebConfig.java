@@ -11,13 +11,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import psam.portfolio.sunder.english.global.interceptor.AccessLogInterceptor;
-import psam.portfolio.sunder.english.global.interceptor.ClientUsernameHolderInterceptor;
-import psam.portfolio.sunder.english.global.interceptor.JwtIpAuthenticationInterceptor;
+import psam.portfolio.sunder.english.global.interceptor.ClientInfoHolderInterceptor;
+import psam.portfolio.sunder.english.global.interceptor.JwtAuthenticationInterceptor;
 import psam.portfolio.sunder.english.global.resolver.argument.RemoteIpArgumentResolver;
 import psam.portfolio.sunder.english.global.validator.EnumPatternValidator;
 import psam.portfolio.sunder.english.global.resolver.argument.TokenArgumentResolver;
 import psam.portfolio.sunder.english.global.resolver.argument.UserIdArgumentResolver;
-import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
 import java.util.Arrays;
@@ -28,7 +27,6 @@ import java.util.List;
 public class WebConfig implements WebMvcConfigurer {
 
     private final JwtUtils jwtUtils;
-    private final ClientUsernameHolder clientUsernameHolder;
     private final Environment env;
 
     @Bean
@@ -47,21 +45,21 @@ public class WebConfig implements WebMvcConfigurer {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new UserIdArgumentResolver(jwtUtils));
         resolvers.add(new TokenArgumentResolver(jwtUtils));
-        resolvers.add(new RemoteIpArgumentResolver(clientUsernameHolder));
+        resolvers.add(new RemoteIpArgumentResolver());
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ClientUsernameHolderInterceptor(clientUsernameHolder, objectMapper()))
+        registry.addInterceptor(new ClientInfoHolderInterceptor(jwtUtils, objectMapper()))
                 .addPathPatterns("/api/**")
                 .order(1);
-        registry.addInterceptor(new AccessLogInterceptor(clientUsernameHolder))
+        registry.addInterceptor(new AccessLogInterceptor())
                 .addPathPatterns("/api/**")
                 .order(2);
 
         // "test" 프로필이 아닐 때만 Interceptor 를 등록
         if (!Arrays.asList(env.getActiveProfiles()).contains("test")) {
-            registry.addInterceptor(new JwtIpAuthenticationInterceptor(jwtUtils, clientUsernameHolder, objectMapper()))
+            registry.addInterceptor(new JwtAuthenticationInterceptor(jwtUtils, objectMapper()))
                     .addPathPatterns("/api/**")
                     .order(3);
         }

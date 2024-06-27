@@ -7,13 +7,11 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
+import psam.portfolio.sunder.english.infrastructure.clientinfo.ClientInfoHolder;
 
 @Slf4j
 @RequiredArgsConstructor
 public class RemoteIpArgumentResolver implements HandlerMethodArgumentResolver {
-
-    private final ClientUsernameHolder clientUsernameHolder;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -25,6 +23,6 @@ public class RemoteIpArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        return clientUsernameHolder.getClientUsername();
+        return ClientInfoHolder.getRemoteIp();
     }
 }

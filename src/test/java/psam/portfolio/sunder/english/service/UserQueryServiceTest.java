@@ -170,7 +170,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
     @DisplayName("사용자가 로그인하고 토큰을 발급받을 수 있다.")
     @Test
-    void loginAndGetToken() throws JsonProcessingException {
+    void loginAndGetToken() {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
@@ -196,6 +196,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(claims.get(JwtClaim.REMOTE_IP.toString(), String.class)).isEqualTo(remoteIp);
 
         assertThat(result.getUserId()).isEqualTo(director.getId().toString());
+        assertThat(result.getAcademyId()).isEqualTo(director.getAcademy().getId().toString());
         assertThat(result.getRoleNames()).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
     }
 

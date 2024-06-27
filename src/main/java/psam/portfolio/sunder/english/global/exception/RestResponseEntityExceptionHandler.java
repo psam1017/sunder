@@ -34,7 +34,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
-import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
+import psam.portfolio.sunder.english.infrastructure.clientinfo.ClientInfoHolder;
 
 import java.util.Objects;
 
@@ -50,8 +50,6 @@ import static org.springframework.http.HttpStatus.*;
 @RestControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-
-    private final ClientUsernameHolder clientUsernameHolder;
     private final ObjectMapper objectMapper;
 
     /**
@@ -188,8 +186,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
-
-        log.error("[NoResourceFoundException handle] request uri = {} {} {}", clientUsernameHolder.getClientUsername(), httpServletRequest.getMethod(), httpServletRequest.getRequestURI());
+        log.error("[NoResourceFoundException handle] request uri = {} {}", httpServletRequest.getMethod(), httpServletRequest.getRequestURI());
 
         String message = "There is no API(or resource) for " + ex.getHttpMethod() + " /" + ex.getResourcePath();
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.NOT_FOUND, message);

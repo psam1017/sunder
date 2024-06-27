@@ -230,7 +230,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies/{academyId}/verify", academyId.toString())
+                get("/api/academies/{academyId}/verify", academyId.toString())
                         .contentType(APPLICATION_JSON)
         );
 
