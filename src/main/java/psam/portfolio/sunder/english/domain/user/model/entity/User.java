@@ -56,6 +56,7 @@ public abstract class User extends BaseEntity {
 
     private LocalDateTime passwordChangeAllowedDateTime;
 
+    // 값 타입 컬렉션을 사용하지 않은 이유. ROLE_SECRETARY 등 역할이 추가될 수 있음을 고려하여 정석적인 패턴(SQL_Anti_Patterns.31가지 맛)으로 Role 엔티티를 생성.
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles = new HashSet<>();
 

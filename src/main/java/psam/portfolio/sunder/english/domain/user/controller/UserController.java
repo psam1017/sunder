@@ -98,7 +98,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Object> getMyDetail(@UserId UUID userId) {
+    public ApiResponse<?> getMyDetail(@UserId UUID userId) {
         Object myInfo = userQueryService.getMyInfo(userId);
         return ApiResponse.ok(myInfo);
     }

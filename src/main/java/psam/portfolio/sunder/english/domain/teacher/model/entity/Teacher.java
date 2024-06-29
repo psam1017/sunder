@@ -29,8 +29,12 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 public class Teacher extends User {
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "academy_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private Academy academy;
 
     @OneToMany(mappedBy = "teacher")

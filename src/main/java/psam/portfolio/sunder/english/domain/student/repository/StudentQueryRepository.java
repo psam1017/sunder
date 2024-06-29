@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.exception.NoSuchStudentException;
-import psam.portfolio.sunder.english.domain.student.model.request.StudentSearchCond;
+import psam.portfolio.sunder.english.domain.student.model.request.StudentPageSearchCond;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public class StudentQueryRepository {
                 .fetch();
     }
 
-    public List<Student> findAllBySearchCond(UUID academyId, StudentSearchCond cond) {
+    public List<Student> findAllByPageSearchCond(UUID academyId, StudentPageSearchCond cond) {
 
         OrderSpecifier<?> customOrder = specifyCustomOrder(cond);
         OrderSpecifier<String> defaultOrder = specifyDefaultOrder();
@@ -93,7 +93,7 @@ public class StudentQueryRepository {
                 .fetch();
     }
 
-    public long countBySearchCond(long contentSize, UUID academyId, StudentSearchCond cond) {
+    public long countByPageSearchCond(long contentSize, UUID academyId, StudentPageSearchCond cond) {
         int size = cond.getSize();
         long offset = cond.getOffset();
 
@@ -101,15 +101,15 @@ public class StudentQueryRepository {
             if (size > contentSize) {
                 return contentSize;
             }
-            return this.countBySearchCondQuery(academyId, cond);
+            return this.countByPageSearchCondQuery(academyId, cond);
         }
         if (contentSize != 0 && size > contentSize) {
             return offset + contentSize;
         }
-        return this.countBySearchCondQuery(academyId, cond);
+        return this.countByPageSearchCondQuery(academyId, cond);
     }
 
-    private long countBySearchCondQuery(UUID academyId, StudentSearchCond cond) {
+    private long countByPageSearchCondQuery(UUID academyId, StudentPageSearchCond cond) {
         Long count = query.select(student.countDistinct())
                 .from(student)
                 .where(
@@ -186,7 +186,7 @@ public class StudentQueryRepository {
         return null;
     }
 
-    private static OrderSpecifier<?> specifyCustomOrder(StudentSearchCond cond) {
+    private static OrderSpecifier<?> specifyCustomOrder(StudentPageSearchCond cond) {
         String prop = cond.getProp();
         Order order = cond.getDir();
 

@@ -5,19 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
-import psam.portfolio.sunder.english.global.pagination.SearchCond;
+import psam.portfolio.sunder.english.global.pagination.PageSearchCond;
 
 @Getter
-@Setter
-@NoArgsConstructor
-public class BookSearchCond extends SearchCond {
+public class BookPageSearchCond extends PageSearchCond {
 
     private String keyword;
     private boolean privateOnly;
     private Integer year;
 
     @Builder
-    public BookSearchCond(Integer page, Integer size, String prop, String dir, String keyword, Boolean privateOnly, Integer year) {
+    public BookPageSearchCond(Integer page, Integer size, String prop, String dir, String keyword, Boolean privateOnly, Integer year) {
         super(page, size, prop, dir);
         keyword = substring20(keyword);
         this.keyword = removeTwoWhiteSpaces(keyword);
@@ -34,7 +32,9 @@ public class BookSearchCond extends SearchCond {
 
     private String removeTwoWhiteSpaces(String str) {
         if (StringUtils.hasText(str)) {
-            return str.trim().replaceAll("\\s{2,}", " ");
+            while (str.contains("  ")) {
+                str = str.replaceAll("\\s+", " ");
+            }
         }
         return str;
     }

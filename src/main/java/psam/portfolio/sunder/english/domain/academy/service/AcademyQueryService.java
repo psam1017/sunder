@@ -8,7 +8,7 @@ import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademySta
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.exception.OneParamToCheckAcademyDuplException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicPageSearchCond;
 import psam.portfolio.sunder.english.domain.academy.model.response.AcademyFullResponse;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -139,9 +139,9 @@ public class AcademyQueryService {
      * @param cond 검색 조건
      * @return 학원 목록과 페이징 정보
      */
-    public Map<String, Object> getPublicList(AcademyPublicSearchCond cond) {
-        List<Academy> academies = academyQueryRepository.findAllBySearchCond(cond);
-        long count = academyQueryRepository.countBySearchCond(academies.size(), cond);
+    public Map<String, Object> getPublicList(AcademyPublicPageSearchCond cond) {
+        List<Academy> academies = academyQueryRepository.findAllByPageSearchCond(cond);
+        long count = academyQueryRepository.countByPageSearchCond(academies.size(), cond);
 
         return Map.of(
                 "academies", academies.stream().map(AcademyFullResponse::from).toList(),

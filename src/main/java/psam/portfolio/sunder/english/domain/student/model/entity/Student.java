@@ -44,8 +44,12 @@ public class Student extends User {
     @Embedded
     private Parent parent;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "academy_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private Academy academy;
 
     @OneToMany(mappedBy = "student")

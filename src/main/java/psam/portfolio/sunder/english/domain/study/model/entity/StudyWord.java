@@ -11,10 +11,7 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(
         name = "study_words",
-        indexes = {
-                @Index(columnList = "practice_id"),
-                @Index(columnList = "exam_id")
-        }
+        indexes = @Index(columnList = "study_id")
 )
 @Entity
 public class StudyWord {
@@ -22,23 +19,27 @@ public class StudyWord {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String submit;
     private String question;
+    private String submit;
     private String answer;
     private boolean correct;
-    private String incorrectReason;
+    private String reason;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "study_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(
+            name = "study_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private Study study;
 
     @Builder
-    public StudyWord(String submit, String question, String answer, boolean correct, String incorrectReason, Study study) {
-        this.submit = submit;
+    public StudyWord(String question, String submit, String answer, boolean correct, String reason, Study study) {
         this.question = question;
+        this.submit = submit;
         this.answer = answer;
         this.correct = correct;
-        this.incorrectReason = incorrectReason;
+        this.reason = reason;
         this.study = study;
     }
 
@@ -46,7 +47,7 @@ public class StudyWord {
         this.correct = correct;
     }
 
-    public void setIncorrectReason(String incorrectReason) {
-        this.incorrectReason = incorrectReason;
+    public void setReason(String incorrectReason) {
+        this.reason = incorrectReason;
     }
 }

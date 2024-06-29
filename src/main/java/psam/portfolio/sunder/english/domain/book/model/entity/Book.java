@@ -51,9 +51,6 @@ public class Book extends BaseEntity {
     @OneToMany(mappedBy = "book")
     private List<Word> words = new ArrayList<>();
 
-    @OneToMany(mappedBy = "book")
-    private List<Study> studies = new ArrayList<>();
-
     @Builder
     public Book(boolean openToPublic, String publisher, String name, String chapter, String subject, Academy academy) {
         this.status = BookStatus.CREATED;

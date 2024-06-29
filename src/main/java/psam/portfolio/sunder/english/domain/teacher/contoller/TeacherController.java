@@ -48,7 +48,7 @@ public class TeacherController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     @GetMapping("")
     public ApiResponse<Map<String, List<?>>> getTeacherList(@UserId UUID userId,
-                                                            @ModelAttribute TeacherSearchCond cond) {
+                                                            @ModelAttribute TeacherPageSearchCond cond) {
         List<?> teachers = teacherQueryService.getList(userId, cond);
         return ApiResponse.ok(Map.of("teachers", teachers));
     }
@@ -62,7 +62,7 @@ public class TeacherController {
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     @GetMapping("/{teacherId}")
-    public ApiResponse<Object> getTeacherDetail(@UserId UUID userId,
+    public ApiResponse<?> getTeacherDetail(@UserId UUID userId,
                                                 @PathVariable UUID teacherId) {
         Object teacher = teacherQueryService.getDetail(userId, teacherId);
         return ApiResponse.ok(teacher);

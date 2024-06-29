@@ -9,7 +9,7 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyQueryRepository;
 import psam.portfolio.sunder.english.domain.student.model.entity.QStudent;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.student.model.request.StudentSearchCond;
+import psam.portfolio.sunder.english.domain.student.model.request.StudentPageSearchCond;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentPublicResponse;
 import psam.portfolio.sunder.english.domain.student.repository.StudentQueryRepository;
@@ -60,13 +60,13 @@ public class StudentQueryService {
      * @param cond      학생 목록 조회 조건
      * @return 학생 목록
      */
-    public Map<String, Object> getList(UUID teacherId, StudentSearchCond cond) {
+    public Map<String, Object> getList(UUID teacherId, StudentPageSearchCond cond) {
         Academy getAcademy = academyQueryRepository.getOne(
                 QAcademy.academy.teachers.any().id.eq(teacherId)
         );
 
-        List<Student> students = studentQueryRepository.findAllBySearchCond(getAcademy.getId(), cond);
-        long count = studentQueryRepository.countBySearchCond(students.size(), getAcademy.getId(), cond);
+        List<Student> students = studentQueryRepository.findAllByPageSearchCond(getAcademy.getId(), cond);
+        long count = studentQueryRepository.countByPageSearchCond(students.size(), getAcademy.getId(), cond);
 
         return Map.of(
                 "students", students.stream().map(StudentPublicResponse::from).toList(),

@@ -10,7 +10,7 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.student.model.request.StudentSearchCond;
+import psam.portfolio.sunder.english.domain.student.model.request.StudentPageSearchCond;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentPublicResponse;
 import psam.portfolio.sunder.english.domain.student.service.StudentQueryService;
@@ -66,7 +66,7 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
 
         Collections.sort(attendanceIds);
         attendanceIds.remove(attendanceIds.size() - 1);
-        StudentSearchCond cond = StudentSearchCond.builder()
+        StudentPageSearchCond cond = StudentPageSearchCond.builder()
                 .page(1)
                 .size(10)
                 .build();
@@ -101,7 +101,7 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.registerStudent("Bart Simpson", "ELEM2", new Address("123 Main St", "Apt 4B", "12345"), new School("Springfield Elementary", 4), new Parent("Marge Simpson", "555-123-4567"), UserStatus.ACTIVE, academy); // Different parent name
         dataCreator.registerStudent("Bart Simpson", "ELEM3", new Address("123 Main St", "Apt 4B", "12345"), new School("Springfield Elementary", 4), new Parent("Homer Simpson", "555-123-4567"), UserStatus.WITHDRAWN, academy); // Different status
 
-        StudentSearchCond cond = StudentSearchCond.builder()
+        StudentPageSearchCond cond = StudentPageSearchCond.builder()
                 .page(1)
                 .size(10)
                 .name("Bart")

@@ -8,7 +8,7 @@ import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademySta
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherSearchCond;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPageSearchCond;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherQueryService;
@@ -51,7 +51,7 @@ public class TeacherQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
         saveTeachers.add(0, director);
 
-        TeacherSearchCond cond = TeacherSearchCond.builder()
+        TeacherPageSearchCond cond = TeacherPageSearchCond.builder()
                 .page(null)
                 .size(null)
                 .prop("name")
@@ -97,7 +97,7 @@ public class TeacherQueryServiceTest extends AbstractSunderApplicationTest {
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(student, ROLE_STUDENT);
 
-        TeacherSearchCond cond = TeacherSearchCond.builder()
+        TeacherPageSearchCond cond = TeacherPageSearchCond.builder()
                 .page(null)
                 .size(null)
                 .prop("name")

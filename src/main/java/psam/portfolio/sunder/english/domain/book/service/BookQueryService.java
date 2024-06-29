@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.exception.BookAccessDeniedException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
-import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
@@ -40,12 +40,12 @@ public class BookQueryService {
      * @param cond   교재 목록 조회 조건
      * @return 교재 목록과 페이지 정보
      */
-    public Map<String, Object> getBookList(UUID userId, BookSearchCond cond) {
+    public Map<String, Object> getBookList(UUID userId, BookPageSearchCond cond) {
         User getUser = userQueryRepository.getById(userId);
         UUID academyId = getAcademyFromUser(getUser).getId();
 
-        List<Book> books = bookQueryRepository.findAllBySearchCond(academyId, cond);
-        long count = bookQueryRepository.countBySearchCond(books.size(), academyId, cond);
+        List<Book> books = bookQueryRepository.findAllByPageSearchCond(academyId, cond);
+        long count = bookQueryRepository.countByPageSearchCond(books.size(), academyId, cond);
 
         return Map.of(
                 "books", books.stream().map(BookFullResponse::from).toList(),

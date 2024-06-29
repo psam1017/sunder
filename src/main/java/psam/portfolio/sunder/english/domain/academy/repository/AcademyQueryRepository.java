@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.NoSuchAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicPageSearchCond;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +69,7 @@ public class AcademyQueryRepository {
                 .fetch();
     }
 
-    public List<Academy> findAllBySearchCond(AcademyPublicSearchCond cond) {
+    public List<Academy> findAllByPageSearchCond(AcademyPublicPageSearchCond cond) {
         return query.selectDistinct(academy)
                 .from(academy)
                 .where(
@@ -83,7 +83,7 @@ public class AcademyQueryRepository {
                 .fetch();
     }
 
-    public long countBySearchCond(long contentSize, AcademyPublicSearchCond cond) {
+    public long countByPageSearchCond(long contentSize, AcademyPublicPageSearchCond cond) {
         int size = cond.getSize();
         long offset = cond.getOffset();
 
@@ -91,15 +91,15 @@ public class AcademyQueryRepository {
             if (size > contentSize) {
                 return contentSize;
             }
-            return this.countBySearchCondQuery(cond);
+            return this.countByPageSearchCondQuery(cond);
         }
         if (contentSize != 0 && size > contentSize) {
             return offset + contentSize;
         }
-        return this.countBySearchCondQuery(cond);
+        return this.countByPageSearchCondQuery(cond);
     }
 
-    private long countBySearchCondQuery(AcademyPublicSearchCond cond) {
+    private long countByPageSearchCondQuery(AcademyPublicPageSearchCond cond) {
         Long count = query.select(academy.countDistinct())
                 .from(academy)
                 .where(
@@ -128,7 +128,7 @@ public class AcademyQueryRepository {
         return null;
     }
 
-    private OrderSpecifier<?> specifyOrder(AcademyPublicSearchCond cond) {
+    private OrderSpecifier<?> specifyOrder(AcademyPublicPageSearchCond cond) {
         String prop = cond.getProp();
         Order order = cond.getDir();
 

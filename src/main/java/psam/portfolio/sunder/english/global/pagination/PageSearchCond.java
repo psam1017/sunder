@@ -6,7 +6,7 @@ import static com.querydsl.core.types.Order.ASC;
 import static com.querydsl.core.types.Order.DESC;
 
 /**
- * SearchCond 는 Repository Tier 에서 요구할 유스케이스이다. 언제나 아래 4개의 값을 요구한다.
+ * PageSearchCond 는 Repository Tier 에서 요구할 유스케이스이며, 언제나 아래 4개의 값을 요구한다.
  * 따라서 모든 필드는 null 이 아니고, 기본값을 가져야 한다.
  * <br>
  * page 는 현재 페이지이다. -> 1
@@ -14,21 +14,14 @@ import static com.querydsl.core.types.Order.DESC;
  * prop 은 정렬의 기준이다. -> id, createdDateTime 등
  * dir 은 정렬 방향이다. -> DESC
  */
-public abstract class SearchCond {
+public abstract class PageSearchCond {
 
     protected int page;
     protected int size;
     protected String prop;
     protected Order dir;
 
-    public SearchCond() {
-        this.page = 1;
-        this.size = 10;
-        this.prop = "";
-        this.dir = DESC;
-    }
-
-    public SearchCond(Integer page, Integer size, String prop, String dir) {
+    public PageSearchCond(Integer page, Integer size, String prop, String dir) {
         if (page == null || page < 0) {
             this.page = 1;
         } else {

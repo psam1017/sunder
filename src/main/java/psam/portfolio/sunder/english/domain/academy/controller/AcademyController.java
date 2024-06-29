@@ -11,7 +11,7 @@ import psam.portfolio.sunder.english.global.resolver.argument.AcademyId;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
-import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicPageSearchCond;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyQueryService;
 
@@ -74,7 +74,7 @@ public class AcademyController {
      * @return 학원 목록
      */
     @GetMapping("")
-    public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute @Valid AcademyPublicSearchCond cond) {
+    public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute @Valid AcademyPublicPageSearchCond cond) {
         Map<String, Object> response = academyQueryService.getPublicList(cond);
         return ApiResponse.ok(response);
     }
