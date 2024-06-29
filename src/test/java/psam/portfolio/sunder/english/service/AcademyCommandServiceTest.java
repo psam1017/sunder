@@ -5,10 +5,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
 import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.DirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
@@ -17,10 +18,10 @@ import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandServic
 import psam.portfolio.sunder.english.domain.teacher.exception.RoleDirectorRequiredException;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
@@ -370,7 +371,8 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
     void updateInfo() {
         // given
         Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
         String uniqueAcademyName = infoContainer.getUniqueAcademyName();
         String uniquePhoneNumber = infoContainer.getUniquePhoneNumber();
@@ -387,7 +389,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
                 .build();
 
         // when
-        UUID academyId = refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH));
+        UUID academyId = refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH));
 
         // then
         Academy getAcademy = academyQueryRepository.getById(academyId);
@@ -405,7 +407,8 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
     void updateInfoWithDuplicateName() {
         // given
         Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
         Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
@@ -421,7 +424,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
@@ -430,7 +433,8 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
     void updateInfoWithDuplicatePhone() {
         // given
         Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
         Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
@@ -446,7 +450,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
@@ -455,7 +459,8 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
     void updateInfoWithDuplicateEmail() {
         // given
         Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
         Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
@@ -471,7 +476,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
@@ -480,7 +485,8 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
     void updateInfoWithPending() {
         // given
         Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
         Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.PENDING);
 
@@ -496,17 +502,17 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
+        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
                 .doesNotThrowAnyException();
     }
 
-    // 테스트 6. 학원 정보 수정 시 자기 학원의 이름은 중복 검사에서 제외된다.
     @DisplayName("자기 학원의 이름은 중복 검사에서 제외된다.")
     @Test
     void updateInfoWithSelf() {
         // given
         Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(registerAcademy.getName())
@@ -520,8 +526,34 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
+        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
                 .doesNotThrowAnyException();
+    }
+
+    @DisplayName("학원장이 아니라면 수정할 수 없다.")
+    @Test
+    public void updateInfoRequireDirector() {
+        // given
+        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
+        dataCreator.createUserRoles(registerTeacher, ROLE_TEACHER);
+
+        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+
+        AcademyPATCH academyPATCH = AcademyPATCH.builder()
+                .name(anotherAcademy.getName())
+                .phone(anotherAcademy.getPhone())
+                .email(anotherAcademy.getEmail())
+                .street("new street")
+                .addressDetail("new detail")
+                .postalCode("11111")
+                .openToPublic(false)
+                .build();
+
+        // when
+        // then
+        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerTeacher.getId(), academyPATCH)))
+                .isInstanceOf(RoleDirectorRequiredException.class);
     }
 
     @DisplayName("학원장은 자기 학원을 폐쇄 신청할 수 있다.")

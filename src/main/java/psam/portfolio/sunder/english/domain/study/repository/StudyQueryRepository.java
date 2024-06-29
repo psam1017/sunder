@@ -6,59 +6,59 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.domain.study.exception.NoSuchExamException;
-import psam.portfolio.sunder.english.domain.study.model.entity.Exam;
+import psam.portfolio.sunder.english.domain.study.exception.NoSuchStudyException;
+import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.domain.study.model.entity.QExam.exam;
+import static psam.portfolio.sunder.english.domain.study.model.entity.QStudy.study;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Repository
-public class ExamQueryRepository {
+public class StudyQueryRepository {
 
     private final JPAQueryFactory query;
     private final EntityManager em;
 
-    public Exam getById(UUID uuid) {
-        Exam entity = em.find(Exam.class, uuid);
+    public Study getById(UUID uuid) {
+        Study entity = em.find(Study.class, uuid);
         if (entity == null) {
-            throw new NoSuchExamException();
+            throw new NoSuchStudyException();
         }
         return entity;
     }
 
-    public Exam getOne(BooleanExpression... expressions) {
-        Exam entity = query
-                .select(exam)
-                .from(exam)
+    public Study getOne(BooleanExpression... expressions) {
+        Study entity = query
+                .select(study)
+                .from(study)
                 .where(expressions)
                 .fetchOne();
         if (entity == null) {
-            throw new NoSuchExamException();
+            throw new NoSuchStudyException();
         }
         return entity;
     }
 
-    public Optional<Exam> findOne(BooleanExpression... expressions) {
+    public Optional<Study> findOne(BooleanExpression... expressions) {
         return Optional.ofNullable(
-                query.select(exam)
-                        .from(exam)
+                query.select(study)
+                        .from(study)
                         .where(expressions)
                         .fetchOne()
         );
     }
 
-    public Optional<Exam> findById(UUID uuid) {
-        return Optional.ofNullable(em.find(Exam.class, uuid));
+    public Optional<Study> findById(UUID uuid) {
+        return Optional.ofNullable(em.find(Study.class, uuid));
     }
 
-    public List<Exam> findAll(BooleanExpression... expressions) {
-        return query.select(exam)
-                .from(exam)
+    public List<Study> findAll(BooleanExpression... expressions) {
+        return query.select(study)
+                .from(study)
                 .where(expressions)
                 .fetch();
     }

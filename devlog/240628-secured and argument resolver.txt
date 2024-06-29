@@ -1,0 +1,13 @@
+이런. 또 Spring Security 버그다.
+최근에는 백엔드 API 를 어느 정도 정리하고, 프론트엔드 작업을 하면서 통합테스트를 하는데, argument resolver 에서 예외가 발생했었다.
+
+원인을 찾아보니 token 이 보내지지 않아서 애초에 접근이 불가능한데 token 으로부터 subject 를 추출하려고 해서 생긴 일이다.
+그런데 @Secured 로 이미 token 이 있는지를 검사하고 있지 않나? 싶어서 테스트를 해보니 결과는 다음과 같았다.
+
+- token 이 있고, 허용하는 권한을 가지고 있는 경우 통과
+- token 이 있고, 허용하는 권한을 가지고 있지 않은 경우 거부
+- token 이 없는 경우, argument resolver 에서 예외 발생
+
+최근해 본 결과, argument resolver 가 @Secured 보다도 더 높은 우선순위를 가지고 먼저 실행이 되는 것 같기에 발생한 예외로 보였고 실제로 그러했다.
+나는 @Secured 로 권한 검증이 끝난 다음, 검증된 token 을 받아서 argument resolver 가 실행할 것을 기대했는데 그 반대였다.
+따라서 argument resolver 에서 token 및 그와 관련된 SecurityContextHolder 를 비롯한 ThreadLocal 저장 정보가 권한 검증이 되었다고 신뢰할 수 없기에 별도로 인증되었는지, 유효한 토큰인지 정도는 직접 검사할 필요가 있다.

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import psam.portfolio.sunder.english.domain.teacher.exception.TeacherAccessDeniedException;
 import psam.portfolio.sunder.english.domain.teacher.model.request.*;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherQueryService;
@@ -12,10 +13,7 @@ import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/teachers")
@@ -118,9 +116,13 @@ public class TeacherController {
      * @return 개인정보 변경 완료된 선생님 아이디
      */
     @Secured("ROLE_TEACHER")
-    @PatchMapping("/personal-info")
-    public ApiResponse<Map<String, UUID>> updateTeacherInfo(@UserId UUID teacherId,
+    @PatchMapping("/{teacherId}/personal-info")
+    public ApiResponse<Map<String, UUID>> updateTeacherInfo(@UserId UUID userId,
+                                                            @PathVariable UUID teacherId,
                                                             @RequestBody @Valid TeacherPATCHInfo patch) {
+        if (!Objects.equals(userId, teacherId)) {
+            throw new TeacherAccessDeniedException();
+        }
         UUID updatedTeacherId = teacherCommandService.updateInfo(teacherId, patch);
         return ApiResponse.ok(Map.of("teacherId", updatedTeacherId));
     }

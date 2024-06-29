@@ -9,6 +9,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.global.security.filter.JwtAuthenticationFilter;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
@@ -47,10 +49,20 @@ public class RestDocsEnvironment extends AbstractSunderApplicationTest {
     }
 
     protected String createBearerToken(User user) {
+
+        String academyId = null;
+        if (user instanceof Teacher t) {
+            academyId = t.getAcademy().getId().toString();
+        } else if (user instanceof Student s) {
+            academyId = s.getAcademy().getId().toString();
+        }
+
         Map<String, Object> claims = Map.of(
+                LOGIN_ID.toString(), user.getLoginId(),
                 PASSWORD.toString(), user.getLoginPw(),
                 USER_STATUS.toString(), user.getStatus().toString(),
-                ROLE_NAMES.toString(), createJson(user.getRoles().stream().map(UserRole::getRoleName).toList())
+                ROLE_NAMES.toString(), createJson(user.getRoles().stream().map(UserRole::getRoleName).toList()),
+                ACADEMY_ID.toString(), academyId
         );
         return "Bearer " + jwtUtils.generateToken(user.getId().toString(), 1000 * 60, claims);
     }

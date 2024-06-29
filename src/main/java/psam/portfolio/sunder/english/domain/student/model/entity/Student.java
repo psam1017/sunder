@@ -5,12 +5,16 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -43,6 +47,9 @@ public class Student extends User {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Academy academy;
+
+    @OneToMany(mappedBy = "student")
+    private List<Study> studies = new ArrayList<>();
 
     @Builder
     public Student(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status, Academy academy, String attendanceId, String note, School school, Parent parent) {

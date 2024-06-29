@@ -80,8 +80,8 @@ public class StudentController {
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @GetMapping("/{studentId}")
-    public ApiResponse<Object> getStudent(@UserId UUID teacherId,
-                                          @PathVariable UUID studentId) {
+    public ApiResponse<Object> getStudentDetail(@UserId UUID teacherId,
+                                                @PathVariable UUID studentId) {
         StudentFullResponse studentResponse = studentQueryService.getDetail(teacherId, studentId);
         return ApiResponse.ok(studentResponse);
     }

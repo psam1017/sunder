@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
+import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -37,7 +38,7 @@ public class Book extends BaseEntity {
     private BookStatus status;
 
     private String publisher;
-    private String bookName;
+    private String name;
     private String chapter;
     private String subject;
     private String searchText;
@@ -50,12 +51,15 @@ public class Book extends BaseEntity {
     @OneToMany(mappedBy = "book")
     private List<Word> words = new ArrayList<>();
 
+    @OneToMany(mappedBy = "book")
+    private List<Study> studies = new ArrayList<>();
+
     @Builder
-    public Book(boolean openToPublic, String publisher, String bookName, String chapter, String subject, Academy academy) {
+    public Book(boolean openToPublic, String publisher, String name, String chapter, String subject, Academy academy) {
         this.status = BookStatus.CREATED;
         this.openToPublic = openToPublic;
         this.publisher = publisher;
-        this.bookName = bookName;
+        this.name = name;
         this.chapter = chapter;
         this.subject = subject;
         this.academy = academy;
@@ -74,8 +78,8 @@ public class Book extends BaseEntity {
         this.publisher = publisher;
     }
 
-    public void setBookName(String bookName) {
-        this.bookName = bookName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setChapter(String chapter) {
@@ -91,7 +95,7 @@ public class Book extends BaseEntity {
     }
 
     public void updateSearchText() {
-        updateSearchText(publisher, bookName, chapter, subject);
+        updateSearchText(publisher, name, chapter, subject);
     }
 
     private void updateSearchText(String... strings) {

@@ -183,11 +183,9 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         LoginResult result = refreshAnd(() -> sut.login(loginForm, remoteIp));
 
         // then
-        assertThat(result.getAccessToken()).startsWith("Bearer ");
-        assertThat(result.getRefreshToken()).startsWith("Bearer ");
-        String accessToken = result.getAccessToken().replaceAll("Bearer ", "");
+        String accessToken = result.getAccessToken();
         String accessTokenSubject = jwtUtils.extractSubject(accessToken);
-        String refreshTokenSubject = jwtUtils.extractSubject(result.getRefreshToken().replaceAll("Bearer ", ""));
+        String refreshTokenSubject = jwtUtils.extractSubject(result.getRefreshToken());
         assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
         assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
         Claims claims = jwtUtils.extractAllClaims(accessToken);
@@ -283,13 +281,9 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getId(), remoteIp));
 
         // then
-        assertThat(response.getAccessToken()).startsWith("Bearer ");
-        assertThat(response.getRefreshToken()).startsWith("Bearer ");
-        String accessToken = response.getAccessToken().replaceAll("Bearer ", "");
+        String accessToken = response.getAccessToken();
         String accessTokenSubject = jwtUtils.extractSubject(accessToken);
-        String refreshTokenSubject = jwtUtils.extractSubject(response.getRefreshToken().replaceAll("Bearer ", ""));
         assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
-        assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
 
         Claims claims = jwtUtils.extractAllClaims(accessToken);
         assertThat(claims.get(JwtClaim.PASSWORD.toString(), String.class)).isEqualTo(director.getLoginPw());

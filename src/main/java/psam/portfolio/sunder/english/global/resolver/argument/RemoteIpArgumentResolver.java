@@ -16,9 +16,9 @@ public class RemoteIpArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
 
-        boolean hasTokenAnnotation = parameter.hasParameterAnnotation(RemoteIp.class);
+        boolean hasRemoteIpAnnotation = parameter.hasParameterAnnotation(RemoteIp.class);
         boolean hasStringType = String.class.isAssignableFrom(parameter.getParameterType());
-        return hasTokenAnnotation && hasStringType;
+        return hasRemoteIpAnnotation && hasStringType;
     }
 
     @Override

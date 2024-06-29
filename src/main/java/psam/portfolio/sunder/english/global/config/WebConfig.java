@@ -13,6 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import psam.portfolio.sunder.english.global.interceptor.AccessLogInterceptor;
 import psam.portfolio.sunder.english.global.interceptor.ClientInfoHolderInterceptor;
 import psam.portfolio.sunder.english.global.interceptor.JwtAuthenticationInterceptor;
+import psam.portfolio.sunder.english.global.resolver.argument.AcademyIdArgumentResolver;
 import psam.portfolio.sunder.english.global.resolver.argument.RemoteIpArgumentResolver;
 import psam.portfolio.sunder.english.global.validator.EnumPatternValidator;
 import psam.portfolio.sunder.english.global.resolver.argument.TokenArgumentResolver;
@@ -44,6 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new UserIdArgumentResolver(jwtUtils));
+        resolvers.add(new AcademyIdArgumentResolver(jwtUtils));
         resolvers.add(new TokenArgumentResolver(jwtUtils));
         resolvers.add(new RemoteIpArgumentResolver());
     }

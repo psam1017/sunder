@@ -245,7 +245,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
         log.error("[TypeMismatchException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
-        String message = ex.getPropertyName() + " should be of type " + Objects.requireNonNull(ex.getRequiredType()).getName();
+        String message;
+        if (ex.getRequiredType() == null) {
+            message = ex.getPropertyName() + " has invalid type";
+        } else {
+            message = ex.getPropertyName() + " should be type of " + ex.getRequiredType().getName();
+        }
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
 
         return createResponseEntity(body, BAD_REQUEST);

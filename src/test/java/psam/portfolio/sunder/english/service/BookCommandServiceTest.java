@@ -44,14 +44,14 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
 
         String publisher = "publisher";
-        String bookName = "bookName";
+        String name = "name";
         String chapter = "chapter";
         String subject = "subject";
 
         BookReplace replace = BookReplace.builder()
                 .openToPublic(false)
                 .publisher(publisher)
-                .bookName(bookName)
+                .name(name)
                 .chapter(chapter)
                 .subject(subject)
                 .build();
@@ -62,7 +62,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         // then
         Book getBook = bookQueryRepository.getById(bookId);
         assertThat(getBook.getPublisher()).isEqualTo(publisher);
-        assertThat(getBook.getBookName()).isEqualTo(bookName);
+        assertThat(getBook.getName()).isEqualTo(name);
         assertThat(getBook.getChapter()).isEqualTo(chapter);
         assertThat(getBook.getSubject()).isEqualTo(subject);
 
@@ -76,18 +76,18 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
-        Book book = dataCreator.registerBook(true, "publisher", "bookName", "chapter", "subject", academy);
+        Book book = dataCreator.registerBook(true, "publisher", "name", "chapter", "subject", academy);
 
         boolean openToPublic = false;
         String publisher = "updatedPublisher";
-        String bookName = "updatedBookName";
+        String name = "updatedName";
         String chapter = "updatedChapter";
         String subject = "updatedSubject";
 
         BookReplace replace = BookReplace.builder()
                 .openToPublic(openToPublic)
                 .publisher(publisher)
-                .bookName(bookName)
+                .name(name)
                 .chapter(chapter)
                 .subject(subject)
                 .build();
@@ -99,7 +99,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         Book getBook = bookQueryRepository.getById(bookId);
         assertThat(getBook.isOpenToPublic()).isEqualTo(openToPublic);
         assertThat(getBook.getPublisher()).isEqualTo(publisher);
-        assertThat(getBook.getBookName()).isEqualTo(bookName);
+        assertThat(getBook.getName()).isEqualTo(name);
         assertThat(getBook.getChapter()).isEqualTo(chapter);
         assertThat(getBook.getSubject()).isEqualTo(subject);
 
@@ -119,7 +119,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         BookReplace replace = BookReplace.builder()
                 .openToPublic(false)
                 .publisher("updatedPublisher")
-                .bookName("updatedBookName")
+                .name("updatedName")
                 .chapter("updatedChapter")
                 .subject("updatedSubject")
                 .build();

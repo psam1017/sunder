@@ -21,7 +21,7 @@ public class BookReplace {
     private String publisher;
 
     @NotBlank
-    private String bookName;
+    private String name;
     private String chapter;
     private String subject;
 
@@ -29,7 +29,7 @@ public class BookReplace {
         return Book.builder()
                 .openToPublic(openToPublic)
                 .publisher(publisher)
-                .bookName(bookName)
+                .name(name)
                 .chapter(chapter)
                 .subject(subject)
                 .academy(academy)

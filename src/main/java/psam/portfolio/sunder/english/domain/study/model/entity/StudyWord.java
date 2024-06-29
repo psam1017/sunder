@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.domain.study.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
         }
 )
 @Entity
-public abstract class StudyWord {
+public class StudyWord {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,11 +28,25 @@ public abstract class StudyWord {
     private boolean correct;
     private String incorrectReason;
 
-    protected StudyWord(String submit, String question, String answer, boolean correct, String incorrectReason) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "study_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Study study;
+
+    @Builder
+    public StudyWord(String submit, String question, String answer, boolean correct, String incorrectReason, Study study) {
         this.submit = submit;
         this.question = question;
         this.answer = answer;
         this.correct = correct;
+        this.incorrectReason = incorrectReason;
+        this.study = study;
+    }
+
+    public void setCorrect(boolean correct) {
+        this.correct = correct;
+    }
+
+    public void setIncorrectReason(String incorrectReason) {
         this.incorrectReason = incorrectReason;
     }
 }

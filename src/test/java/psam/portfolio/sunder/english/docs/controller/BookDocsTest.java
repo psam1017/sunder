@@ -43,7 +43,7 @@ public class BookDocsTest extends RestDocsEnvironment {
         BookReplace replace = BookReplace.builder()
                 .openToPublic(false)
                 .publisher("publisher")
-                .bookName("bookName")
+                .name("name")
                 .chapter("chapter")
                 .subject("subject")
                 .build();
@@ -66,7 +66,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         requestFields(
                                 fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
                                 fieldWithPath("publisher").type(STRING).description("출판사"),
-                                fieldWithPath("bookName").type(STRING).description("교재명"),
+                                fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터"),
                                 fieldWithPath("subject").type(STRING).description("주제")
                         ),
@@ -88,7 +88,7 @@ public class BookDocsTest extends RestDocsEnvironment {
         BookReplace replace = BookReplace.builder()
                 .openToPublic(true)
                 .publisher("newPublisher")
-                .bookName("newBookName")
+                .name("newName")
                 .chapter("newChapter")
                 .subject("newSubject")
                 .build();
@@ -114,7 +114,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         requestFields(
                                 fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
                                 fieldWithPath("publisher").type(STRING).description("출판사"),
-                                fieldWithPath("bookName").type(STRING).description("교재명"),
+                                fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터"),
                                 fieldWithPath("subject").type(STRING).description("주제")
                         ),
@@ -261,7 +261,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         relaxedResponseFields(
                                 fieldWithPath("data.books[].id").type(STRING).description("교재 아이디"),
                                 fieldWithPath("data.books[].publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.books[].bookName").type(STRING).description("교재명"),
+                                fieldWithPath("data.books[].name").type(STRING).description("교재명"),
                                 fieldWithPath("data.books[].chapter").type(STRING).description("챕터"),
                                 fieldWithPath("data.books[].subject").type(STRING).description("주제"),
                                 fieldWithPath("data.books[].academyId").type(STRING).description("학원 아이디"),
@@ -314,7 +314,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         relaxedResponseFields(
                                 fieldWithPath("data.book.id").type(STRING).description("교재 아이디"),
                                 fieldWithPath("data.book.publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.book.bookName").type(STRING).description("교재명"),
+                                fieldWithPath("data.book.name").type(STRING).description("교재명"),
                                 fieldWithPath("data.book.chapter").type(STRING).description("챕터"),
                                 fieldWithPath("data.book.subject").type(STRING).description("주제"),
                                 fieldWithPath("data.book.academyId").type(STRING).description("학원 아이디"),
@@ -370,7 +370,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         relaxedResponseFields(
                                 fieldWithPath("data.book.id").type(STRING).description("교재 아이디"),
                                 fieldWithPath("data.book.publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.book.bookName").type(STRING).description("교재명"),
+                                fieldWithPath("data.book.name").type(STRING).description("교재명"),
                                 fieldWithPath("data.book.chapter").type(STRING).description("챕터"),
                                 fieldWithPath("data.book.subject").type(STRING).description("주제"),
                                 fieldWithPath("data.book.academyId").type(STRING).description("학원 아이디"),

@@ -6,5 +6,6 @@ public enum JwtClaim {
     PASSWORD,
     USER_STATUS,
     ROLE_NAMES,
-    REMOTE_IP
+    REMOTE_IP,
+    ACADEMY_ID
 }

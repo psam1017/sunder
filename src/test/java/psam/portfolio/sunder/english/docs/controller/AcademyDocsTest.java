@@ -416,7 +416,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies")
+                patch("/api/academies/{academyId}", academy.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(academyPATCH))
@@ -427,6 +427,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                                pathParameters(
+                                        parameterWithName("academyId").description("수정할 학원 아이디")
+                                ),
                                 requestFields(
                                         fieldWithPath("name").type(STRING).description("학원 이름"),
                                         fieldWithPath("phone").type(STRING).description("학원 전화번호").optional(),
@@ -551,7 +554,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies/revoke")
+                patch("/api/academies/{academyId}/revoke", academy.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -561,6 +564,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("academyId").description("수정할 학원 아이디")
+                        ),
                         relaxedResponseFields(
                                 fieldWithPath("data.academyId").type(STRING).description("페쇄를 취소한 학원 아이디")
                         )
@@ -582,7 +588,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies/end-trial")
+                post("/api/academies/end-trial")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(loginForm))

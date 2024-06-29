@@ -134,7 +134,8 @@ public class UserQueryService {
                 PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
                 REMOTE_IP.toString(), remoteIp,
-                ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList())
+                ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList()),
+                ACADEMY_ID.toString(), academyId
         );
         return new LoginResult(
                 jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims), // accessToken 만료 시간은 3시간
@@ -155,16 +156,23 @@ public class UserQueryService {
      */
     public TokenRefreshResponse refreshToken(UUID userId, String remoteIp) {
         User getUser = userQueryRepository.getById(userId);
+        String academyId = null;
+        if (getUser instanceof Teacher t) {
+            academyId = t.getAcademy().getId().toString();
+        } else if (getUser instanceof Student s) {
+            academyId = s.getAcademy().getId().toString();
+        }
+        
         Map<String, Object> claims = Map.of(
                 LOGIN_ID.toString(), getUser.getLoginId(),
                 PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
                 REMOTE_IP.toString(), remoteIp,
-                ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList())
+                ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList()),
+                ACADEMY_ID.toString(), academyId
         );
         return new TokenRefreshResponse(
-                jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims), // accessToken 만료 시간은 3시간
-                jwtUtils.generateToken(getUser.getId().toString(), 43200000) // refreshToken 만료 시간은 12시간
+                jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims) // accessToken 만료 시간은 3시간
         );
     }
 

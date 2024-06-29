@@ -61,7 +61,7 @@ public class BookCommandService {
             );
             getBook.setOpenToPublic(replace.getOpenToPublic());
             getBook.setPublisher(replace.getPublisher());
-            getBook.setBookName(replace.getBookName());
+            getBook.setName(replace.getName());
             getBook.setChapter(replace.getChapter());
             getBook.setSubject(replace.getSubject());
             getBook.updateSearchText();

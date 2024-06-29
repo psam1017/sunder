@@ -4,6 +4,7 @@
 
 ==== HTTP Request
 include::{snippets}/academy-docs-test/update-info/http-request.adoc[]
+include::{snippets}/academy-docs-test/update-info/path-parameters.adoc[]
 include::{snippets}/academy-docs-test/update-info/request-fields.adoc[]
 
 ==== HTTP Response

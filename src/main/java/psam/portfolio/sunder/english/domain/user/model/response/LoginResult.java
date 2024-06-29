@@ -16,8 +16,8 @@ public class LoginResult {
     private final List<RoleName> roleNames;
 
     public LoginResult(String accessToken, String refreshToken, boolean passwordChangeRequired, String userId, String academyId, List<RoleName> roleNames) {
-        this.accessToken = "Bearer " + accessToken;
-        this.refreshToken = "Bearer " + refreshToken;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.passwordChangeRequired = passwordChangeRequired;
         this.userId = userId;
         this.academyId = academyId;

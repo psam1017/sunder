@@ -11,28 +11,27 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import psam.portfolio.sunder.english.infrastructure.jwt.IllegalTokenException;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim;
+import psam.portfolio.sunder.english.infrastructure.jwt.JwtStatus;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-/**
- * token without "Bearer " prefix
- */
 @Slf4j
 @RequiredArgsConstructor
-public class TokenArgumentResolver implements HandlerMethodArgumentResolver {
+public class AcademyIdArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final JwtUtils jwtUtils;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
 
-        boolean hasTokenAnnotation = parameter.hasParameterAnnotation(Token.class);
-        boolean hasStringType = String.class.isAssignableFrom(parameter.getParameterType());
-        return hasTokenAnnotation && hasStringType;
+        boolean hasAcademyIdAnnotation = parameter.hasParameterAnnotation(AcademyId.class);
+        boolean hasUUIDType = UUID.class.isAssignableFrom(parameter.getParameterType());
+        return hasAcademyIdAnnotation && hasUUIDType;
     }
 
     @Override
@@ -44,7 +43,7 @@ public class TokenArgumentResolver implements HandlerMethodArgumentResolver {
         if (StringUtils.hasText(authorization) && Pattern.matches("^Bearer .*", authorization)) {
             String token = authorization.replaceFirst("^Bearer ", "");
             if (jwtUtils.hasInvalidStatus(token).isEmpty()) {
-                return token;
+                return UUID.fromString(jwtUtils.extractClaim(token, c -> c.get(JwtClaim.ACADEMY_ID.toString(), String.class)));
             }
         }
         return null;

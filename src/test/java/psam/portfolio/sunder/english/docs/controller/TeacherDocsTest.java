@@ -420,7 +420,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.patch("/api/teachers/personal-info")
+                RestDocumentationRequestBuilders.patch("/api/teachers/{teacherId}/personal-info", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(patch))
@@ -431,6 +431,9 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("teacherId").description("수정할 선생 아이디")
+                        ),
                         requestFields(
                                 fieldWithPath("name").type(STRING).description("변경할 선생님 이름"),
                                 fieldWithPath("phone").type(STRING).description("변경할 선생님 전화번호").optional(),

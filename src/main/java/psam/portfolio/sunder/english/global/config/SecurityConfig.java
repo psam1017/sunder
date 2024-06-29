@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -36,7 +35,6 @@ import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServ
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceRepo;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
-@RequiredArgsConstructor
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 @EnableWebSecurity

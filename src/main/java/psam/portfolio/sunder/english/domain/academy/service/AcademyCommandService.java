@@ -178,6 +178,9 @@ public class AcademyCommandService {
     public UUID updateInfo(UUID directorId, AcademyPATCH patch) {
         Teacher getDirector = teacherQueryRepository.getById(directorId);
         Academy getAcademy = getDirector.getAcademy();
+        if (!getDirector.isDirector()) {
+            throw new RoleDirectorRequiredException();
+        }
 
         // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생, 단, 자기 학원은 제외하며 PENDING 상태도 제외.
         academyQueryRepository.findOne(
