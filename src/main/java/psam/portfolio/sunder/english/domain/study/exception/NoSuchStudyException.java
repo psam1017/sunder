@@ -8,6 +8,6 @@ import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
 public class NoSuchStudyException extends ApiException {
     @Override
     public ApiResponse<?> initialize() {
-        return ApiResponse.error(ApiStatus.NO_SUCH_ELEMENT, Study.class, "존재하지 않는 공부내역입니다.");
+        return ApiResponse.error(ApiStatus.NO_SUCH_ELEMENT, Study.class, "존재하지 않는 학습입니다.");
     }
 }

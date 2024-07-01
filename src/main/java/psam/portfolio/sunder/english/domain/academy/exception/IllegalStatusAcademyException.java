@@ -13,6 +13,6 @@ public class IllegalStatusAcademyException extends ApiException {
     }
 
     public IllegalStatusAcademyException(AcademyStatus academyStatus) {
-        this.response = ApiResponse.error(ApiStatus.ILLEGAL_STATUS, Academy.class, academyStatus.toString(), "서비스를 이용할 수 없는 상태입니다. [" + academyStatus + "]");
+        this.response = ApiResponse.error(ApiStatus.ILLEGAL_STATUS, Academy.class, academyStatus.toString(), "서비스를 이용할 수 없는 상태입니다. [" + academyStatus.value() + "]");
     }
 }

@@ -159,7 +159,7 @@ public class AcademyCommandService {
         }
         getAcademy.verify();
 
-        // 인증 시점에는 모든 선생(=학원장)의 상태를 인증함으로 변경한다.
+        // 인증 시점에는 모든 선생님(=학원장)의 상태를 인증함으로 변경한다.
         getAcademy.getTeachers().forEach(teacher -> {
             teacher.startTrial();
             teacher.verifyEmail(true);

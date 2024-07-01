@@ -22,16 +22,8 @@ public abstract class PageSearchCond {
     protected Order dir;
 
     public PageSearchCond(Integer page, Integer size, String prop, String dir) {
-        if (page == null || page < 0) {
-            this.page = 1;
-        } else {
-            this.page = page;
-        }
-        if (size == null || size < 10) {
-            this.size = 10;
-        } else {
-            this.size = Math.min(size, 100);
-        }
+        this.page = page == null || page < 0 ? 1 : page;
+        this.size = size == null || size < 10 ? 10 : Math.min(size, 100);
         this.prop = prop == null ? "" : prop;
         this.dir = "asc".equalsIgnoreCase(dir) ? ASC : DESC;
     }

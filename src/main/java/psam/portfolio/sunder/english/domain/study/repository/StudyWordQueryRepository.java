@@ -11,7 +11,6 @@ import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.study.model.entity.QStudyWord.studyWord;
 
@@ -23,8 +22,8 @@ public class StudyWordQueryRepository {
     private final JPAQueryFactory query;
     private final EntityManager em;
 
-    public StudyWord getById(UUID uuid) {
-        StudyWord entity = em.find(StudyWord.class, uuid);
+    public StudyWord getById(Long id) {
+        StudyWord entity = em.find(StudyWord.class, id);
         if (entity == null) {
             throw new NoSuchStudyWordException();
         }
@@ -52,8 +51,8 @@ public class StudyWordQueryRepository {
         );
     }
 
-    public Optional<StudyWord> findById(UUID uuid) {
-        return Optional.ofNullable(em.find(StudyWord.class, uuid));
+    public Optional<StudyWord> findById(Long id) {
+        return Optional.ofNullable(em.find(StudyWord.class, id));
     }
 
     public List<StudyWord> findAll(BooleanExpression... expressions) {

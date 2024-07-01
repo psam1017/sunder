@@ -26,7 +26,7 @@ public class TeacherController {
     /**
      * 선생님 등록 서비스
      *
-     * @param teacherId 학원에 등록할 선생의 아이디
+     * @param teacherId 학원에 등록할 선생님의 아이디
      * @param post      등록할 선생님 정보
      * @return 등록에 성공한 선생님 아이디
      */

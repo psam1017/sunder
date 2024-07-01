@@ -1,5 +1,6 @@
 package psam.portfolio.sunder.english.domain.study.model.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class StudyPATCHSubmit {
     @AllArgsConstructor
     @Builder
     public static class StudyWordPATCHSubmit {
+        @NotNull
         private Long id;
         private String submit;
     }

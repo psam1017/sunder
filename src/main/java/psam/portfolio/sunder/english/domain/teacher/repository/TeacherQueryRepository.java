@@ -86,7 +86,7 @@ public class TeacherQueryRepository {
         return academyId != null ? teacher.academy.id.eq(academyId) : null;
     }
 
-    private BooleanExpression teacherNameContains(String teacherName) {
+    private static BooleanExpression teacherNameContains(String teacherName) {
         if (StringUtils.hasText(teacherName)) {
             return Expressions
                     .stringTemplate("replace({0}, ' ', '')", teacher.name.toLowerCase())
@@ -95,7 +95,7 @@ public class TeacherQueryRepository {
         return null;
     }
 
-    private BooleanExpression userStatusEq(UserStatus status) {
+    private static BooleanExpression userStatusEq(UserStatus status) {
         return status != null ? teacher.status.eq(status) : null;
     }
 

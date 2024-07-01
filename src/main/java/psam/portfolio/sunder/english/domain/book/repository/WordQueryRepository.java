@@ -6,12 +6,11 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchWordException;
+import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.book.model.entity.QWord.word;
 
@@ -23,8 +22,8 @@ public class WordQueryRepository {
     private final JPAQueryFactory query;
     private final EntityManager em;
 
-    public Word getById(UUID uuid) {
-        Word entity = em.find(Word.class, uuid);
+    public Word getById(Long id) {
+        Word entity = em.find(Word.class, id);
         if (entity == null) {
             throw new NoSuchWordException();
         }
@@ -43,8 +42,8 @@ public class WordQueryRepository {
         return entity;
     }
 
-    public Optional<Word> findById(UUID uuid) {
-        return Optional.ofNullable(em.find(Word.class, uuid));
+    public Optional<Word> findById(Long id) {
+        return Optional.ofNullable(em.find(Word.class, id));
     }
 
     public Optional<Word> findOne(BooleanExpression... expressions) {

@@ -79,8 +79,8 @@ public class Academy extends TimeEntity {
         return this.status == AcademyStatus.VERIFIED;
     }
 
-    public boolean isSuspended() {
-        return this.status == AcademyStatus.SUSPENDED;
+    public boolean isForbidden() {
+        return this.status == AcademyStatus.FORBIDDEN;
     }
 
     public boolean isWithdrawn() {

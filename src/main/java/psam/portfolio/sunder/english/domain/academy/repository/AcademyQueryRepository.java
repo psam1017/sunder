@@ -119,7 +119,7 @@ public class AcademyQueryRepository {
         return openToPublic != null ? academy.openToPublic.eq(openToPublic) : null;
     }
 
-    private BooleanExpression academyNameContains(String academyName) {
+    private static BooleanExpression academyNameContains(String academyName) {
         if (StringUtils.hasText(academyName)) {
             return Expressions
                     .stringTemplate("replace({0}, ' ', '')", academy.name.toLowerCase())

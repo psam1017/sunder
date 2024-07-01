@@ -1,14 +1,23 @@
 package psam.portfolio.sunder.english.domain.study.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.exception.NoSuchStudyException;
+import psam.portfolio.sunder.english.domain.study.model.entity.QStudyWord;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
+import psam.portfolio.sunder.english.domain.study.model.request.StudySlicingSearchCond;
+import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingResponse;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,5 +70,90 @@ public class StudyQueryRepository {
                 .from(study)
                 .where(expressions)
                 .fetch();
+    }
+
+    public long findNextSequenceOfLastStudy() {
+        Long lastSequence = query.select(study.sequence.max())
+                .from(study)
+                .fetchOne();
+        return lastSequence == null ? 1 : lastSequence + 1;
+    }
+
+    public List<StudySlicingResponse> findAllBySlicingSearchCond(Student student, StudySlicingSearchCond cond) {
+        return findAllBySlicingSearchCondQuery(student, null, cond);
+    }
+
+    public List<StudySlicingResponse> findAllBySlicingSearchCond(Teacher teacher, StudySlicingSearchCond cond) {
+        return findAllBySlicingSearchCondQuery(null, teacher, cond);
+    }
+
+    // lastSequence 의 비교 방향과 정렬 방향이 일치해야 한다.
+    private List<StudySlicingResponse> findAllBySlicingSearchCondQuery(Student student, Teacher teacher, StudySlicingSearchCond cond) {
+        QStudyWord qStudyWord = QStudyWord.studyWord;
+        return query.select(Projections.constructor(StudySlicingResponse.class,
+                        study.id,
+                        study.sequence,
+                        study.title,
+                        study.status,
+                        study.type,
+                        study.classification,
+                        study.target,
+                        study.submitDateTime,
+                        study.student.id.as("studentId"),
+                        study.student.attendanceId.as("attendanceId"),
+                        study.student.name.as("studentName"),
+                        study.student.school.name.as("schoolName"),
+                        study.student.school.grade.as("schoolGrade"),
+                        qStudyWord.correct.isTrue().count().coalesce(0L).as("correctCount"),
+                        qStudyWord.count().coalesce(0L).as("totalCount")
+                ))
+                .distinct()
+                .from(study)
+                .join(study.studyWords, qStudyWord)
+                .where(
+                        sequenceLt(cond.getLastSequence()),
+                        studentIdEq(student),
+                        academyIdEqByTeacher(teacher),
+                        createdDateTimeGoe(cond.getStartDateTime()),
+                        createdDateTimeLoe(cond.getEndDateTime()),
+                        studentNameContains(cond.getStudentName()),
+                        studentSchoolGradeEq(cond.getSchoolGrade())
+                )
+                .orderBy(study.sequence.desc())
+                .limit(cond.getLimit())
+                .fetch();
+    }
+
+    private static BooleanExpression sequenceLt(Long sequence) {
+        return sequence == null ? null : study.sequence.lt(sequence);
+    }
+
+    private static BooleanExpression studentIdEq(Student student) {
+        return student == null ? null : study.student.id.eq(student.getId());
+    }
+
+    private BooleanExpression academyIdEqByTeacher(Teacher teacher) {
+        return teacher == null ? null : study.student.academy.id.eq(teacher.getAcademy().getId());
+    }
+
+    private static BooleanExpression createdDateTimeGoe(LocalDateTime createdDateTime) {
+        return createdDateTime == null ? null : study.createdDateTime.goe(createdDateTime);
+    }
+
+    private static BooleanExpression createdDateTimeLoe(LocalDateTime createdDateTime) {
+        return createdDateTime == null ? null : study.createdDateTime.loe(createdDateTime);
+    }
+
+    private static BooleanExpression studentNameContains(String studentName) {
+        if (StringUtils.hasText(studentName)) {
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", study.student.name.toLowerCase())
+                    .contains(studentName.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
+    private static BooleanExpression studentSchoolGradeEq(Integer schoolGrade) {
+        return schoolGrade == null ? null : study.student.school.grade.eq(schoolGrade);
     }
 }

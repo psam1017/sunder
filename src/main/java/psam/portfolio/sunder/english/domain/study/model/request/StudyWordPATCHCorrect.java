@@ -15,8 +15,6 @@ import java.util.List;
 public class StudyWordPATCHCorrect {
 
     @NotNull
-    private Long id;
-    @NotNull
     private Boolean correct;
     private String reason;
 }

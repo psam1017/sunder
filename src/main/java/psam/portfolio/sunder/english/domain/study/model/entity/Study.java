@@ -14,8 +14,10 @@ import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -25,7 +27,8 @@ import java.util.UUID;
         name = "studies",
         indexes = {
                 @Index(columnList = "student_id"),
-                @Index(columnList = "teacher_id")
+                @Index(columnList = "teacher_id"),
+                @Index(columnList = "sequence")
         }
 )
 @Entity
@@ -34,9 +37,16 @@ public class Study extends TimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(
+            nullable = false,
+            unique = true,
+            updatable = false
+    )
+    private long sequence;
     @Column(nullable = false)
-    private Long sequence;
-
+    private boolean ignoreCase;
+    @Column(nullable = false)
+    private String title;
     @Enumerated(EnumType.STRING)
     private StudyStatus status;
     @Enumerated(EnumType.STRING)
@@ -45,6 +55,7 @@ public class Study extends TimeEntity {
     private StudyClassification classification;
     @Enumerated(EnumType.STRING)
     private StudyTarget target;
+    private LocalDateTime submitDateTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
@@ -59,7 +70,7 @@ public class Study extends TimeEntity {
     private Teacher teacher;
 
     // ddl-auto 로는 컬렉션 테이블에 인덱스가 생성되지 않기에 외래키를 부여한다. 만약 인덱스를 생성하고 싶다면 다음 2가지를 고려한다.
-    // 1. 다대일 테이블로 만들어 다룬다.
+    // 1. 엔티티로 만들어 다룬다.
     // 2. database 에서 직접 인덱스를 생성한다.
     @ElementCollection
     @CollectionTable(
@@ -72,13 +83,36 @@ public class Study extends TimeEntity {
     private List<StudyWord> studyWords = new ArrayList<>();
 
     @Builder
-    public Study(Long sequence, StudyStatus status, StudyType type, StudyClassification classification, StudyTarget target, Student student, Teacher teacher) {
+    public Study(long sequence, Boolean ignoreCase, String title, StudyStatus status, StudyType type, StudyClassification classification, StudyTarget target, Student student, Teacher teacher) {
         this.sequence = sequence;
+        this.ignoreCase = ignoreCase == null || ignoreCase;
+        this.title = title;
         this.status = status;
         this.type = type;
         this.classification = classification;
         this.target = target;
         this.student = student;
         this.teacher = teacher;
+    }
+
+    public void delete() {
+        this.status = StudyStatus.DELETED;
+    }
+
+    public boolean canSubmit() {
+        return this.status == StudyStatus.ASSIGNED || this.status == StudyStatus.STARTED;
+    }
+
+    public boolean hasStudyWord(StudyWord getStudyWord) {
+        return getStudyWord != null && Objects.equals(getStudyWord.getStudy().getId(), this.id);
+    }
+
+    public void submit() {
+        this.status = StudyStatus.SUBMITTED;
+        this.submitDateTime = LocalDateTime.now();
+    }
+
+    public boolean isSubmitted() {
+        return this.status == StudyStatus.SUBMITTED;
     }
 }

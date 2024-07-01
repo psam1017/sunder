@@ -31,7 +31,7 @@ public class TeacherQueryService {
      * @param userId 사용자 아이디
      * @param cond   선생님 검색 조건
      * @return 선생님 목록
-     * @apiNote 학생이 요청할 때와 선생이 요청할 때 응답스펙이 다르다.
+     * @apiNote 학생이 요청할 때와 선생님이 요청할 때 응답스펙이 다르다.
      */
     public List<?> getList(UUID userId, TeacherPageSearchCond cond) {
         User getUser = userQueryRepository.getById(userId);
