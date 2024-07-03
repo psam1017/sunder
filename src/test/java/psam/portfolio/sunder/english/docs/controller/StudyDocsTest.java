@@ -252,7 +252,7 @@ public class StudyDocsTest extends RestDocsEnvironment {
             dataCreator.registerWord("apple" + i, "사과" + i, book);
         }
 
-        StudyPOSTStart post = new StudyPOSTStart(List.of(book.getId()), true, 10, StudyType.WRITING, StudyClassification.EXAM, StudyTarget.KOREAN);
+        StudyPOSTStart post = new StudyPOSTStart(List.of(book.getId()), true, 10, StudyType.SELECT, StudyClassification.EXAM, StudyTarget.KOREAN);
         UUID startStudyId = studyCommandService.start(student.getId(), post);
 
         Study startStudy = studyQueryRepository.getById(startStudyId);
