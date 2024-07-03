@@ -163,6 +163,56 @@ public class StudyDocsTest extends RestDocsEnvironment {
                 ));
     }
 
+    @DisplayName("학생이 학습을 제출할 수 있다.")
+    @Test
+    public void submitStudy() throws Exception {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
+
+        Book book = dataCreator.registerBook(false, "능률(김성곤)", "중3-1학기", "2과", "본문", academy);
+        for (int i = 1; i <= 5; i++) {
+            dataCreator.registerWord("apple" + i, "사과" + i, book);
+        }
+
+        StudyPOSTStart post = new StudyPOSTStart(List.of(book.getId()), true, 5, StudyType.WRITING, StudyClassification.EXAM, StudyTarget.KOREAN);
+        UUID startStudyId = studyCommandService.start(student.getId(), post);
+
+        Study startStudy = studyQueryRepository.getById(startStudyId);
+        List<StudyPATCHSubmit.StudyWordPATCHSubmit> submitStudyWords = new ArrayList<>();
+        for (StudyWord sw : startStudy.getStudyWords()) {
+            submitStudyWords.add(new StudyPATCHSubmit.StudyWordPATCHSubmit(sw.getId(), sw.getAnswer()));
+        }
+        StudyPATCHSubmit patchSubmit = new StudyPATCHSubmit(submitStudyWords);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                patch("/api/studies/{studyId}/submit", startStudyId)
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, createBearerToken(student))
+                        .content(createJson(patchSubmit))
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("studyId").description("제출할 학습 아이디")
+                        ),
+                        requestFields(
+                                fieldWithPath("studyWords").type(ARRAY).description("제출할 학습 단어 목록"),
+                                fieldWithPath("studyWords[].id").type(NUMBER).description("단어 아이디"),
+                                fieldWithPath("studyWords[].submit").type(STRING).description("제출할 답변").optional()
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.studyId").type(STRING).description("제출된 학습 아이디")
+                        )
+                ));
+    }
+
     @DisplayName("학습 목록을 조회할 수 있다.")
     @Test
     public void getStudyList() throws Exception {
@@ -337,56 +387,6 @@ public class StudyDocsTest extends RestDocsEnvironment {
                 ));
     }
 
-    @DisplayName("학생이 학습을 제출할 수 있다.")
-    @Test
-    public void submitStudy() throws Exception {
-        // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
-        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
-
-        Book book = dataCreator.registerBook(false, "능률(김성곤)", "중3-1학기", "2과", "본문", academy);
-        for (int i = 1; i <= 5; i++) {
-            dataCreator.registerWord("apple" + i, "사과" + i, book);
-        }
-
-        StudyPOSTStart post = new StudyPOSTStart(List.of(book.getId()), true, 5, StudyType.WRITING, StudyClassification.EXAM, StudyTarget.KOREAN);
-        UUID startStudyId = studyCommandService.start(student.getId(), post);
-
-        Study startStudy = studyQueryRepository.getById(startStudyId);
-        List<StudyPATCHSubmit.StudyWordPATCHSubmit> submitStudyWords = new ArrayList<>();
-        for (StudyWord sw : startStudy.getStudyWords()) {
-            submitStudyWords.add(new StudyPATCHSubmit.StudyWordPATCHSubmit(sw.getId(), sw.getAnswer()));
-        }
-        StudyPATCHSubmit patchSubmit = new StudyPATCHSubmit(submitStudyWords);
-
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                patch("/api/studies/{studyId}/submit", startStudyId)
-                        .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createBearerToken(student))
-                        .content(createJson(patchSubmit))
-        );
-
-        // then
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("code").value("200"))
-                .andDo(restDocs.document(
-                        pathParameters(
-                                parameterWithName("studyId").description("제출할 학습 아이디")
-                        ),
-                        requestFields(
-                                fieldWithPath("studyWords").type(ARRAY).description("제출할 학습 단어 목록"),
-                                fieldWithPath("studyWords[].id").type(NUMBER).description("단어 아이디"),
-                                fieldWithPath("studyWords[].submit").type(STRING).description("제출할 답변")
-                        ),
-                        relaxedResponseFields(
-                                fieldWithPath("data.studyId").type(STRING).description("제출된 학습 아이디")
-                        )
-                ));
-    }
-
     @DisplayName("선생님이 학습 단어를 정정할 수 있다.")
     @Test
     public void correctStudyWord() throws Exception {
@@ -435,7 +435,7 @@ public class StudyDocsTest extends RestDocsEnvironment {
                         ),
                         requestFields(
                                 fieldWithPath("correct").type(BOOLEAN).description("정답 여부"),
-                                fieldWithPath("reason").type(STRING).description("정오 채점 이유")
+                                fieldWithPath("reason").type(STRING).description("정오 채점 이유").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.studyId").type(STRING).description("정정된 학습 아이디"),
