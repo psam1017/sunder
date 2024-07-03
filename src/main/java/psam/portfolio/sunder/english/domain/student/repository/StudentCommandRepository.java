@@ -8,7 +8,7 @@ import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 
 import java.util.UUID;
 
-public interface StudentCommandRepository extends JpaRepository<Student, Long> {
+public interface StudentCommandRepository extends JpaRepository<Student, UUID> {
 
     @Modifying(clearAutomatically = true)
     @Query("""

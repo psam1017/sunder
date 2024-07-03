@@ -230,7 +230,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies/{academyId}/verify", academyId.toString())
+                get("/api/academies/{academyId}/verify", academyId.toString())
                         .contentType(APPLICATION_JSON)
         );
 
@@ -248,7 +248,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 ));
     }
 
-    @DisplayName("선생이 자기 학원의 상세 정보를 조회할 수 있다.")
+    @DisplayName("선생님이 자기 학원의 상세 정보를 조회할 수 있다.")
     @Test
     void getDetailByTeacher() throws Exception {
         // given
@@ -280,7 +280,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                 queryParameters(
                                         parameterWithName("select").description("""
                                                 같이 조회할 정보 옵션 +
-                                                - teacher : 학원에 소속된 선생 목록을 같이 조회
+                                                - teacher : 학원에 소속된 선생님 목록을 같이 조회
                                                 """).optional()
                                 ),
                                 relaxedResponseFields(
@@ -295,21 +295,21 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.academy.status").type(STRING).description("학원 상태"),
                                         fieldWithPath("data.academy.createdDateTime").type(STRING).description("학원 생성일시"),
                                         fieldWithPath("data.academy.modifiedDateTime").type(STRING).description("학원 수정일시"),
-                                        fieldWithPath("data.teachers[].id").type(STRING).description("선생 아이디"),
-                                        fieldWithPath("data.teachers[].loginId").type(STRING).description("선생 로그인 아이디"),
-                                        fieldWithPath("data.teachers[].name").type(STRING).description("선생 이름"),
-                                        fieldWithPath("data.teachers[].email").type(STRING).description("선생 이메일"),
-                                        fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("선생 이메일 인증 여부"),
-                                        fieldWithPath("data.teachers[].phone").type(STRING).description("선생 전화번호"),
-                                        fieldWithPath("data.teachers[].street").type(STRING).description("선생 주소 (도로명)"),
-                                        fieldWithPath("data.teachers[].addressDetail").type(STRING).description("선생 주소 (상세주소)"),
-                                        fieldWithPath("data.teachers[].postalCode").type(STRING).description("선생 주소 (우편번호)"),
-                                        fieldWithPath("data.teachers[].status").type(STRING).description("선생 상태"),
-                                        fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생 권한"),
-                                        fieldWithPath("data.teachers[].lastPasswordChangeDateTime").type(STRING).description("선생 마지막 비밀번호 변경일시"),
-                                        fieldWithPath("data.teachers[].academyId").type(STRING).description("선생이 속한 학원 아이디"),
-                                        fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생 생성일시"),
-                                        fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생 수정일시"),
+                                        fieldWithPath("data.teachers[].id").type(STRING).description("선생님 아이디"),
+                                        fieldWithPath("data.teachers[].loginId").type(STRING).description("선생님 로그인 아이디"),
+                                        fieldWithPath("data.teachers[].name").type(STRING).description("선생님 이름"),
+                                        fieldWithPath("data.teachers[].email").type(STRING).description("선생님 이메일"),
+                                        fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("선생님 이메일 인증 여부"),
+                                        fieldWithPath("data.teachers[].phone").type(STRING).description("선생님 전화번호"),
+                                        fieldWithPath("data.teachers[].street").type(STRING).description("선생님 주소 (도로명)"),
+                                        fieldWithPath("data.teachers[].addressDetail").type(STRING).description("선생님 주소 (상세주소)"),
+                                        fieldWithPath("data.teachers[].postalCode").type(STRING).description("선생님 주소 (우편번호)"),
+                                        fieldWithPath("data.teachers[].status").type(STRING).description("선생님 상태"),
+                                        fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생님 권한"),
+                                        fieldWithPath("data.teachers[].lastPasswordChangeDateTime").type(STRING).description("선생님 마지막 비밀번호 변경일시"),
+                                        fieldWithPath("data.teachers[].academyId").type(STRING).description("선생님이 속한 학원 아이디"),
+                                        fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생님 생성일시"),
+                                        fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생님 수정일시"),
                                         fieldWithPath("data.teachers[].createdBy").type(STRING).description("생성자 아이디").optional(),
                                         fieldWithPath("data.teachers[].modifiedBy").type(STRING).description("수정자 아이디").optional()
                                 )
@@ -367,7 +367,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                 queryParameters(
                                         parameterWithName("select").description("""
                                                 같이 조회할 정보 옵션 +
-                                                - teacher : 학원에 소속된 선생 목록을 같이 조회
+                                                - teacher : 학원에 소속된 선생님 목록을 같이 조회
                                                 """).optional()
                                 ),
                                 relaxedResponseFields(
@@ -382,12 +382,12 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.academy.status").type(STRING).description("학원 상태"),
                                         fieldWithPath("data.academy.createdDateTime").type(STRING).description("학원 생성일시"),
                                         fieldWithPath("data.academy.modifiedDateTime").type(STRING).description("학원 수정일시"),
-                                        fieldWithPath("data.teachers[].id").type(STRING).description("선생 아이디"),
-                                        fieldWithPath("data.teachers[].name").type(STRING).description("선생 이름"),
-                                        fieldWithPath("data.teachers[].status").type(STRING).description("선생 상태"),
-                                        fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생 권한"),
-                                        fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생 생성일시"),
-                                        fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생 수정일시")
+                                        fieldWithPath("data.teachers[].id").type(STRING).description("선생님 아이디"),
+                                        fieldWithPath("data.teachers[].name").type(STRING).description("선생님 이름"),
+                                        fieldWithPath("data.teachers[].status").type(STRING).description("선생님 상태"),
+                                        fieldWithPath("data.teachers[].roles[]").type(ARRAY).description("선생님 권한"),
+                                        fieldWithPath("data.teachers[].createdDateTime").type(STRING).description("선생님 생성일시"),
+                                        fieldWithPath("data.teachers[].modifiedDateTime").type(STRING).description("선생님 수정일시")
                                 )
                         )
                 );
@@ -416,7 +416,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies")
+                patch("/api/academies/{academyId}", academy.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(academyPATCH))
@@ -427,6 +427,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                                pathParameters(
+                                        parameterWithName("academyId").description("수정할 학원 아이디")
+                                ),
                                 requestFields(
                                         fieldWithPath("name").type(STRING).description("학원 이름"),
                                         fieldWithPath("phone").type(STRING).description("학원 전화번호").optional(),
@@ -551,7 +554,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies/revoke")
+                patch("/api/academies/{academyId}/revoke", academy.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -561,6 +564,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("academyId").description("수정할 학원 아이디")
+                        ),
                         relaxedResponseFields(
                                 fieldWithPath("data.academyId").type(STRING).description("페쇄를 취소한 학원 아이디")
                         )
@@ -582,7 +588,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/academies/end-trial")
+                post("/api/academies/end-trial")
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(loginForm))

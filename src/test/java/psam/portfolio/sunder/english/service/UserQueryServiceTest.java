@@ -170,7 +170,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
     @DisplayName("사용자가 로그인하고 토큰을 발급받을 수 있다.")
     @Test
-    void loginAndGetToken() throws JsonProcessingException {
+    void loginAndGetToken() {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
@@ -183,11 +183,9 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         LoginResult result = refreshAnd(() -> sut.login(loginForm, remoteIp));
 
         // then
-        assertThat(result.getAccessToken()).startsWith("Bearer ");
-        assertThat(result.getRefreshToken()).startsWith("Bearer ");
-        String accessToken = result.getAccessToken().replaceAll("Bearer ", "");
+        String accessToken = result.getAccessToken();
         String accessTokenSubject = jwtUtils.extractSubject(accessToken);
-        String refreshTokenSubject = jwtUtils.extractSubject(result.getRefreshToken().replaceAll("Bearer ", ""));
+        String refreshTokenSubject = jwtUtils.extractSubject(result.getRefreshToken());
         assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
         assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
         Claims claims = jwtUtils.extractAllClaims(accessToken);
@@ -196,6 +194,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(claims.get(JwtClaim.REMOTE_IP.toString(), String.class)).isEqualTo(remoteIp);
 
         assertThat(result.getUserId()).isEqualTo(director.getId().toString());
+        assertThat(result.getAcademyId()).isEqualTo(director.getAcademy().getId().toString());
         assertThat(result.getRoleNames()).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
     }
 
@@ -282,13 +281,9 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         TokenRefreshResponse response = refreshAnd(() -> sut.refreshToken(director.getId(), remoteIp));
 
         // then
-        assertThat(response.getAccessToken()).startsWith("Bearer ");
-        assertThat(response.getRefreshToken()).startsWith("Bearer ");
-        String accessToken = response.getAccessToken().replaceAll("Bearer ", "");
+        String accessToken = response.getAccessToken();
         String accessTokenSubject = jwtUtils.extractSubject(accessToken);
-        String refreshTokenSubject = jwtUtils.extractSubject(response.getRefreshToken().replaceAll("Bearer ", ""));
         assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
-        assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
 
         Claims claims = jwtUtils.extractAllClaims(accessToken);
         assertThat(claims.get(JwtClaim.PASSWORD.toString(), String.class)).isEqualTo(director.getLoginPw());
@@ -320,7 +315,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(result).isTrue();
     }
 
-    @DisplayName("선생이 자기 자신의 정보를 조회할 수 있다.")
+    @DisplayName("선생님이 자기 자신의 정보를 조회할 수 있다.")
     @Test
     void getMyInfoByTeacher() {
         // given

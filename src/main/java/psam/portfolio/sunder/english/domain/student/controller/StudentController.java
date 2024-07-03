@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.domain.student.model.request.StudentPATCHInfo;
 import psam.portfolio.sunder.english.domain.student.model.request.StudentPATCHStatus;
 import psam.portfolio.sunder.english.domain.student.model.request.StudentPOST;
-import psam.portfolio.sunder.english.domain.student.model.request.StudentSearchCond;
+import psam.portfolio.sunder.english.domain.student.model.request.StudentPageSearchCond;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.student.service.StudentCommandService;
 import psam.portfolio.sunder.english.domain.student.service.StudentQueryService;
@@ -66,7 +66,7 @@ public class StudentController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @GetMapping("")
     public ApiResponse<Map<String, Object>> getStudentList(@UserId UUID teacherId,
-                                                           @ModelAttribute StudentSearchCond cond) {
+                                                           @ModelAttribute StudentPageSearchCond cond) {
         Map<String, Object> response = studentQueryService.getList(teacherId, cond);
         return ApiResponse.ok(response);
     }
@@ -80,10 +80,10 @@ public class StudentController {
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @GetMapping("/{studentId}")
-    public ApiResponse<Object> getStudent(@UserId UUID teacherId,
-                                          @PathVariable UUID studentId) {
-        StudentFullResponse studentResponse = studentQueryService.getDetail(teacherId, studentId);
-        return ApiResponse.ok(studentResponse);
+    public ApiResponse<StudentFullResponse> getStudentDetail(@UserId UUID teacherId,
+                                                @PathVariable UUID studentId) {
+        StudentFullResponse student = studentQueryService.getDetail(teacherId, studentId);
+        return ApiResponse.ok(student);
     }
 
     /**

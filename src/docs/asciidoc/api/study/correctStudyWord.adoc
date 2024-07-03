@@ -1,0 +1,10 @@
+=== 학습 단어 정정하기
+
+==== HTTP Request
+include::{snippets}/study-docs-test/correct-study-word/http-request.adoc[]
+include::{snippets}/study-docs-test/correct-study-word/path-parameters.adoc[]
+include::{snippets}/study-docs-test/correct-study-word/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/study-docs-test/correct-study-word/http-response.adoc[]
+include::{snippets}/study-docs-test/correct-study-word/response-fields.adoc[]

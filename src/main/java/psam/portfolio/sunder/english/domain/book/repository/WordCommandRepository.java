@@ -9,7 +9,7 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 
 import java.util.UUID;
 
-public interface WordCommandRepository extends JpaRepository<Word, UUID> {
+public interface WordCommandRepository extends JpaRepository<Word, Long> {
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("""

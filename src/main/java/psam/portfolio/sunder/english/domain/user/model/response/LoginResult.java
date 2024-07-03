@@ -12,13 +12,15 @@ public class LoginResult {
     private final String accessToken;
     private final boolean passwordChangeRequired;
     private final String userId;
+    private final String academyId;
     private final List<RoleName> roleNames;
 
-    public LoginResult(String accessToken, String refreshToken, boolean passwordChangeRequired, String userId, List<RoleName> roleNames) {
-        this.accessToken = "Bearer " + accessToken;
-        this.refreshToken = "Bearer " + refreshToken;
+    public LoginResult(String accessToken, String refreshToken, boolean passwordChangeRequired, String userId, String academyId, List<RoleName> roleNames) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.passwordChangeRequired = passwordChangeRequired;
         this.userId = userId;
+        this.academyId = academyId;
         this.roleNames = roleNames;
     }
 }

@@ -81,10 +81,10 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         assertThat(getTeacher.getAddress().getDetail()).isEqualTo(address.getDetail());
         assertThat(getTeacher.getAddress().getPostalCode()).isEqualTo(address.getPostalCode());
 
-        // 등록된 선생은 이미 이메일 인증 상태로 취급한다(이메일 인증 생략)
+        // 등록된 선생님은 이미 이메일 인증 상태로 취급한다(이메일 인증 생략)
         assertThat(getTeacher.isEmailVerified()).isTrue();
 
-        // 등록된 선생은 ROLE_TEACHER 권한'만' 가진다.
+        // 등록된 선생님은 ROLE_TEACHER 권한'만' 가진다.
         assertThat(getTeacher.getAcademy().getId()).isEqualTo(academy.getId());
         assertThat(getTeacher.getRoles()).hasSize(1)
                 .extracting(UserRole::getRoleName)

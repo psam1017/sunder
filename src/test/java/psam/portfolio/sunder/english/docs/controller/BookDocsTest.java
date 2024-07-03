@@ -34,7 +34,7 @@ public class BookDocsTest extends RestDocsEnvironment {
 
     @DisplayName("선생님이 학원 교재를 등록할 수 있다.")
     @Test
-    void saveBook() throws Exception {
+    void registerBook() throws Exception {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
@@ -43,7 +43,7 @@ public class BookDocsTest extends RestDocsEnvironment {
         BookReplace replace = BookReplace.builder()
                 .openToPublic(false)
                 .publisher("publisher")
-                .bookName("bookName")
+                .name("name")
                 .chapter("chapter")
                 .subject("subject")
                 .build();
@@ -66,7 +66,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         requestFields(
                                 fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
                                 fieldWithPath("publisher").type(STRING).description("출판사"),
-                                fieldWithPath("bookName").type(STRING).description("교재명"),
+                                fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터"),
                                 fieldWithPath("subject").type(STRING).description("주제")
                         ),
@@ -88,7 +88,7 @@ public class BookDocsTest extends RestDocsEnvironment {
         BookReplace replace = BookReplace.builder()
                 .openToPublic(true)
                 .publisher("newPublisher")
-                .bookName("newBookName")
+                .name("newName")
                 .chapter("newChapter")
                 .subject("newSubject")
                 .build();
@@ -114,7 +114,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         requestFields(
                                 fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
                                 fieldWithPath("publisher").type(STRING).description("출판사"),
-                                fieldWithPath("bookName").type(STRING).description("교재명"),
+                                fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터"),
                                 fieldWithPath("subject").type(STRING).description("주제")
                         ),
@@ -261,7 +261,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         relaxedResponseFields(
                                 fieldWithPath("data.books[].id").type(STRING).description("교재 아이디"),
                                 fieldWithPath("data.books[].publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.books[].bookName").type(STRING).description("교재명"),
+                                fieldWithPath("data.books[].name").type(STRING).description("교재명"),
                                 fieldWithPath("data.books[].chapter").type(STRING).description("챕터"),
                                 fieldWithPath("data.books[].subject").type(STRING).description("주제"),
                                 fieldWithPath("data.books[].academyId").type(STRING).description("학원 아이디"),
@@ -314,7 +314,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         relaxedResponseFields(
                                 fieldWithPath("data.book.id").type(STRING).description("교재 아이디"),
                                 fieldWithPath("data.book.publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.book.bookName").type(STRING).description("교재명"),
+                                fieldWithPath("data.book.name").type(STRING).description("교재명"),
                                 fieldWithPath("data.book.chapter").type(STRING).description("챕터"),
                                 fieldWithPath("data.book.subject").type(STRING).description("주제"),
                                 fieldWithPath("data.book.academyId").type(STRING).description("학원 아이디"),
@@ -326,105 +326,6 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.words[].id").type(NUMBER).description("단어 아이디"),
                                 fieldWithPath("data.words[].english").type(STRING).description("영어 단어"),
                                 fieldWithPath("data.words[].korean").type(STRING).description("한글 뜻")
-                        )
-                ));
-    }
-
-    @DisplayName("단어 목록을 비운 채로 교재 상세 정보와 단어 목록을 조회할 수 있다.")
-    @Test
-    void getBookDetailEmpty() throws Exception {
-        // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
-        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
-        Book book = dataCreator.registerAnyBook(academy);
-        dataCreator.registerWord("apple", "사과", book);
-        dataCreator.registerWord("banana", "바나나", book);
-        dataCreator.registerWord("cherry", "체리", book);
-
-        refresh();
-
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/books/{bookId}", book.getId())
-                        .param("empty", "korean-english")
-                        .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createBearerToken(teacher))
-        );
-
-        // then
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("code").value("200"))
-                .andDo(restDocs.document(
-                        pathParameters(
-                                parameterWithName("bookId").description("조회할 교재 아이디")
-                        ),
-                        queryParameters(
-                                parameterWithName("empty").description("""
-                                        비울 단어 필드 +
-                                        - 'korean' 이 포함되면 한글 뜻을 비움 +
-                                        - 'english' 가 포함되면 영어 단어를 비움
-                                        """)
-                        ),
-                        relaxedResponseFields(
-                                fieldWithPath("data.book.id").type(STRING).description("교재 아이디"),
-                                fieldWithPath("data.book.publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.book.bookName").type(STRING).description("교재명"),
-                                fieldWithPath("data.book.chapter").type(STRING).description("챕터"),
-                                fieldWithPath("data.book.subject").type(STRING).description("주제"),
-                                fieldWithPath("data.book.academyId").type(STRING).description("학원 아이디"),
-                                fieldWithPath("data.book.openToPublic").type(BOOLEAN).description("공개 여부"),
-                                fieldWithPath("data.book.createdDateTime").type(STRING).description("생성 일시"),
-                                fieldWithPath("data.book.modifiedDateTime").type(STRING).description("수정 일시"),
-                                fieldWithPath("data.book.createdBy").type(STRING).description("생성자 아이디").optional(),
-                                fieldWithPath("data.book.modifiedBy").type(STRING).description("수정자 아이디").optional(),
-                                fieldWithPath("data.words[].id").type(NUMBER).description("단어 아이디"),
-                                fieldWithPath("data.words[].english").type(NULL).description("영어 단어(null 로 조회)"),
-                                fieldWithPath("data.words[].korean").type(NULL).description("한글 뜻(null 로 조회)")
-                        )
-                ));
-    }
-
-    @DisplayName("교재 상세 정보와 단어 목록을 base64 로 인코딩한 채로 조회할 수 있다.")
-    @Test
-    void getBookDetailEncoded() throws Exception {
-        // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
-        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
-        Book book = dataCreator.registerAnyBook(academy);
-        dataCreator.registerWord("apple", "사과", book);
-        dataCreator.registerWord("banana", "바나나", book);
-        dataCreator.registerWord("cherry", "체리", book);
-
-        refresh();
-
-        // when
-        ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.get("/api/books/{bookId}", book.getId())
-                        .param("enc", "true")
-                        .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, createBearerToken(teacher))
-        );
-
-        // then
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("code").value("200"))
-                .andDo(restDocs.document(
-                        pathParameters(
-                                parameterWithName("bookId").description("조회할 교재 아이디")
-                        ),
-                        queryParameters(
-                                parameterWithName("enc").description("""
-                                        인코딩 여부 +
-                                        - true : 단어를 인코딩하여 조회 +
-                                        - false : 단어를 인코딩하지 않고 조회
-                                        """)
-                        ),
-                        relaxedResponseFields(
-                                fieldWithPath("data").type(STRING).description("인코딩된 교재 정보 json. json 내용은 생략")
                         )
                 ));
     }

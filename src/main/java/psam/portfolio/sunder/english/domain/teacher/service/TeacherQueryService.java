@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherSearchCond;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPageSearchCond;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
@@ -31,17 +31,17 @@ public class TeacherQueryService {
      * @param userId 사용자 아이디
      * @param cond   선생님 검색 조건
      * @return 선생님 목록
-     * @apiNote 학생이 요청할 때와 선생이 요청할 때 응답스펙이 다르다.
+     * @apiNote 학생이 요청할 때와 선생님이 요청할 때 응답스펙이 다르다.
      */
-    public List<?> getList(UUID userId, TeacherSearchCond cond) {
+    public List<?> getList(UUID userId, TeacherPageSearchCond cond) {
         User getUser = userQueryRepository.getById(userId);
 
         if (getUser instanceof Student student) {
             UUID academyId = student.getAcademy().getId();
-            return teacherQueryRepository.findAllBySearchCond(academyId, cond).stream().map(TeacherPublicResponse::from).toList();
+            return teacherQueryRepository.findAllByPageSearchCond(academyId, cond).stream().map(TeacherPublicResponse::from).toList();
         } else if (getUser instanceof Teacher teacher) {
             UUID academyId = teacher.getAcademy().getId();
-            return teacherQueryRepository.findAllBySearchCond(academyId, cond).stream().map(TeacherFullResponse::from).toList();
+            return teacherQueryRepository.findAllByPageSearchCond(academyId, cond).stream().map(TeacherFullResponse::from).toList();
         }
         throw new NoSuchUserException();
     }

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.exception.NoSuchTeacherException;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherSearchCond;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPageSearchCond;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 
 import java.util.List;
@@ -70,7 +70,7 @@ public class TeacherQueryRepository {
                 .fetch();
     }
 
-    public List<Teacher> findAllBySearchCond(UUID academyId, TeacherSearchCond cond) {
+    public List<Teacher> findAllByPageSearchCond(UUID academyId, TeacherPageSearchCond cond) {
         return query.selectDistinct(teacher)
                 .from(teacher)
                 .where(
@@ -86,7 +86,7 @@ public class TeacherQueryRepository {
         return academyId != null ? teacher.academy.id.eq(academyId) : null;
     }
 
-    private BooleanExpression teacherNameContains(String teacherName) {
+    private static BooleanExpression teacherNameContains(String teacherName) {
         if (StringUtils.hasText(teacherName)) {
             return Expressions
                     .stringTemplate("replace({0}, ' ', '')", teacher.name.toLowerCase())
@@ -95,11 +95,11 @@ public class TeacherQueryRepository {
         return null;
     }
 
-    private BooleanExpression userStatusEq(UserStatus status) {
+    private static BooleanExpression userStatusEq(UserStatus status) {
         return status != null ? teacher.status.eq(status) : null;
     }
 
-    private OrderSpecifier<?> specifiedOrder(TeacherSearchCond cond) {
+    private OrderSpecifier<?> specifiedOrder(TeacherPageSearchCond cond) {
         String prop = cond.getProp();
         Order order = cond.getDir();
 

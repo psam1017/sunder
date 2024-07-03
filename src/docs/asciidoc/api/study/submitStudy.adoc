@@ -1,0 +1,10 @@
+=== 학습 제출하기
+
+==== HTTP Request
+include::{snippets}/study-docs-test/submit-study/http-request.adoc[]
+include::{snippets}/study-docs-test/submit-study/path-parameters.adoc[]
+include::{snippets}/study-docs-test/submit-study/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/study-docs-test/submit-study/http-response.adoc[]
+include::{snippets}/study-docs-test/submit-study/response-fields.adoc[]

@@ -4,6 +4,7 @@
 
 ==== HTTP Request
 include::{snippets}/teacher-docs-test/update-teacher-info/http-request.adoc[]
+include::{snippets}/teacher-docs-test/update-teacher-info/path-parameters.adoc[]
 include::{snippets}/teacher-docs-test/update-teacher-info/request-fields.adoc[]
 
 ==== HTTP Response

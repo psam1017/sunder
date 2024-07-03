@@ -1,0 +1,9 @@
+=== 숙제 생성하기
+
+==== HTTP Request
+include::{snippets}/study-docs-test/assign-study/http-request.adoc[]
+include::{snippets}/study-docs-test/assign-study/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/study-docs-test/assign-study/http-response.adoc[]
+include::{snippets}/study-docs-test/assign-study/response-fields.adoc[]

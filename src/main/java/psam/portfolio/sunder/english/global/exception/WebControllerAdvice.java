@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartException;
 import psam.portfolio.sunder.english.global.api.v1.ApiException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
+import psam.portfolio.sunder.english.infrastructure.jwt.IllegalTokenException;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -27,7 +28,12 @@ public class WebControllerAdvice {
         log.error("[ApiException handle] request uri = {}", request.getRequestURI());
         log.error("[reasons] {}", ex.getResponse().getReasons().toString());
 
-        return new ResponseEntity<>(ex.getResponse(), BAD_REQUEST);
+        return new ResponseEntity<>(ex.getResponse(), OK);
+    }
+
+    @ExceptionHandler(IllegalTokenException.class)
+    public ResponseEntity<Object> handleIllegalTokenException(IllegalTokenException ex) {
+        return new ResponseEntity<>(ex.getResponse(), UNAUTHORIZED);
     }
 
     @ExceptionHandler(BindException.class)

@@ -4,22 +4,21 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
+import psam.portfolio.sunder.english.domain.user.exception.UserAccessDeniedException;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginPwForm;
+import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.request.UserPATCHPassword;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
 import psam.portfolio.sunder.english.domain.user.model.response.TokenRefreshResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
-import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
-import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.RemoteIp;
-import psam.portfolio.sunder.english.global.resolver.argument.Token;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
-import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -65,9 +64,13 @@ public class UserController {
      *
      * @return 지연 성공 여부
      */
-    @PostMapping("/password/alert-later")
+    @PatchMapping("/{userId}/password/alert-later")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Map<String, Boolean>> alterPasswordChangeLater(@UserId UUID userId) {
+    public ApiResponse<Map<String, Boolean>> alterPasswordChangeLater(@UserId UUID tokenSubject,
+                                                                      @PathVariable UUID userId) {
+        if (!Objects.equals(tokenSubject, userId)) {
+            throw new UserAccessDeniedException();
+        }
         boolean result = userCommandService.alterPasswordChangeLater(userId);
         return ApiResponse.ok(Map.of("delay", result));
     }
@@ -95,7 +98,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Object> getMyInfo(@UserId UUID userId) {
+    public ApiResponse<?> getMyDetail(@UserId UUID userId) {
         Object myInfo = userQueryService.getMyInfo(userId);
         return ApiResponse.ok(myInfo);
     }
@@ -131,10 +134,14 @@ public class UserController {
      * @param password 기존 패스워드
      * @return 비밀번호 변경이 유효한 시간
      */
-    @PostMapping("/password/change-auth")
+    @PatchMapping("/{userId}/password/change-auth")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Map<String, Object>> authenticateToChangePassword(@UserId UUID userId,
+    public ApiResponse<Map<String, Object>> authenticateToChangePassword(@UserId UUID tokenSubject,
+                                                                         @PathVariable UUID userId,
                                                                          @RequestBody @Valid UserPATCHPassword password) {
+        if (!Objects.equals(tokenSubject, userId)) {
+            throw new UserAccessDeniedException();
+        }
         int passwordChangeAllowedAmount = userCommandService.authenticateToChangePassword(userId, password.getLoginPw());
         return ApiResponse.ok(Map.of("passwordChangeAllowedAmount", passwordChangeAllowedAmount));
     }
@@ -146,10 +153,14 @@ public class UserController {
      * @param password 변경할 패스워드
      * @return 변경 성공 여부
      */
-    @PatchMapping("/password/change-new")
+    @PatchMapping("/{userId}/password/change-new")
     @Secured({"ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Map<String, Boolean>> changePassword(@UserId UUID userId,
+    public ApiResponse<Map<String, Boolean>> changePassword(@UserId UUID tokenSubject,
+                                                            @PathVariable UUID userId,
                                                             @RequestBody @Valid UserPATCHPassword password) {
+        if (!Objects.equals(tokenSubject, userId)) {
+            throw new UserAccessDeniedException();
+        }
         boolean result = userCommandService.changePassword(userId, password.getLoginPw());
         return ApiResponse.ok(Map.of("newPassword", result));
     }

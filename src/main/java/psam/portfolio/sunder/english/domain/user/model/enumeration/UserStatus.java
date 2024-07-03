@@ -6,12 +6,22 @@ import java.util.Objects;
 
 public enum UserStatus {
 
-    PENDING,
-    TRIAL,
-    TRIAL_END,
-    ACTIVE,
-    FORBIDDEN,
-    WITHDRAWN;
+    PENDING("대기"),
+    TRIAL("체험"),
+    TRIAL_END("체험종료"),
+    ACTIVE("활성"),
+    FORBIDDEN("차단"),
+    WITHDRAWN("탈퇴");
+
+    private final String value;
+
+    UserStatus(String value) {
+        this.value = value;
+    }
+
+    public String value() {
+        return value;
+    }
 
     @JsonCreator
     public static UserStatus ofNullable(String str) {

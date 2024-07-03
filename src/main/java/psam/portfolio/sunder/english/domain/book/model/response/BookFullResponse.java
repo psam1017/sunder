@@ -17,7 +17,7 @@ public class BookFullResponse {
 
     private UUID id;
     private String publisher;
-    private String bookName;
+    private String name;
     private String chapter;
     private String subject;
     private UUID academyId;
@@ -33,7 +33,7 @@ public class BookFullResponse {
         return BookFullResponse.builder()
                 .id(book.getId())
                 .publisher(book.getPublisher())
-                .bookName(book.getBookName())
+                .name(book.getName())
                 .chapter(book.getChapter())
                 .subject(book.getSubject())
                 .academyId(book.getAcademy().getId())

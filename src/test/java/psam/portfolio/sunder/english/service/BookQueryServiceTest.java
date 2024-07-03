@@ -7,7 +7,7 @@ import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
-import psam.portfolio.sunder.english.domain.book.model.request.BookSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
@@ -42,7 +42,7 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
         dataCreator.registerBook(false, "능률(김성곤)", "중3", "2과", "본문", academy);
         dataCreator.registerBook(false, "능률(김성곤)", "중3", "1과", "예문", academy);
 
-        BookSearchCond cond = BookSearchCond.builder()
+        BookPageSearchCond cond = BookPageSearchCond.builder()
                 .keyword("능률 김 중3 1과 본문")
                 .privateOnly(false)
                 .year(null)
@@ -54,7 +54,7 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
         // then
         List<BookFullResponse> books = (List<BookFullResponse>) result.get("books");
         assertThat(books).hasSize(1)
-                .extracting("publisher", "bookName", "chapter", "subject", "academyId", "openToPublic")
+                .extracting("publisher", "name", "chapter", "subject", "academyId", "openToPublic")
                 .containsExactly(
                         tuple("능률(김성곤)", "중3", "1과", "본문", academy.getId(), false)
                 );
@@ -78,7 +78,7 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
         // then
         BookFullResponse getBook = result.getBook();
         assertThat(getBook.getPublisher()).isEqualTo(book.getPublisher());
-        assertThat(getBook.getBookName()).isEqualTo(book.getBookName());
+        assertThat(getBook.getName()).isEqualTo(book.getName());
         assertThat(getBook.getChapter()).isEqualTo(book.getChapter());
         assertThat(getBook.getSubject()).isEqualTo(book.getSubject());
         assertThat(getBook.getAcademyId()).isEqualTo(book.getAcademy().getId());

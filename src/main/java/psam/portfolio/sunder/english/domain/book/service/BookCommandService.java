@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.book.exception.TooManyWordToSaveException;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.WordStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
@@ -21,6 +22,7 @@ import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepos
 import psam.portfolio.sunder.english.infrastructure.excel.ExcelUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +30,9 @@ import java.util.UUID;
 @Transactional
 @Service
 public class BookCommandService {
+
+    // 변경 시 WordPOSTList.words 의 size 도 변경해야 함.
+    private static final int MAX_WORD_SIZE = 100;
 
     private final BookCommandRepository bookCommandRepository;
     private final BookQueryRepository bookQueryRepository;
@@ -61,7 +66,7 @@ public class BookCommandService {
             );
             getBook.setOpenToPublic(replace.getOpenToPublic());
             getBook.setPublisher(replace.getPublisher());
-            getBook.setBookName(replace.getBookName());
+            getBook.setName(replace.getName());
             getBook.setChapter(replace.getChapter());
             getBook.setSubject(replace.getSubject());
             getBook.updateSearchText();
@@ -115,14 +120,21 @@ public class BookCommandService {
         wordCommandRepository.updateStatusByBookId(WordStatus.DELETED, getBook.getId());
 
         Book refreshBook = bookQueryRepository.getById(getBook.getId());
-        List<Word> words = excelUtils.readExcel(file, "english", "korean").stream()
-                .filter(w -> StringUtils.hasText(w.get(0)) && StringUtils.hasText(w.get(1)))
-                .map(w -> Word.builder()
+        List<Word> words = new ArrayList<>();
+        for (List<String> w : excelUtils.readExcel(file, "english", "korean")) {
+            if (StringUtils.hasText(w.get(0)) && StringUtils.hasText(w.get(1))) {
+                Word build = Word.builder()
                         .english(w.get(0))
                         .korean(w.get(1))
                         .book(refreshBook)
-                        .build())
-                .toList();
+                        .build();
+                words.add(build);
+            }
+        }
+        if (words.size() > MAX_WORD_SIZE) {
+            throw new TooManyWordToSaveException(MAX_WORD_SIZE);
+        }
+
         List<Word> saveWords = wordCommandRepository.saveAll(words);
         refreshBook.getWords().addAll(saveWords);
 

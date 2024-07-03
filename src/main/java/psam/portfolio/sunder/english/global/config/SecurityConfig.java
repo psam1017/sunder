@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -35,9 +34,7 @@ import psam.portfolio.sunder.english.global.security.handler.AuthenticationFailu
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceJwt;
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceRepo;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
-import psam.portfolio.sunder.english.infrastructure.username.ClientUsernameHolder;
 
-@RequiredArgsConstructor
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 @EnableWebSecurity
@@ -95,8 +92,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsServiceJwt userDetailsServiceJwt, JwtUtils jwtUtils, ClientUsernameHolder clientUsernameHolder) {
-        return new JwtAuthenticationFilter(userDetailsServiceJwt, jwtUtils, clientUsernameHolder);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(UserDetailsServiceJwt userDetailsServiceJwt, JwtUtils jwtUtils) {
+        return new JwtAuthenticationFilter(userDetailsServiceJwt, jwtUtils);
     }
 
     @Bean

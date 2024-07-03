@@ -17,6 +17,7 @@ import java.util.Set;
 @Builder
 public class TeacherPOSTRoles {
 
+    // ROLE_DIRECTOR, ROLE_TEACHER 로만 변경할 수 있다.
     @NotEmpty
     @UniqueElements
     private Set<@EnumPattern(regexp = "^(ROLE_DIRECTOR|ROLE_TEACHER)$") RoleName> roles;

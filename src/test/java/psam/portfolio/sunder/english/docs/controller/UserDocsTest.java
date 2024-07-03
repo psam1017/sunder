@@ -25,8 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.*;
@@ -147,10 +146,11 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("loginPw").type(STRING).description("비밀번호")
                                 ),
                                 relaxedResponseFields(
-                                        fieldWithPath("data.accessToken").type(STRING).description("발급된 액세스 토큰(1시간). Authorization 헤더에 추가하여 사용"),
-                                        fieldWithPath("data.refreshToken").type(STRING).description("발급된 리프레시 토큰(12시간). 액세스 토큰 만료 시 재발급에 사용"),
+                                        fieldWithPath("data.accessToken").type(STRING).description("발급된 액세스 토큰. Authorization 헤더에 추가하여 사용"),
+                                        fieldWithPath("data.refreshToken").type(STRING).description("발급된 리프레시 토큰. 액세스 토큰 만료 시 재발급에 사용"),
                                         fieldWithPath("data.passwordChangeRequired").type(BOOLEAN).description("비밀번호 변경 주기인지 여부"),
                                         fieldWithPath("data.userId").type(STRING).description("사용자 아이디"),
+                                        fieldWithPath("data.academyId").type(STRING).description("(학원 소속인 경우)학원 아이디"),
                                         fieldWithPath("data.roleNames").type(ARRAY).description("사용자가 가진 권한 목록")
                                 )
                         )
@@ -172,7 +172,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/users/password/alert-later")
+                patch("/api/users/{userId}/password/alert-later", director.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -182,6 +182,9 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                                pathParameters(
+                                        parameterWithName("userId").description("수정할 사용자 아이디")
+                                ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.delay").type(BOOLEAN).description("비밀번호 변경 알림 지연 성공 여부")
                                 )
@@ -214,8 +217,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 relaxedResponseFields(
-                                        fieldWithPath("data.accessToken").type(STRING).description("새로 발급한 액세스 토큰(1시간). Authorization 헤더에 추가하여 사용"),
-                                        fieldWithPath("data.refreshToken").type(STRING).description("새로 발급한 리프레시 토큰(12시간). 액세스 토큰 만료 시 재발급에 사용")
+                                        fieldWithPath("data.accessToken").type(STRING).description("새로 발급한 액세스 토큰. Authorization 헤더에 추가하여 사용")
                                 )
                         )
                 );
@@ -315,7 +317,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                post("/api/users/password/change-auth")
+                patch("/api/users/{userId}/password/change-auth", director.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
                         .content(createJson(patch))
@@ -326,6 +328,9 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                                pathParameters(
+                                        parameterWithName("userId").description("수정할 사용자 아이디")
+                                ),
                                 requestFields(
                                         fieldWithPath("loginPw").type(STRING).description("기존 비밀번호")
                                 ),
@@ -351,7 +356,7 @@ public class UserDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                patch("/api/users/password/change-new")
+                patch("/api/users/{userId}/password/change-new", director.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, createBearerToken(director))
                         .content(createJson(patchPassword))
@@ -362,6 +367,9 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                                pathParameters(
+                                        parameterWithName("userId").description("수정할 사용자 아이디")
+                                ),
                                 requestFields(
                                         fieldWithPath("loginPw").type(STRING).description("변경을 위해 새로 입력한 비밀번호")
                                 ),
@@ -372,7 +380,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                 );
     }
 
-    @DisplayName("선생이 자기 자신의 정보를 조회할 수 있다.")
+    @DisplayName("선생님이 자기 자신의 정보를 조회할 수 있다.")
     @Test
     void getMyInfoByTeacher() throws Exception {
         // given

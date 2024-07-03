@@ -4,16 +4,19 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
+import psam.portfolio.sunder.english.global.resolver.argument.AcademyId;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
-import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicSearchCond;
+import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicPageSearchCond;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyQueryService;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -58,7 +61,7 @@ public class AcademyController {
      * @param academyId 학원 아이디
      * @return 학원 승인 여부
      */
-    @PatchMapping("/{academyId}/verify")
+    @GetMapping("/{academyId}/verify")
     public ApiResponse<Map<String, Boolean>> verify(@PathVariable String academyId) {
         boolean result = academyCommandService.verify(UUID.fromString(academyId));
         return ApiResponse.ok(Map.of("verified", result));
@@ -71,7 +74,7 @@ public class AcademyController {
      * @return 학원 목록
      */
     @GetMapping("")
-    public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute @Valid AcademyPublicSearchCond cond) {
+    public ApiResponse<Map<String, Object>> getPublicList(@ModelAttribute @Valid AcademyPublicPageSearchCond cond) {
         Map<String, Object> response = academyQueryService.getPublicList(cond);
         return ApiResponse.ok(response);
     }
@@ -86,9 +89,9 @@ public class AcademyController {
      */
     @GetMapping("/{academyId}")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
-    public ApiResponse<Map<String, Object>> getDetail(@UserId UUID userId,
-                                                      @PathVariable UUID academyId,
-                                                      @RequestParam(required = false) String select) {
+    public ApiResponse<Map<String, Object>> getAcademyDetail(@UserId UUID userId,
+                                                             @PathVariable UUID academyId,
+                                                             @RequestParam(required = false) String select) {
         Map<String, Object> responseData = academyQueryService.getDetail(academyId, userId, select);
         return ApiResponse.ok(responseData);
     }
@@ -101,11 +104,16 @@ public class AcademyController {
      * @return 수정을 완료한 학원 아이디
      */
     @Secured("ROLE_DIRECTOR")
-    @PatchMapping("")
+    @PatchMapping("/{academyId}")
     public ApiResponse<Map<String, UUID>> updateInfo(@UserId UUID directorId,
+                                                     @AcademyId UUID tokenAcademyId,
+                                                     @PathVariable UUID academyId,
                                                      @RequestBody @Valid AcademyPATCH patch) {
-        UUID academyId = academyCommandService.updateInfo(directorId, patch);
-        return ApiResponse.ok(Map.of("academyId", academyId));
+        if (!Objects.equals(tokenAcademyId, academyId)) {
+            throw new AcademyAccessDeniedException();
+        }
+        UUID updateAcademyId = academyCommandService.updateInfo(directorId, patch);
+        return ApiResponse.ok(Map.of("academyId", updateAcademyId));
     }
 
     /**
@@ -122,14 +130,19 @@ public class AcademyController {
     }
 
     /**
-     * 학원 페쇄 취소 서비스. 페쇄 신청을 취소하고 DB 에서 완전히 삭제된다.
+     * 학원 페쇄 취소 서비스
      *
      * @param directorId 학원장 아이디
      * @return 페쇄를 취소한 학원 아이디
      */
     @Secured("ROLE_DIRECTOR")
-    @PatchMapping("/revoke")
-    public ApiResponse<Map<String, UUID>> revokeWithdraw(@UserId UUID directorId) {
+    @PatchMapping("/{academyId}/revoke")
+    public ApiResponse<Map<String, UUID>> revokeWithdraw(@UserId UUID directorId,
+                                                         @AcademyId UUID tokenAcademyId,
+                                                         @PathVariable UUID academyId) {
+        if (!Objects.equals(tokenAcademyId, academyId)) {
+            throw new AcademyAccessDeniedException();
+        }
         UUID deletedAcademyId = academyCommandService.revokeWithdrawal(directorId);
         return ApiResponse.ok(Map.of("academyId", deletedAcademyId));
     }
@@ -140,7 +153,7 @@ public class AcademyController {
      * @param loginForm 학원장의 아이디와 비밀번호
      * @return 전환 완료 여부
      */
-    @PatchMapping("/end-trial")
+    @PostMapping("/end-trial")
     public ApiResponse<Map<String, Boolean>> endTrial(@RequestBody @Valid UserLoginForm loginForm) {
         boolean result = academyCommandService.endTrial(loginForm);
         return ApiResponse.ok(Map.of("endTrial", result));

@@ -159,7 +159,7 @@ public class AcademyCommandService {
         }
         getAcademy.verify();
 
-        // 인증 시점에는 모든 선생(=학원장)의 상태를 인증함으로 변경한다.
+        // 인증 시점에는 모든 선생님(=학원장)의 상태를 인증함으로 변경한다.
         getAcademy.getTeachers().forEach(teacher -> {
             teacher.startTrial();
             teacher.verifyEmail(true);
@@ -178,6 +178,9 @@ public class AcademyCommandService {
     public UUID updateInfo(UUID directorId, AcademyPATCH patch) {
         Teacher getDirector = teacherQueryRepository.getById(directorId);
         Academy getAcademy = getDirector.getAcademy();
+        if (!getDirector.isDirector()) {
+            throw new RoleDirectorRequiredException();
+        }
 
         // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생, 단, 자기 학원은 제외하며 PENDING 상태도 제외.
         academyQueryRepository.findOne(

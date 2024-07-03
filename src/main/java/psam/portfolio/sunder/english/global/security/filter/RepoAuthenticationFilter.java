@@ -30,7 +30,7 @@ public class RepoAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorization = request.getHeader(AUTHORIZATION);
         if(StringUtils.hasText(authorization) && Pattern.matches("^Bearer .*", authorization)) {
-            String token = authorization.replaceAll("^Bearer( )*", "");
+            String token = authorization.replaceFirst("^Bearer ", "");
             if (SecurityContextHolder.getContext().getAuthentication() == null && jwtUtils.hasInvalidStatus(token).isEmpty()) {
                 String subject = jwtUtils.extractSubject(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(subject);

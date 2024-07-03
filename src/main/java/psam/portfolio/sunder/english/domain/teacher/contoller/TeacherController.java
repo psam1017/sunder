@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import psam.portfolio.sunder.english.domain.teacher.exception.TeacherAccessDeniedException;
 import psam.portfolio.sunder.english.domain.teacher.model.request.*;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherQueryService;
@@ -12,10 +13,7 @@ import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/teachers")
@@ -28,7 +26,7 @@ public class TeacherController {
     /**
      * 선생님 등록 서비스
      *
-     * @param teacherId 학원에 등록할 선생의 아이디
+     * @param teacherId 학원에 등록할 선생님의 아이디
      * @param post      등록할 선생님 정보
      * @return 등록에 성공한 선생님 아이디
      */
@@ -50,7 +48,7 @@ public class TeacherController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     @GetMapping("")
     public ApiResponse<Map<String, List<?>>> getTeacherList(@UserId UUID userId,
-                                                            @ModelAttribute TeacherSearchCond cond) {
+                                                            @ModelAttribute TeacherPageSearchCond cond) {
         List<?> teachers = teacherQueryService.getList(userId, cond);
         return ApiResponse.ok(Map.of("teachers", teachers));
     }
@@ -64,7 +62,7 @@ public class TeacherController {
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     @GetMapping("/{teacherId}")
-    public ApiResponse<Object> getTeacherDetail(@UserId UUID userId,
+    public ApiResponse<?> getTeacherDetail(@UserId UUID userId,
                                                 @PathVariable UUID teacherId) {
         Object teacher = teacherQueryService.getDetail(userId, teacherId);
         return ApiResponse.ok(teacher);
@@ -118,9 +116,13 @@ public class TeacherController {
      * @return 개인정보 변경 완료된 선생님 아이디
      */
     @Secured("ROLE_TEACHER")
-    @PatchMapping("/personal-info")
-    public ApiResponse<Map<String, UUID>> updateTeacherInfo(@UserId UUID teacherId,
+    @PatchMapping("/{teacherId}/personal-info")
+    public ApiResponse<Map<String, UUID>> updateTeacherInfo(@UserId UUID userId,
+                                                            @PathVariable UUID teacherId,
                                                             @RequestBody @Valid TeacherPATCHInfo patch) {
+        if (!Objects.equals(userId, teacherId)) {
+            throw new TeacherAccessDeniedException();
+        }
         UUID updatedTeacherId = teacherCommandService.updateInfo(teacherId, patch);
         return ApiResponse.ok(Map.of("teacherId", updatedTeacherId));
     }

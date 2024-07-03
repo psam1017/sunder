@@ -4,14 +4,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import psam.portfolio.sunder.english.infrastructure.jwt.IllegalTokenException;
+import psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -38,11 +41,12 @@ public class TokenArgumentResolver implements HandlerMethodArgumentResolver {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String authorization = request.getHeader(AUTHORIZATION);
 
-        String token = authorization.replaceAll("^Bearer( )*", "");
-        jwtUtils.hasInvalidStatus(token).ifPresent(status -> {
-            log.error("error occured at TokenArgumentResolver. authorization = {}, status = {}", authorization, status.name());
-            throw new IllegalTokenException();
-        });
-        return token;
+        if (StringUtils.hasText(authorization) && Pattern.matches("^Bearer .*", authorization)) {
+            String token = authorization.replaceFirst("^Bearer ", "");
+            if (jwtUtils.hasInvalidStatus(token).isEmpty()) {
+                return token;
+            }
+        }
+        return null;
     }
 }

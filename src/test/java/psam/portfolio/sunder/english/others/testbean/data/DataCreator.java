@@ -176,20 +176,22 @@ public class DataCreator {
     }
 
     public Book registerAnyBook(Academy academy) {
-        return registerBook(false, "publisher", "bookName", "chapter", "subject", academy);
+        return registerBook(false, "publisher", "name", "chapter", "subject", academy);
     }
 
-    public Book registerBook(boolean openToPublic, String publisher, String bookName, String chapter, String subject, Academy academy) {
+    public Book registerBook(boolean openToPublic, String publisher, String name, String chapter, String subject, Academy academy) {
         Book book = Book.builder()
                 .openToPublic(openToPublic)
                 .publisher(publisher)
-                .bookName(bookName)
+                .name(name)
                 .chapter(chapter)
                 .subject(subject)
                 .academy(academy)
                 .build();
         Book saveBook = bookCommandRepository.save(book);
-        academy.getBooks().add(saveBook);
+        if (academy != null) {
+            academy.getBooks().add(saveBook);
+        }
         return saveBook;
     }
 
