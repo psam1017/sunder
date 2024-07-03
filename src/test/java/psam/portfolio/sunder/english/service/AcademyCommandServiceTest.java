@@ -84,7 +84,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
                 .isInstanceOf(DuplicateAcademyException.class);
     }
 
-    @DisplayName("학원을 등록하면서 선생의 정보도 중복 검사를 수행한다.")
+    @DisplayName("학원을 등록하면서 선생님의 정보도 중복 검사를 수행한다.")
     @Test
     void checkDuplWhenRegisterDirector(){
         // mocking

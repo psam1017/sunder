@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 
 import java.util.ArrayList;
 import java.util.List;

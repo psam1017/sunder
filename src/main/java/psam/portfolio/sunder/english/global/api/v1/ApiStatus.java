@@ -2,6 +2,8 @@ package psam.portfolio.sunder.english.global.api.v1;
 
 import org.springframework.util.ObjectUtils;
 
+import java.util.Objects;
+
 /**
  * 0xx : Business - 비즈니스 로직 수행 도중에 발생시킨 예외에 의한 코드
  * 1xx : Informational - 요청을 여전히 처리 중
@@ -88,7 +90,7 @@ public enum ApiStatus {
 
     public ApiStatus of(String code) {
         for (ApiStatus status : ApiStatus.values()) {
-            if (ObjectUtils.nullSafeEquals(status.code(), code)) {
+            if (Objects.equals(status.code(), code)) {
                 return status;
             }
         }

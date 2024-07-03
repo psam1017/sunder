@@ -2,8 +2,6 @@ package psam.portfolio.sunder.english.domain.book.model.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.global.pagination.PageSearchCond;
 
@@ -17,15 +15,15 @@ public class BookPageSearchCond extends PageSearchCond {
     @Builder
     public BookPageSearchCond(Integer page, Integer size, String prop, String dir, String keyword, Boolean privateOnly, Integer year) {
         super(page, size, prop, dir);
-        keyword = substring20(keyword);
+        keyword = substring20AndToLowerCase(keyword);
         this.keyword = removeTwoWhiteSpaces(keyword);
         this.privateOnly = privateOnly == null || privateOnly;
         this.year = year;
     }
 
-    private String substring20(String str) {
+    private String substring20AndToLowerCase(String str) {
         if (StringUtils.hasText(str) && str.length() > 20) {
-            return str.substring(0, 20);
+            return str.substring(0, 20).toLowerCase();
         }
         return str;
     }

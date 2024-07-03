@@ -71,7 +71,6 @@ public class BookQueryRepository {
                 .from(book)
                 .where(
                         academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
-                        statusNe(BookStatus.DELETED),
                         createdDateTimeYearEq(cond),
                         searchTextContains(cond.getSplitKeyword())
                 )
@@ -102,7 +101,6 @@ public class BookQueryRepository {
                 .from(book)
                 .where(
                         academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
-                        statusNe(BookStatus.DELETED),
                         createdDateTimeYearEq(cond),
                         searchTextContains(cond.getSplitKeyword())
                 )
@@ -115,10 +113,6 @@ public class BookQueryRepository {
         return privateOnly ? expression : expression.or(book.academy.id.isNull());
     }
 
-    private static BooleanExpression statusNe(BookStatus status) {
-        return status != null ? book.status.ne(status) : null;
-    }
-
     private static BooleanExpression createdDateTimeYearEq(BookPageSearchCond cond) {
         return cond.getYear() == null ? null : book.createdDateTime.year().eq(cond.getYear());
     }
@@ -128,7 +122,7 @@ public class BookQueryRepository {
             return null;
         }
         return Arrays.stream(keywords)
-                .map(book.searchText::contains)
+                .map(k -> book.searchText.toLowerCase().contains(k))
                 .reduce(BooleanExpression::and)
                 .orElse(null);
     }

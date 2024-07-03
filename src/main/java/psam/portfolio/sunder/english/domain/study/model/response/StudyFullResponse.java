@@ -14,6 +14,7 @@ import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
 import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +46,7 @@ public class StudyFullResponse {
                 .classification(study.getClassification())
                 .target(study.getTarget())
                 .submitDateTime(study.getSubmitDateTime())
-                .studyRanges(study.getStudyRanges())
+                .studyRanges(new ArrayList<>(study.getStudyRanges()))
                 .build();
     }
 }

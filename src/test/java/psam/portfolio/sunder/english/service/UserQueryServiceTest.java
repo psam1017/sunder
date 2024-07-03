@@ -315,7 +315,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(result).isTrue();
     }
 
-    @DisplayName("선생이 자기 자신의 정보를 조회할 수 있다.")
+    @DisplayName("선생님이 자기 자신의 정보를 조회할 수 있다.")
     @Test
     void getMyInfoByTeacher() {
         // given

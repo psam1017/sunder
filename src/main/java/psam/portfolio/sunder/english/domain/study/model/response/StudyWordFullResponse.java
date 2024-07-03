@@ -30,7 +30,7 @@ public class StudyWordFullResponse {
                 .answer(canSeeAnswer ? studyWord.getAnswer() : null)
                 .correct(studyWord.getCorrect())
                 .reason(studyWord.getReason())
-                .choices(studyWord.getChoices())
+                .choices(new ArrayList<>(studyWord.getChoices()))
                 .build();
     }
 }

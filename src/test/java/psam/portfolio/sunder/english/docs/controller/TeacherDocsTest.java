@@ -432,7 +432,7 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         pathParameters(
-                                parameterWithName("teacherId").description("수정할 선생 아이디")
+                                parameterWithName("teacherId").description("수정할 선생님 아이디")
                         ),
                         requestFields(
                                 fieldWithPath("name").type(STRING).description("변경할 선생님 이름"),

@@ -1,0 +1,9 @@
+=== 학습 삭제하기
+
+==== HTTP Request
+include::{snippets}/study-docs-test/delete-study/http-request.adoc[]
+include::{snippets}/study-docs-test/delete-study/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/study-docs-test/delete-study/http-response.adoc[]
+include::{snippets}/study-docs-test/delete-study/response-fields.adoc[]

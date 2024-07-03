@@ -189,7 +189,9 @@ public class DataCreator {
                 .academy(academy)
                 .build();
         Book saveBook = bookCommandRepository.save(book);
-        academy.getBooks().add(saveBook);
+        if (academy != null) {
+            academy.getBooks().add(saveBook);
+        }
         return saveBook;
     }
 

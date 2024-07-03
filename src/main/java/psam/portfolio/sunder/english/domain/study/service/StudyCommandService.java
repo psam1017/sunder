@@ -10,6 +10,7 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
+import psam.portfolio.sunder.english.domain.student.model.entity.QStudent;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.repository.StudentQueryRepository;
 import psam.portfolio.sunder.english.domain.study.exception.IllegalStatusStudyException;
@@ -23,17 +24,18 @@ import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
 import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
 import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit;
+import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTAssign;
 import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTStart;
 import psam.portfolio.sunder.english.domain.study.model.request.StudyWordPATCHCorrect;
 import psam.portfolio.sunder.english.domain.study.repository.StudyCommandRepository;
 import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepository;
 import psam.portfolio.sunder.english.domain.study.repository.StudyWordCommandRepository;
 import psam.portfolio.sunder.english.domain.study.repository.StudyWordQueryRepository;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
+import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit.StudyWordPATCHSubmit;
 
@@ -51,6 +53,81 @@ public class StudyCommandService {
 
     private final StudentQueryRepository studentQueryRepository;
     private final BookQueryRepository bookQueryRepository;
+    private final TeacherQueryRepository teacherQueryRepository;
+
+    /**
+     * 숙제 생성 서비스
+     *
+     * @param teacherId 숙제를 내주는 선생님 아이디
+     * @param post      생성할 숙제 정보
+     * @return 생성에 성공한 숙제 아이디 배열
+     */
+    public List<UUID> assign(UUID teacherId, StudyPOSTAssign post) {
+
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+
+        QBook qBook = QBook.book;
+        List<Book> getBooks = bookQueryRepository.findAll(
+                qBook.id.in(post.getBookIds()),
+                qBook.academy.id.eq(getTeacher.getAcademy().getId())
+                        .or(qBook.openToPublic.isTrue())
+        );
+
+        if (ObjectUtils.isEmpty(getBooks)) {
+            throw new NoSuchBookException();
+        }
+
+        // 교재를 book.name, book.chapter, book.subject 순서로 오름차순 정렬
+        getBooks.sort(Comparator.comparing(Book::getName)
+                .thenComparing(Book::getChapter)
+                .thenComparing(Book::getSubject));
+
+        // Title 생성
+        String title = createTitle(getBooks);
+
+        List<Student> getStudents = studentQueryRepository.findAll(
+                QStudent.student.id.in(post.getStudentIds()),
+                QStudent.student.academy.id.eq(getTeacher.getAcademy().getId())
+        );
+
+        // 단어 목록부터 생성
+        List<StudyRange> studyRanges = new ArrayList<>();
+        List<Word> words = new ArrayList<>();
+        for (Book b : getBooks) {
+            studyRanges.add(StudyRange.of(b));
+            words.addAll(b.getWords());
+        }
+
+        // 단어 최소 개수 검사
+        int wordsSize = words.size();
+        if (wordsSize < WORD_SIZE_TO_STUDY) {
+            throw new WordSizeNotEnoughToStudyException(WORD_SIZE_TO_STUDY);
+        }
+
+        // 최초 한 번은 무조건 섞는다.
+        Collections.shuffle(words);
+
+        List<UUID> saveStudyIds = new ArrayList<>();
+        for (Student getStudent : getStudents) {
+            // 만약 동일한 학습으로 생성하지 않는다면 매번 단어 순서를 섞는다.
+            if (post.getShuffleEach()) {
+                Collections.shuffle(words);
+            }
+
+            // 학습 생성
+            long nextSequence = studyQueryRepository.findNextSequenceOfLastStudy();
+            Study saveStudy = studyCommandRepository.save(post.toEntity(nextSequence, getStudent, title)); // status = ASSIGNED
+            saveStudy.getStudyRanges().addAll(studyRanges);
+
+            // 학습 단어 저장
+            List<StudyWord> buildStudyWords = buildStudyWords(post, saveStudy, words);
+            List<StudyWord> saveStudyWords = studyWordCommandRepository.saveAll(buildStudyWords);
+            saveStudy.getStudyWords().addAll(saveStudyWords);
+            saveStudyIds.add(saveStudy.getId());
+        }
+
+        return saveStudyIds;
+    }
 
     /**
      * 학습 시작 서비스
@@ -82,9 +159,9 @@ public class StudyCommandService {
         // Title 생성
         String title = createTitle(getBooks);
 
-        // 학습 사건 생성
+        // 학습 생성
         long nextSequence = studyQueryRepository.findNextSequenceOfLastStudy();
-        Study saveStudy = studyCommandRepository.save(post.toEntity(nextSequence, getStudent, title));
+        Study saveStudy = studyCommandRepository.save(post.toEntity(nextSequence, getStudent, title)); // status = STARTED
 
         // 학습 범위 저장
         List<Word> words = new ArrayList<>();
@@ -119,7 +196,13 @@ public class StudyCommandService {
     }
 
     private String buildTitleSegment(Book book) {
-        StringBuilder titleSegment = new StringBuilder(book.getName());
+        StringBuilder titleSegment = new StringBuilder();
+
+        if (StringUtils.hasText(book.getPublisher())) {
+            titleSegment.append(book.getPublisher()).append(" ");
+        }
+        titleSegment.append(book.getName());
+
         boolean chapterExist = StringUtils.hasText(book.getChapter());
         boolean subjectExist = StringUtils.hasText(book.getSubject());
 
@@ -141,36 +224,42 @@ public class StudyCommandService {
 
     private List<StudyWord> buildSelectStudyWords(StudyPOSTStart post, Study saveStudy, List<Word> words) {
         boolean isStudyTargetKorean = saveStudy.getTarget() == StudyTarget.KOREAN;
-        return IntStream.range(0, post.getNumberOfWords())
-                .mapToObj(i -> {
-                    Word w = words.get(i);
-                    StudyWord studyWord = isStudyTargetKorean
-                            ? buildKoreanStudyWord(saveStudy, w)
-                            : buildEnglishStudyWord(saveStudy, w);
+        int bound = Math.min(words.size(), post.getNumberOfWords());
+        List<StudyWord> studyWords = new ArrayList<>();
+        for (int i = 0; i < bound; i++) {
+            Word w = words.get(i);
+            StudyWord studyWord = isStudyTargetKorean
+                    ? buildKoreanStudyWord(saveStudy, w)
+                    : buildEnglishStudyWord(saveStudy, w);
 
-                    List<String> choices = new ArrayList<>();
-                    choices.add(isStudyTargetKorean ? w.getKorean() : w.getEnglish());
+            List<String> choices = new ArrayList<>();
+            choices.add(isStudyTargetKorean ? w.getKorean() : w.getEnglish());
 
-                    while (choices.size() < 4) {
-                        Word randomWord = words.get(ThreadLocalRandom.current().nextInt(words.size()));
-                        String choice = isStudyTargetKorean ? randomWord.getKorean() : randomWord.getEnglish();
-                        if (!choices.contains(choice)) {
-                            choices.add(choice);
-                        }
-                    }
-                    Collections.shuffle(choices);
-                    studyWord.getChoices().addAll(choices);
-                    return studyWord;
-                }).collect(Collectors.toList());
+            while (choices.size() < 4) {
+                Word randomWord = words.get(ThreadLocalRandom.current().nextInt(words.size()));
+                String choice = isStudyTargetKorean ? randomWord.getKorean() : randomWord.getEnglish();
+                if (!choices.contains(choice)) {
+                    choices.add(choice);
+                }
+            }
+            Collections.shuffle(choices);
+            studyWord.getChoices().addAll(choices);
+            studyWords.add(studyWord);
+        }
+        return studyWords;
     }
 
     private List<StudyWord> buildNonSelectStudyWords(StudyPOSTStart post, Study saveStudy, List<Word> words) {
         boolean isStudyTargetKorean = saveStudy.getTarget() == StudyTarget.KOREAN;
-        return IntStream.range(0, post.getNumberOfWords())
-                .mapToObj(i -> isStudyTargetKorean
-                        ? buildKoreanStudyWord(saveStudy, words.get(i))
-                        : buildEnglishStudyWord(saveStudy, words.get(i)))
-                .collect(Collectors.toList());
+        int bound = Math.min(post.getNumberOfWords(), words.size());
+        List<StudyWord> studyWords = new ArrayList<>();
+        for (int i = 0; i < bound; i++) {
+            StudyWord studyWord = isStudyTargetKorean
+                    ? buildKoreanStudyWord(saveStudy, words.get(i))
+                    : buildEnglishStudyWord(saveStudy, words.get(i));
+            studyWords.add(studyWord);
+        }
+        return studyWords;
     }
 
     private static StudyWord buildKoreanStudyWord(Study saveStudy, Word w) {
@@ -188,7 +277,6 @@ public class StudyCommandService {
                 .study(saveStudy)
                 .build();
     }
-
 
     /**
      * 학습 제출 서비스
@@ -218,7 +306,7 @@ public class StudyCommandService {
                 getStudyWord.submit(sw.getSubmit());
             }
         }
-        return studentId;
+        return studyId;
     }
 
     /**
@@ -232,11 +320,16 @@ public class StudyCommandService {
      * @return 정정에 성공한 학습 단어 아이디
      */
     public Long correctStudyWord(UUID teacherId, UUID studyId, Long studyWordId, StudyWordPATCHCorrect patch) {
-        studyWordQueryRepository.getOne(
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        StudyWord getStudyWord = studyWordQueryRepository.getOne(
                 QStudyWord.studyWord.id.eq(studyWordId),
-                QStudyWord.studyWord.study.id.eq(studyId),
-                QStudyWord.studyWord.study.student.academy.teachers.any().id.eq(teacherId)
-        ).correct(patch.getCorrect(), patch.getReason());
+                QStudyWord.studyWord.study.id.eq(studyId)
+        );
+        if (!Objects.equals(getTeacher.getAcademy().getId(), getStudyWord.getStudy().getStudent().getAcademy().getId())) {
+            throw new StudyAccessDeniedException();
+        }
+        getStudyWord.getStudy().isCorrectedBy(getTeacher);
+        getStudyWord.correct(patch.getCorrect(), patch.getReason());
         return studyWordId;
     }
 

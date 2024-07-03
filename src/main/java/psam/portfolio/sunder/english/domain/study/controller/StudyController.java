@@ -4,16 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit;
-import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTStart;
-import psam.portfolio.sunder.english.domain.study.model.request.StudySlicingSearchCond;
-import psam.portfolio.sunder.english.domain.study.model.request.StudyWordPATCHCorrect;
+import psam.portfolio.sunder.english.domain.study.model.request.*;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyFullResponse;
 import psam.portfolio.sunder.english.domain.study.service.StudyCommandService;
 import psam.portfolio.sunder.english.domain.study.service.StudyQueryService;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,19 +28,23 @@ public class StudyController {
     private final StudyCommandService studyCommandService;
     private final StudyQueryService studyQueryService;
 
-    // TODO: 2024-06-29 선생님이 숙제를 내주는 POST API. assignStudy
     // TODO: 2024-06-29 선생님의 학생 성적 통계 대시보드
     // TODO: 2024-06-29 학생의 자기 성적 통계 대시보드
 
-    /*
+    /**
+     * 숙제 생성 서비스
+     *
+     * @param teacherId 숙제를 내주는 선생님 아이디
+     * @param post      생성할 숙제 정보
+     * @return 생성에 성공한 숙제 아이디 배열
+     */
     @PostMapping("/assign")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
-    public ApiResponse<Map<String, UUID>> assignStudy(@UserId UUID teacherId,
-                                                     @RequestBody @Valid StudyPOSTAssign studyPOSTAssign) {
-        UUID studyId = studyCommandService.assignStudy(teacherId, studyPOSTAssign);
-        return ApiResponse.ok(Map.of("studyId", studyId)));
+    public ApiResponse<Map<String, List<UUID>>> assignStudy(@UserId UUID teacherId,
+                                                            @RequestBody @Valid StudyPOSTAssign post) {
+        List<UUID> studyIds = studyCommandService.assign(teacherId, post);
+        return ApiResponse.ok(Map.of("studyIds", studyIds));
     }
-     */
 
     /**
      * 학습 시작 서비스
@@ -72,8 +74,8 @@ public class StudyController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     public ApiResponse<Map<String, Object>> getStudyList(@UserId UUID userId,
                                                          @ModelAttribute StudySlicingSearchCond cond) {
-        Map<String, Object> studies = studyQueryService.getStudyList(userId, cond);
-        return ApiResponse.ok(Map.of("studies", studies));
+        Map<String, Object> response = studyQueryService.getStudyList(userId, cond);
+        return ApiResponse.ok(response);
     }
 
     /**
@@ -88,7 +90,7 @@ public class StudyController {
     @GetMapping("/{studyId}")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     public ApiResponse<Map<String, Object>> getStudyDetail(@UserId UUID userId,
-                                                         @PathVariable UUID studyId) {
+                                                           @PathVariable UUID studyId) {
         Map<String, Object> response = studyQueryService.getDetail(userId, studyId);
         return ApiResponse.ok(response);
     }

@@ -13,11 +13,15 @@ package psam.portfolio.sunder.english.global.slicing;
 public abstract class SlicingSearchCond {
 
     protected int size;
-    protected long lastSequence;
+    protected Long lastSequence;
 
     public SlicingSearchCond(Integer size, Long lastSequence) {
         this.size = size == null || size < 10 ? 10 : Math.min(size, 100);
-        this.lastSequence = lastSequence == null ? Long.MAX_VALUE : lastSequence;
+        this.lastSequence = lastSequence;
+    }
+
+    public void setLastSequence(long lastSequence) {
+        this.lastSequence = lastSequence;
     }
 
     public int getSize() {

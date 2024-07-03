@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.domain.study.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -18,6 +19,7 @@ import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingRes
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -104,8 +106,13 @@ public class StudyQueryRepository {
                         study.student.name.as("studentName"),
                         study.student.school.name.as("schoolName"),
                         study.student.school.grade.as("schoolGrade"),
-                        qStudyWord.correct.isTrue().count().coalesce(0L).as("correctCount"),
-                        qStudyWord.count().coalesce(0L).as("totalCount")
+                        new CaseBuilder()
+                                .when(qStudyWord.correct.isTrue())
+                                .then(1)
+                                .otherwise(0)
+                                .sum()
+                                .as("correctCount"),
+                        qStudyWord.count().castToNum(Integer.class).as("totalCount")
                 ))
                 .distinct()
                 .from(study)
@@ -116,9 +123,11 @@ public class StudyQueryRepository {
                         academyIdEqByTeacher(teacher),
                         createdDateTimeGoe(cond.getStartDateTime()),
                         createdDateTimeLoe(cond.getEndDateTime()),
+                        titleContains(cond.getSplitStudyWord()),
                         studentNameContains(cond.getStudentName()),
                         studentSchoolGradeEq(cond.getSchoolGrade())
                 )
+                .groupBy(study.id)
                 .orderBy(study.sequence.desc())
                 .limit(cond.getLimit())
                 .fetch();
@@ -144,6 +153,16 @@ public class StudyQueryRepository {
         return createdDateTime == null ? null : study.createdDateTime.loe(createdDateTime);
     }
 
+    private static BooleanExpression titleContains(String[] titles) {
+        if (titles == null || titles.length == 0) {
+            return null;
+        }
+        return Arrays.stream(titles)
+                .map(t -> study.title.toLowerCase().contains(t))
+                .reduce(BooleanExpression::or)
+                .orElse(null);
+    }
+
     private static BooleanExpression studentNameContains(String studentName) {
         if (StringUtils.hasText(studentName)) {
             return Expressions
@@ -155,5 +174,12 @@ public class StudyQueryRepository {
 
     private static BooleanExpression studentSchoolGradeEq(Integer schoolGrade) {
         return schoolGrade == null ? null : study.student.school.grade.eq(schoolGrade);
+    }
+
+    public long countAll() {
+        Long count = query.select(study.id.count())
+                .from(study)
+                .fetchOne();
+        return count == null ? 0 : count;
     }
 }

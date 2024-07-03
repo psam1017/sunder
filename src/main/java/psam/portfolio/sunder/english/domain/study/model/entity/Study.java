@@ -12,7 +12,7 @@ import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
 import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
 import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.global.jpa.audit.TimeEntity;
+import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.UUID;
         }
 )
 @Entity
-public class Study extends TimeEntity {
+public class Study extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -70,7 +70,7 @@ public class Study extends TimeEntity {
     private Teacher teacher;
 
     // ddl-auto 로는 컬렉션 테이블에 인덱스가 생성되지 않기에 외래키를 부여한다. 만약 인덱스를 생성하고 싶다면 다음 2가지를 고려한다.
-    // 1. 엔티티로 만들어 다룬다.
+    // 1. 엔티티로 만들고 다대일 관계를 생성한다. 이때 orphanRemoval = true, cascade = CascadeType.ALL 을 설정하면 컬렉션 테이블을 만드는 것과 같은 효과를 낼 수 있다.
     // 2. database 에서 직접 인덱스를 생성한다.
     @ElementCollection
     @CollectionTable(
@@ -80,6 +80,7 @@ public class Study extends TimeEntity {
     private List<StudyRange> studyRanges = new ArrayList<>();
 
     @OneToMany(mappedBy = "study")
+    @OrderBy("id asc")
     private List<StudyWord> studyWords = new ArrayList<>();
 
     @Builder
@@ -114,5 +115,13 @@ public class Study extends TimeEntity {
 
     public boolean isSubmitted() {
         return this.status == StudyStatus.SUBMITTED;
+    }
+
+    public boolean isPractice() {
+        return this.classification == StudyClassification.PRACTICE;
+    }
+
+    public void isCorrectedBy(Teacher teacher) {
+        this.teacher = teacher;
     }
 }

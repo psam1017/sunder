@@ -1,0 +1,9 @@
+=== 학습 목록 조회하기
+
+==== HTTP Request
+include::{snippets}/study-docs-test/get-study-list/http-request.adoc[]
+include::{snippets}/study-docs-test/get-study-list/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/study-docs-test/get-study-list/http-response.adoc[]
+include::{snippets}/study-docs-test/get-study-list/response-fields.adoc[]

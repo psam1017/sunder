@@ -28,6 +28,6 @@ public class StudySlicingResponse {
     private String studentName;
     private String schoolName;
     private Integer schoolGrade;
-    private Long correctCount;
-    private Long totalCount;
+    private Integer correctCount;
+    private Integer totalCount;
 }
