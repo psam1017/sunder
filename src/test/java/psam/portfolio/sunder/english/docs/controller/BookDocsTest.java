@@ -65,10 +65,10 @@ public class BookDocsTest extends RestDocsEnvironment {
                 .andDo(restDocs.document(
                         requestFields(
                                 fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
-                                fieldWithPath("publisher").type(STRING).description("출판사"),
+                                fieldWithPath("publisher").type(STRING).description("출판사").optional(),
                                 fieldWithPath("name").type(STRING).description("교재명"),
-                                fieldWithPath("chapter").type(STRING).description("챕터"),
-                                fieldWithPath("subject").type(STRING).description("주제")
+                                fieldWithPath("chapter").type(STRING).description("챕터").optional(),
+                                fieldWithPath("subject").type(STRING).description("주제").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.bookId").type(STRING).description("등록된 교재 아이디")
@@ -113,10 +113,10 @@ public class BookDocsTest extends RestDocsEnvironment {
                         ),
                         requestFields(
                                 fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
-                                fieldWithPath("publisher").type(STRING).description("출판사"),
+                                fieldWithPath("publisher").type(STRING).description("출판사").optional(),
                                 fieldWithPath("name").type(STRING).description("교재명"),
-                                fieldWithPath("chapter").type(STRING).description("챕터"),
-                                fieldWithPath("subject").type(STRING).description("주제")
+                                fieldWithPath("chapter").type(STRING).description("챕터").optional(),
+                                fieldWithPath("subject").type(STRING).description("주제").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.bookId").type(STRING).description("수정된 교재 아이디")

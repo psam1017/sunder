@@ -18,6 +18,8 @@ import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
+import java.util.UUID;
+
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_TEACHER;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class StudentDocsTest extends RestDocsEnvironment {
 
     @DisplayName("선생님이 학원의 출석 아이디 중복을 검사할 수 있다.")
@@ -47,6 +50,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, createBearerToken(teacher))
                         .param("attendanceId", attendanceId)
+                        .param("studentId", UUID.randomUUID().toString())
         );
 
         // then
@@ -55,7 +59,8 @@ public class StudentDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         queryParameters(
-                                parameterWithName("attendanceId").description("출석 아이디")
+                                parameterWithName("attendanceId").description("출석 아이디"),
+                                parameterWithName("studentId").description("중복 체크에서 제외할 학생 아이디").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.isOk").type(BOOLEAN).description("중복 여부")
@@ -117,17 +122,17 @@ public class StudentDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("loginId").type(STRING).description("학생 로그인 아이디"),
                                 fieldWithPath("loginPw").type(STRING).description("학생 로그인 비밀번호"),
                                 fieldWithPath("name").type(STRING).description("학생 이름"),
-                                fieldWithPath("email").type(STRING).description("학생 이메일"),
-                                fieldWithPath("phone").type(STRING).description("학생 전화번호"),
-                                fieldWithPath("street").type(STRING).description("학생 주소"),
-                                fieldWithPath("addressDetail").type(STRING).description("학생 상세주소"),
-                                fieldWithPath("postalCode").type(STRING).description("학생 우편번호"),
-                                fieldWithPath("attendanceId").type(STRING).description("학생 출석 아이디"),
-                                fieldWithPath("note").type(STRING).description("학생 메모"),
-                                fieldWithPath("schoolName").type(STRING).description("학생 학교 이름"),
-                                fieldWithPath("schoolGrade").type(NUMBER).description("학생 학년"),
-                                fieldWithPath("parentName").type(STRING).description("학생 부모 이름"),
-                                fieldWithPath("parentPhone").type(STRING).description("학생 부모 전화번호")
+                                fieldWithPath("email").type(STRING).description("학생 이메일").optional(),
+                                fieldWithPath("phone").type(STRING).description("학생 전화번호").optional(),
+                                fieldWithPath("street").type(STRING).description("학생 주소").optional(),
+                                fieldWithPath("addressDetail").type(STRING).description("학생 상세주소").optional(),
+                                fieldWithPath("postalCode").type(STRING).description("학생 우편번호").optional(),
+                                fieldWithPath("attendanceId").type(STRING).description("학생 출석 아이디").optional(),
+                                fieldWithPath("note").type(STRING).description("학생 메모").optional(),
+                                fieldWithPath("schoolName").type(STRING).description("학생 학교 이름").optional(),
+                                fieldWithPath("schoolGrade").type(NUMBER).description("학생 학년").optional(),
+                                fieldWithPath("parentName").type(STRING).description("학생 부모 이름").optional(),
+                                fieldWithPath("parentPhone").type(STRING).description("학생 부모 전화번호").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.studentId").type(STRING).description("등록된 학생 아이디")
@@ -259,7 +264,6 @@ public class StudentDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.loginId").type(STRING).description("학생 로그인 아이디"),
                                 fieldWithPath("data.name").type(STRING).description("학생 이름"),
                                 fieldWithPath("data.email").type(STRING).description("학생 이메일"),
-                                fieldWithPath("data.emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
                                 fieldWithPath("data.phone").type(STRING).description("학생 전화번호"),
                                 fieldWithPath("data.street").type(STRING).description("학생 주소"),
                                 fieldWithPath("data.addressDetail").type(STRING).description("학생 상세주소"),
@@ -345,17 +349,17 @@ public class StudentDocsTest extends RestDocsEnvironment {
                         ),
                         requestFields(
                                 fieldWithPath("name").type(STRING).description("학생 이름"),
-                                fieldWithPath("phone").type(STRING).description("학생 전화번호"),
-                                fieldWithPath("email").type(STRING).description("학생 이메일"),
-                                fieldWithPath("street").type(STRING).description("학생 주소"),
-                                fieldWithPath("addressDetail").type(STRING).description("학생 상세주소"),
-                                fieldWithPath("postalCode").type(STRING).description("학생 우편번호"),
-                                fieldWithPath("attendanceId").type(STRING).description("학생 출석 아이디"),
-                                fieldWithPath("note").type(STRING).description("학생 메모"),
-                                fieldWithPath("schoolName").type(STRING).description("학생 학교 이름"),
-                                fieldWithPath("schoolGrade").type(NUMBER).description("학생 학년"),
-                                fieldWithPath("parentName").type(STRING).description("학생 부모 이름"),
-                                fieldWithPath("parentPhone").type(STRING).description("학생 부모 전화번호")
+                                fieldWithPath("phone").type(STRING).description("학생 전화번호").optional(),
+                                fieldWithPath("email").type(STRING).description("학생 이메일").optional(),
+                                fieldWithPath("street").type(STRING).description("학생 주소").optional(),
+                                fieldWithPath("addressDetail").type(STRING).description("학생 상세주소").optional(),
+                                fieldWithPath("postalCode").type(STRING).description("학생 우편번호").optional(),
+                                fieldWithPath("attendanceId").type(STRING).description("학생 출석 아이디").optional(),
+                                fieldWithPath("note").type(STRING).description("학생 메모").optional(),
+                                fieldWithPath("schoolName").type(STRING).description("학생 학교 이름").optional(),
+                                fieldWithPath("schoolGrade").type(NUMBER).description("학생 학년").optional(),
+                                fieldWithPath("parentName").type(STRING).description("학생 부모 이름").optional(),
+                                fieldWithPath("parentPhone").type(STRING).description("학생 부모 전화번호").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.studentId").type(STRING).description("수정된 학생 아이디")
@@ -394,12 +398,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
                                 parameterWithName("studentId").description("학생 아이디")
                         ),
                         requestFields(
-                                fieldWithPath("status").type(STRING).description("""
-                                        변경할 학생 상태 +
-                                        - PENDING: 대기 +
-                                        - ACTIVE: 활성 +
-                                        - WITHDRAWN: 탈퇴
-                                        """)
+                                fieldWithPath("status").type(STRING).description("변경할 학생 상태")
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.studentId").type(STRING).description("변경된 학생 아이디"),

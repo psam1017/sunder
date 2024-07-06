@@ -20,11 +20,12 @@ public class TeacherPATCHInfo {
     @Pattern(regexp = "^[가-힣]{2,30}$")
     private String name;
 
-    @Pattern(regexp = "^010[0-9]{8}$")
-    private String phone;
-
+    @NotBlank
     @Email
     private String email;
+
+    @Pattern(regexp = "^010[0-9]{8}$")
+    private String phone;
 
     private String street;
     private String addressDetail;

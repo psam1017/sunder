@@ -36,12 +36,13 @@ public class AcademyQueryService {
     /**
      * 학원 등록 시 중복 체크 서비스
      *
-     * @param name  학원 이름
-     * @param phone 학원 전화번호
-     * @param email 학원 이메일
+     * @param name      학원 이름
+     * @param phone     학원 전화번호
+     * @param email     학원 이메일
+     * @param academyId 중복 체크에서 제외할 학원 아이디
      * @return 중복 여부
      */
-    public boolean checkDuplication(String name, String phone, String email) {
+    public boolean checkDuplication(String name, String phone, String email, UUID academyId) {
         boolean hasName = StringUtils.hasText(name);
         boolean hasPhone = StringUtils.hasText(phone);
         boolean hasEmail = StringUtils.hasText(email);
@@ -54,17 +55,17 @@ public class AcademyQueryService {
         if (hasName) {
             optAcademy = academyQueryRepository.findOne(
                     academy.name.eq(name),
-                    academy.status.ne(AcademyStatus.PENDING)
+                    academyId == null ? null : academy.id.ne(academyId)
             );
         } else if (hasPhone) {
             optAcademy = academyQueryRepository.findOne(
                     academy.phone.eq(phone),
-                    academy.status.ne(AcademyStatus.PENDING)
+                    academyId == null ? null : academy.id.ne(academyId)
             );
         } else if (hasEmail) {
             optAcademy = academyQueryRepository.findOne(
                     academy.email.eq(email),
-                    academy.status.ne(AcademyStatus.PENDING)
+                    academyId == null ? null : academy.id.ne(academyId)
             );
         }
         return optAcademy.isEmpty();

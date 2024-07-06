@@ -81,9 +81,6 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         assertThat(getTeacher.getAddress().getDetail()).isEqualTo(address.getDetail());
         assertThat(getTeacher.getAddress().getPostalCode()).isEqualTo(address.getPostalCode());
 
-        // 등록된 선생님은 이미 이메일 인증 상태로 취급한다(이메일 인증 생략)
-        assertThat(getTeacher.isEmailVerified()).isTrue();
-
         // 등록된 선생님은 ROLE_TEACHER 권한'만' 가진다.
         assertThat(getTeacher.getAcademy().getId()).isEqualTo(academy.getId());
         assertThat(getTeacher.getRoles()).hasSize(1)
@@ -158,41 +155,6 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         // then
         assertThatThrownBy(() -> sut.register(director.getId(), post))
                 .isInstanceOf(DuplicateUserException.class);
-    }
-
-    @DisplayName("선생님 정보의 중복 검사 대상에서 PENDING 상태는 제외된다.")
-    @Test
-    void registerTeacherExcludesPendingStatus() {
-        // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
-        dataCreator.createUserRoles(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
-        Teacher teacher = dataCreator.registerTeacher(UserStatus.PENDING, academy);
-        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
-
-        // teacher 와 loginId 가 중복되지만 teacher 의 상태가 PENDING 이므로 중복 검사에서 제외된다.
-        String loginId = teacher.getLoginId();
-        String password = infoContainer.getAnyRawPassword();
-        String name = "name";
-        String email = infoContainer.getUniqueEmail();
-        String phoneNumber = infoContainer.getUniquePhoneNumber();
-        Address address = infoContainer.getAnyAddress();
-
-        TeacherPOST post = new TeacherPOST(
-                loginId,
-                password,
-                name,
-                email,
-                phoneNumber,
-                address.getStreet(),
-                address.getDetail(),
-                address.getPostalCode()
-        );
-
-        // when
-        // then
-        assertThatCode(() -> sut.register(teacher.getId(), post))
-                .doesNotThrowAnyException();
     }
 
     @DisplayName("학원장이 PENDING 상태의 선생님을 ACTIVE 상태로 변경할 수 있다.")

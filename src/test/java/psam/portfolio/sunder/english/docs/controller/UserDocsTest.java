@@ -17,6 +17,7 @@ import psam.portfolio.sunder.english.domain.user.model.request.UserPATCHPassword
 import psam.portfolio.sunder.english.domain.user.service.UserCommandService;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -46,6 +47,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                 get("/api/users/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("loginId", loginId)
+                        .param("userId", UUID.randomUUID().toString())
         );
 
         // then
@@ -54,7 +56,8 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
-                                        parameterWithName("loginId").description("중복체크할 아이디")
+                                        parameterWithName("loginId").description("중복체크할 아이디"),
+                                        parameterWithName("userId").description("수정 시 중복 체크에서 제외할 사용자 아이디").optional()
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
@@ -74,6 +77,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                 get("/api/users/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("email", email)
+                        .param("userId", UUID.randomUUID().toString())
         );
 
         // then
@@ -82,7 +86,8 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
-                                        parameterWithName("email").description("중복체크할 이메일")
+                                        parameterWithName("email").description("중복체크할 이메일"),
+                                        parameterWithName("userId").description("수정 시 중복 체크에서 제외할 사용자 아이디").optional()
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
@@ -102,6 +107,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                 get("/api/users/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("phone", phone)
+                        .param("userId", UUID.randomUUID().toString())
         );
 
         // then
@@ -110,7 +116,8 @@ public class UserDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
-                                        parameterWithName("phone").description("중복체크할 연락처")
+                                        parameterWithName("phone").description("중복체크할 연락처"),
+                                        parameterWithName("userId").description("수정 시 중복 체크에서 제외할 사용자 아이디").optional()
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
@@ -151,7 +158,7 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.passwordChangeRequired").type(BOOLEAN).description("비밀번호 변경 주기인지 여부"),
                                         fieldWithPath("data.userId").type(STRING).description("사용자 아이디"),
                                         fieldWithPath("data.academyId").type(STRING).description("(학원 소속인 경우)학원 아이디"),
-                                        fieldWithPath("data.roleNames").type(ARRAY).description("사용자가 가진 권한 목록")
+                                        fieldWithPath("data.roles").type(ARRAY).description("사용자가 가진 권한 목록")
                                 )
                         )
                 );
@@ -405,7 +412,6 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.loginId").type(STRING).description("로그인 아이디"),
                                         fieldWithPath("data.name").type(STRING).description("이름"),
                                         fieldWithPath("data.email").type(STRING).description("이메일"),
-                                        fieldWithPath("data.emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
                                         fieldWithPath("data.phone").type(STRING).description("연락처"),
                                         fieldWithPath("data.street").type(STRING).description("주소"),
                                         fieldWithPath("data.addressDetail").type(STRING).description("상세 주소"),
@@ -448,7 +454,6 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.loginId").type(STRING).description("로그인 아이디"),
                                         fieldWithPath("data.name").type(STRING).description("이름"),
                                         fieldWithPath("data.email").type(STRING).description("이메일"),
-                                        fieldWithPath("data.emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
                                         fieldWithPath("data.phone").type(STRING).description("연락처"),
                                         fieldWithPath("data.street").type(STRING).description("주소"),
                                         fieldWithPath("data.addressDetail").type(STRING).description("상세 주소"),

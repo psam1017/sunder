@@ -58,9 +58,7 @@ public class TeacherCommandService {
         userQueryRepository.findOne(
                 user.loginId.eq(teacherPOST.getLoginId()) // NotNull
                         .or(user.email.eq(teacherPOST.getEmail())) // NotNull
-                        .or(teacherPOST.getPhone() != null ? user.phone.eq(teacherPOST.getPhone()) : null), // nullable
-                user.status.ne(PENDING),
-                user.emailVerified.eq(true)
+                        .or(teacherPOST.getPhone() != null ? user.phone.eq(teacherPOST.getPhone()) : null) // nullable
         ).ifPresent(user -> {
             throw new DuplicateUserException();
         });
@@ -154,6 +152,16 @@ public class TeacherCommandService {
      */
     public UUID updateInfo(UUID teacherId, TeacherPATCHInfo patch) {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+
+        // User 회원 정보 중복 체크. 단, 자기 자신은 중복에서 제외
+        userQueryRepository.findOne(
+                user.email.eq(patch.getEmail()) // NotNull
+                        .or(patch.getPhone() != null ? user.phone.eq(patch.getPhone()) : null), // nullable
+                user.id.ne(getTeacher.getId())
+        ).ifPresent(user -> {
+            throw new DuplicateUserException();
+        });
+
         getTeacher.setName(patch.getName());
         getTeacher.setEmail(patch.getEmail());
         getTeacher.setPhone(patch.getPhone());

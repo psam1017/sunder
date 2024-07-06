@@ -52,6 +52,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 get("/api/academies/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("name", name)
+                        .param("academyId", UUID.randomUUID().toString())
         );
 
         // then
@@ -60,7 +61,8 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
-                                        parameterWithName("name").description("중복체크할 학원 이름")
+                                        parameterWithName("name").description("중복체크할 학원 이름"),
+                                        parameterWithName("academyId").description("중복체크에서 제외할 학원 아이디")
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
@@ -80,6 +82,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 get("/api/academies/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("phone", phone)
+                        .param("academyId", UUID.randomUUID().toString())
         );
 
         // then
@@ -88,7 +91,8 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
-                                        parameterWithName("phone").description("중복체크할 전화번호")
+                                        parameterWithName("phone").description("중복체크할 전화번호"),
+                                        parameterWithName("academyId").description("중복체크에서 제외할 학원 아이디")
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
@@ -108,6 +112,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 get("/api/academies/check-dupl")
                         .contentType(APPLICATION_JSON)
                         .param("email", email)
+                        .param("academyId", UUID.randomUUID().toString())
         );
 
         // then
@@ -116,7 +121,8 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                                 queryParameters(
-                                        parameterWithName("email").description("중복체크할 이메일")
+                                        parameterWithName("email").description("중복체크할 이메일"),
+                                        parameterWithName("academyId").description("중복체크에서 제외할 학원 아이디")
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.isOk").type(BOOLEAN).description("중복 검사 결과")
@@ -177,7 +183,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("academy.street").type(STRING).description("학원 주소").optional(),
                                 fieldWithPath("academy.addressDetail").type(STRING).description("학원 상세주소").optional(),
                                 fieldWithPath("academy.postalCode").type(STRING).description("학원 우편번호").optional(),
-                                fieldWithPath("academy.openToPublic").description("학원 공개 여부").type(BOOLEAN),
+                                fieldWithPath("academy.openToPublic").type(BOOLEAN).description("학원 공개 여부"),
                                 fieldWithPath("director.loginId").type(STRING).description("학원장 로그인 아이디"),
                                 fieldWithPath("director.loginPw").type(STRING).description("학원장 로그인 비밀번호"),
                                 fieldWithPath("director.name").type(STRING).description("학원장 이름"),
@@ -299,7 +305,6 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.teachers[].loginId").type(STRING).description("선생님 로그인 아이디"),
                                         fieldWithPath("data.teachers[].name").type(STRING).description("선생님 이름"),
                                         fieldWithPath("data.teachers[].email").type(STRING).description("선생님 이메일"),
-                                        fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("선생님 이메일 인증 여부"),
                                         fieldWithPath("data.teachers[].phone").type(STRING).description("선생님 전화번호"),
                                         fieldWithPath("data.teachers[].street").type(STRING).description("선생님 주소 (도로명)"),
                                         fieldWithPath("data.teachers[].addressDetail").type(STRING).description("선생님 주소 (상세주소)"),

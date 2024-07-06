@@ -59,7 +59,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(loginId, email, phone)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(loginId, email, phone, null)))
                 .isInstanceOf(OneParamToCheckUserDuplException.class);
     }
 
@@ -73,7 +73,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(loginId, email, phone)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(loginId, email, phone, null)))
                 .isInstanceOf(OneParamToCheckUserDuplException.class);
     }
 
@@ -89,7 +89,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         String phone = null;
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone, null));
 
         // then
         assertThat(isOk).isFalse();
@@ -107,7 +107,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         String phone = null;
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone, null));
 
         // then
         assertThat(isOk).isFalse();
@@ -125,44 +125,25 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         String phone = teacher.getPhone();
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone, null));
 
         // then
         assertThat(isOk).isFalse();
     }
 
-    @DisplayName("PENDING 상태의 사용자는 중복 검사에서 제외된다.")
+    @DisplayName("사용자 자기 자신은 중복 검사에서 제외된다.")
     @Test
-    void ifPendingOk(){
-        // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = dataCreator.registerTeacher(UserStatus.PENDING, academy);
-
-        String loginId = teacher.getLoginId();
-        String email = null;
-        String phone = null;
-
-        // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
-
-        // then
-        assertThat(isOk).isTrue();
-    }
-
-    @DisplayName("이메일 인증을 하지 않은 사용자는 중복 검사에서 제외된다.")
-    @Test
-    void ifEmailNotVerifiedOk(){
+    void ifUserIdExistOk(){
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
-        teacher.verifyEmail(false);
 
         String loginId = teacher.getLoginId();
         String email = null;
         String phone = null;
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(loginId, email, phone, teacher.getId()));
 
         // then
         assertThat(isOk).isTrue();
@@ -195,7 +176,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
         assertThat(result.getUserId()).isEqualTo(director.getId().toString());
         assertThat(result.getAcademyId()).isEqualTo(director.getAcademy().getId().toString());
-        assertThat(result.getRoleNames()).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
+        assertThat(result.getRoles()).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
     }
 
     @DisplayName("사용자 로그인 아이디가 틀리면 로그인할 수 없다.")

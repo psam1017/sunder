@@ -39,16 +39,18 @@ public class StudentQueryService {
      *
      * @param teacherId    검색하는 선생님 아이디
      * @param attendanceId 출석 아이디
+     * @param studentId    중복 체크에서 제외할 학생 아이디
      * @return 중복 여부 - 가능 = true, 중복 = false
      */
-    public boolean checkDuplication(UUID teacherId, String attendanceId) {
+    public boolean checkDuplication(UUID teacherId, String attendanceId, UUID studentId) {
         Academy getAcademy = academyQueryRepository.getOne(
                 QAcademy.academy.teachers.any().id.eq(teacherId)
         );
 
         Optional<Student> optStudent = studentQueryRepository.findOne(
                 QStudent.student.academy.id.eq(getAcademy.getId()),
-                QStudent.student.attendanceId.eq(attendanceId)
+                QStudent.student.attendanceId.eq(attendanceId),
+                studentId == null ? null : QStudent.student.id.ne(studentId)
         );
         return optStudent.isEmpty();
     }

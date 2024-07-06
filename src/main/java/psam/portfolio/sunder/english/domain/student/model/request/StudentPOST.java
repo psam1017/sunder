@@ -32,7 +32,6 @@ public class StudentPOST {
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$")
     private String name;
 
-    @NotBlank
     @Email
     private String email;
 
@@ -63,7 +62,6 @@ public class StudentPOST {
                 .loginPw(encodeLoginPw)
                 .name(name)
                 .email(email)
-                .emailVerified(true)
                 .phone(phone)
                 .address(Address.builder()
                         .street(street)
