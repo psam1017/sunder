@@ -13,14 +13,14 @@ public class LoginResult {
     private final boolean passwordChangeRequired;
     private final String userId;
     private final String academyId;
-    private final List<RoleName> roleNames;
+    private final List<RoleName> roles;
 
-    public LoginResult(String accessToken, String refreshToken, boolean passwordChangeRequired, String userId, String academyId, List<RoleName> roleNames) {
+    public LoginResult(String accessToken, String refreshToken, boolean passwordChangeRequired, String userId, String academyId, List<RoleName> roles) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.passwordChangeRequired = passwordChangeRequired;
         this.userId = userId;
         this.academyId = academyId;
-        this.roleNames = roleNames;
+        this.roles = roles;
     }
 }

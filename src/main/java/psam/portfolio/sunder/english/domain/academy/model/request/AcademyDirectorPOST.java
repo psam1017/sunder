@@ -104,7 +104,6 @@ public class AcademyDirectorPOST {
                     .loginPw(encodeLoginPw)
                     .name(name)
                     .email(email)
-                    .emailVerified(false)
                     .phone(phone)
                     .address(Address.builder()
                             .street(street)

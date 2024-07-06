@@ -2,7 +2,6 @@ package psam.portfolio.sunder.english.domain.user.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -58,8 +57,10 @@ public class UserQueryService {
      * @param loginId 아이디
      * @param email   이메일
      * @param phone   연락처
+     * @param userId  사용자 아이디(수정 시 중복 체크에서 제외)
+     * @param userId
      */
-    public boolean checkDuplication(String loginId, String email, String phone) {
+    public boolean checkDuplication(String loginId, String email, String phone, UUID userId) {
         boolean hasLoginId = StringUtils.hasText(loginId);
         boolean hasEmail = StringUtils.hasText(email);
         boolean hasPhone = StringUtils.hasText(phone);
@@ -72,32 +73,24 @@ public class UserQueryService {
         if (hasLoginId) {
             optUser = userQueryRepository.findOne(
                     user.loginId.eq(loginId),
-                    userStatusNe(PENDING),
-                    userEmailVerifiedEq(true));
+                    userId == null ? null : user.id.ne(userId)
+            );
         } else if (hasEmail) {
             optUser = userQueryRepository.findOne(
                     user.email.eq(email),
-                    userStatusNe(PENDING),
-                    userEmailVerifiedEq(true));
+                    userId == null ? null : user.id.ne(userId)
+            );
         } else if (hasPhone) {
             optUser = userQueryRepository.findOne(
                     user.phone.eq(phone),
-                    userStatusNe(PENDING),
-                    userEmailVerifiedEq(true));
+                    userId == null ? null : user.id.ne(userId)
+            );
         }
         return optUser.isEmpty();
     }
 
     private static boolean hasOnlyOne(boolean a, boolean b, boolean c) {
         return a ^ b ^ c && !(a && b && c);
-    }
-
-    private static BooleanExpression userStatusNe(UserStatus userStatus) {
-        return user.status.ne(userStatus);
-    }
-
-    private static BooleanExpression userEmailVerifiedEq(boolean verified) {
-        return user.emailVerified.eq(verified);
     }
 
     /**

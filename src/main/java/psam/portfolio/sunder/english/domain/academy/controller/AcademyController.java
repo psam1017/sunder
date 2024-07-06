@@ -33,13 +33,15 @@ public class AcademyController {
      * @param name  학원 이름
      * @param phone 학원 전화번호
      * @param email 학원 이메일
+     * @param academyId 중복 검사에서 제외할 학원 아이디
      * @return 중복 여부
      */
     @GetMapping("/check-dupl")
     public ApiResponse<Map<String, Boolean>> checkDuplication(@RequestParam(required = false) String name,
                                                               @RequestParam(required = false) String phone,
-                                                              @RequestParam(required = false) String email) {
-        boolean result = academyQueryService.checkDuplication(name, phone, email);
+                                                              @RequestParam(required = false) String email,
+                                                              @RequestParam(required = false) UUID academyId) {
+        boolean result = academyQueryService.checkDuplication(name, phone, email, academyId);
         return ApiResponse.ok(Map.of("isOk", result));
     }
 

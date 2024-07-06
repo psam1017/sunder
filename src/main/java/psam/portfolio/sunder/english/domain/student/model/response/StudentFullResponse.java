@@ -25,7 +25,6 @@ public class StudentFullResponse {
     private String loginId;
     private String name;
     private String email;
-    private Boolean emailVerified;
     private String phone;
     private String street;
     private String addressDetail;
@@ -54,7 +53,6 @@ public class StudentFullResponse {
                 .loginId(student.getLoginId())
                 .name(student.getName())
                 .email(student.getEmail())
-                .emailVerified(student.isEmailVerified())
                 .phone(student.getPhone())
                 .street(student.getAddress().getStreet())
                 .addressDetail(student.getAddress().getDetail())

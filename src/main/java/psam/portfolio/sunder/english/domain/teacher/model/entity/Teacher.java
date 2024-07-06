@@ -41,8 +41,8 @@ public class Teacher extends User {
     private List<Study> studies = new ArrayList<>();
 
     @Builder
-    public Teacher(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status, Academy academy) {
-        super(loginId, loginPw, name, email, emailVerified, phone, address, status);
+    public Teacher(String loginId, String loginPw, String name, String email, String phone, Address address, UserStatus status, Academy academy) {
+        super(loginId, loginPw, name, email, phone, address, status);
         this.academy = academy;
     }
 

@@ -44,10 +44,27 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
 
         // when
-        boolean result = sut.checkDuplication(teacher.getId(), student.getAttendanceId());
+        boolean result = sut.checkDuplication(teacher.getId(), student.getAttendanceId(), null);
 
         // then
         assertThat(result).isFalse();
+    }
+
+    @DisplayName("학생 출석번호에서 학생 본인을 제외하고 중복이 있는지 확인할 수 있다.")
+    @Test
+    void checkDuplicationWithExcludingStudent() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, ROLE_TEACHER);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, ROLE_STUDENT);
+
+        // when
+        boolean result = sut.checkDuplication(teacher.getId(), student.getAttendanceId(), student.getId());
+
+        // then
+        assertThat(result).isTrue();
     }
 
     @DisplayName("선생님이 자기 학원의 학생 목록을 조회할 수 있다.")
@@ -154,7 +171,6 @@ public class StudentQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(studentFullResponse.getLoginId()).isEqualTo(student.getLoginId());
         assertThat(studentFullResponse.getName()).isEqualTo(student.getName());
         assertThat(studentFullResponse.getEmail()).isEqualTo(student.getEmail());
-        assertThat(studentFullResponse.getEmailVerified()).isTrue();
         assertThat(studentFullResponse.getPhone()).isEqualTo(student.getPhone());
         assertThat(studentFullResponse.getStreet()).isEqualTo(student.getAddress().getStreet());
         assertThat(studentFullResponse.getAddressDetail()).isEqualTo(student.getAddress().getDetail());

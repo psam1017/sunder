@@ -48,7 +48,6 @@ public class TeacherPOST {
                 .loginPw(encodeLoginPw)
                 .name(name)
                 .email(email)
-                .emailVerified(true)
                 .phone(phone)
                 .address(Address.builder()
                         .street(street)
