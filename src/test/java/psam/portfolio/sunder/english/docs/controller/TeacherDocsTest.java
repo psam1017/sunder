@@ -134,7 +134,6 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.teachers[].loginId").type(STRING).description("선생님 로그인 아이디"),
                                 fieldWithPath("data.teachers[].name").type(STRING).description("선생님 이름"),
                                 fieldWithPath("data.teachers[].email").type(STRING).description("선생님 이메일"),
-                                fieldWithPath("data.teachers[].emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
                                 fieldWithPath("data.teachers[].phone").type(STRING).description("선생님 전화번호").optional(),
                                 fieldWithPath("data.teachers[].street").type(STRING).description("주소"),
                                 fieldWithPath("data.teachers[].addressDetail").type(STRING).description("상세주소"),
@@ -250,7 +249,6 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.loginId").type(STRING).description("선생님 로그인 아이디"),
                                 fieldWithPath("data.name").type(STRING).description("선생님 이름"),
                                 fieldWithPath("data.email").type(STRING).description("선생님 이메일"),
-                                fieldWithPath("data.emailVerified").type(BOOLEAN).description("이메일 인증 여부"),
                                 fieldWithPath("data.phone").type(STRING).description("선생님 전화번호").optional(),
                                 fieldWithPath("data.street").type(STRING).description("주소"),
                                 fieldWithPath("data.addressDetail").type(STRING).description("상세주소"),
@@ -436,8 +434,8 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                         ),
                         requestFields(
                                 fieldWithPath("name").type(STRING).description("변경할 선생님 이름"),
+                                fieldWithPath("email").type(STRING).description("변경할 선생님 이메일"),
                                 fieldWithPath("phone").type(STRING).description("변경할 선생님 전화번호").optional(),
-                                fieldWithPath("email").type(STRING).description("변경할 선생님 이메일").optional(),
                                 fieldWithPath("street").type(STRING).description("변경할 선생님 주소").optional(),
                                 fieldWithPath("addressDetail").type(STRING).description("변경할 선생님 상세주소").optional(),
                                 fieldWithPath("postalCode").type(STRING).description("변경할 선생님 우편번호").optional()

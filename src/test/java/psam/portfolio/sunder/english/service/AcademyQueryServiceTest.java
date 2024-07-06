@@ -41,7 +41,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(name, phone, email)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(name, phone, email, null)))
                 .isInstanceOf(OneParamToCheckAcademyDuplException.class);
     }
 
@@ -55,7 +55,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
 
         // when
         // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(name, phone, email)))
+        assertThatThrownBy(() -> refreshAnd(() -> sut.checkDuplication(name, phone, email, null)))
                 .isInstanceOf(OneParamToCheckAcademyDuplException.class);
     }
 
@@ -70,7 +70,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         String email = null;
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email, null));
 
         // then
         assertThat(isOk).isFalse();
@@ -87,7 +87,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         String email = null;
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email, null));
 
         // then
         assertThat(isOk).isFalse();
@@ -104,24 +104,24 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         String email = registerAcademy.getEmail();
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email, null));
 
         // then
         assertThat(isOk).isFalse();
     }
 
-    @DisplayName("PENDING 상태의 학원은 중복 검사에서 제외된다.")
+    @DisplayName("학원 중복 검사에서 자기 자신은 제외된다.")
     @Test
-    void ifPendingOk() {
+    void excludeSelf() {
         // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.PENDING);
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
         String name = academy.getName();
         String email = null;
         String phone = null;
 
         // when
-        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email));
+        boolean isOk = refreshAnd(() -> sut.checkDuplication(name, phone, email, academy.getId()));
 
         // then
         assertThat(isOk).isTrue();

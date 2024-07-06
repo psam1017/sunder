@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
-import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
 import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -122,44 +121,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
                 .isInstanceOf(DuplicateUserException.class);
     }
 
-    @DisplayName("중복 검사 대상에서 PENDING 상태는 제외된다.")
-    @Test
-    void excludePending(){
-        // mocking
-        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
-                .willReturn(true);
-
-        // given
-        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.PENDING);
-        Teacher registerTeacher = dataCreator.registerTeacher(UserStatus.PENDING, registerAcademy);
-
-        AcademyPOST academyPOST = AcademyPOST.builder()
-                .name(registerAcademy.getName()) // PENDING 상태인 학원의 이름
-                .phone(null) // null
-                .email(null) // null
-                .street("street")
-                .addressDetail("detail")
-                .postalCode("00000")
-                .openToPublic(true)
-                .build();
-
-        DirectorPOST directorPOST = DirectorPOST.builder()
-                .loginId(registerTeacher.getLoginId())
-                .loginPw("P@ssw0rd!")
-                .name("name")
-                .email(registerTeacher.getEmail())
-                .phone(null)
-                .street("street")
-                .addressDetail("detail")
-                .postalCode("00000")
-                .build();
-
-        // when
-        // then
-        Assertions.assertThatCode(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST))
-                .doesNotThrowAnyException();
-    }
-
     @DisplayName("등록된 학원장의 비밀번호는 암호화되어 있다.")
     @Test
     void encodeLoginPw(){
@@ -230,10 +191,7 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         UUID teacherId = refreshAnd(() -> sut.registerDirectorWithAcademy(academyPOST, directorPOST));
 
         // then
-        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
-        assertThat(getTeacher.isEmailVerified()).isFalse();
-
-        Academy getAcademy = academyQueryRepository.getById(getTeacher.getAcademy().getId());
+        Academy getAcademy = teacherQueryRepository.getById(teacherId).getAcademy();
         assertThat(getAcademy.isPending()).isTrue();
     }
 
@@ -317,9 +275,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         // then
         assertThat(result).isTrue();
-
-        getTeacher = teacherQueryRepository.getById(teacherId);
-        assertThat(getTeacher.isEmailVerified()).isTrue();
 
         Academy getAcademy = academyQueryRepository.getById(academyId);
         assertThat(getAcademy.isVerified()).isTrue();
@@ -478,32 +433,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         // then
         assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
                 .isInstanceOf(DuplicateAcademyException.class);
-    }
-
-    @DisplayName("다른 학원과 정보가 중복되더라도 PENDING 상태는 제외한다.")
-    @Test
-    void updateInfoWithPending() {
-        // given
-        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
-
-        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.PENDING);
-
-        AcademyPATCH academyPATCH = AcademyPATCH.builder()
-                .name(anotherAcademy.getName())
-                .phone(anotherAcademy.getPhone())
-                .email(anotherAcademy.getEmail())
-                .street("new street")
-                .addressDetail("new detail")
-                .postalCode("11111")
-                .openToPublic(false)
-                .build();
-
-        // when
-        // then
-        assertThatCode(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
-                .doesNotThrowAnyException();
     }
 
     @DisplayName("자기 학원의 이름은 중복 검사에서 제외된다.")

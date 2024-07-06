@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.DuplicateAcademyException;
 import psam.portfolio.sunder.english.domain.academy.exception.IllegalStatusAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.AcademyPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST.DirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
@@ -41,10 +41,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.academy;
+import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
 import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_TEACHER;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.PENDING;
-import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor
 @Transactional
@@ -80,19 +79,16 @@ public class AcademyCommandService {
         academyQueryRepository.findOne(
                 academy.name.eq(academyPOST.getName()) // NotNull
                         .or(academyPOST.getPhone() != null ? academy.phone.eq(academyPOST.getPhone()) : null) // nullable
-                        .or(academyPOST.getEmail() != null ? academy.email.eq(academyPOST.getEmail()) : null), // nullable
-                academy.status.ne(AcademyStatus.PENDING)
+                        .or(academyPOST.getEmail() != null ? academy.email.eq(academyPOST.getEmail()) : null) // nullable
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
         });
 
-        // user loginId, email, phone 에서 중복 체크. userStatusNotIn(PENDING), userEmailVerifiedEq(true)
+        // user loginId, email, phone 에서 중복 체크
         userQueryRepository.findOne(
                 user.loginId.eq(directorPOST.getLoginId()) // NotNull
                         .or(user.email.eq(directorPOST.getEmail())) // NotNull
-                        .or(directorPOST.getPhone() != null ? user.phone.eq(directorPOST.getPhone()) : null), // nullable
-                user.status.ne(PENDING),
-                user.emailVerified.eq(true)
+                        .or(directorPOST.getPhone() != null ? user.phone.eq(directorPOST.getPhone()) : null) // nullable
         ).ifPresent(user -> {
             throw new DuplicateUserException();
         });
@@ -159,10 +155,9 @@ public class AcademyCommandService {
         }
         getAcademy.verify();
 
-        // 인증 시점에는 모든 선생님(=학원장)의 상태를 인증함으로 변경한다.
+        // 인증 시점에는 모든 선생님(=only 학원장)의 상태를 인증함으로 변경한다.
         getAcademy.getTeachers().forEach(teacher -> {
             teacher.startTrial();
-            teacher.verifyEmail(true);
         });
 
         return true;
@@ -182,12 +177,11 @@ public class AcademyCommandService {
             throw new RoleDirectorRequiredException();
         }
 
-        // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생, 단, 자기 학원은 제외하며 PENDING 상태도 제외.
+        // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생. 단, 자기 학원은 제외.
         academyQueryRepository.findOne(
                 academy.name.eq(patch.getName())
                         .or(patch.getPhone() != null ? academy.phone.eq(patch.getPhone()) : null)
                         .or(patch.getEmail() != null ? academy.email.eq(patch.getEmail()) : null),
-                academy.status.ne(AcademyStatus.PENDING),
                 academy.id.ne(getAcademy.getId())
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
@@ -213,7 +207,6 @@ public class AcademyCommandService {
     public UUID withdraw(UUID directorId) {
         Teacher director = teacherQueryRepository.getById(directorId);
 
-        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄는 신중한 조치가 필요하므로 한 번 더 검증한다.
         if (!director.isDirector()) {
             throw new RoleDirectorRequiredException();
         }
@@ -233,7 +226,6 @@ public class AcademyCommandService {
     public UUID revokeWithdrawal(UUID directorId) {
         Teacher director = teacherQueryRepository.getById(directorId);
 
-        // @Secured 에서 학원장인지를 이미 검증하지만, 학원 폐쇄 취소는 신중한 조치가 필요하므로 한 번 더 검증한다.
         if (!director.isDirector()) {
             throw new RoleDirectorRequiredException();
         }

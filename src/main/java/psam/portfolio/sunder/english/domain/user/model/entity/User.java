@@ -41,8 +41,6 @@ public abstract class User extends BaseEntity {
     @Column
     private String email;
 
-    private boolean emailVerified;
-
     @Column
     private String phone;
 
@@ -60,22 +58,17 @@ public abstract class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRole> roles = new HashSet<>();
 
-    protected User(String loginId, String loginPw, String name, String email, boolean emailVerified, String phone, Address address, UserStatus status) {
+    protected User(String loginId, String loginPw, String name, String email, String phone, Address address, UserStatus status) {
         this.loginId = loginId;
         this.loginPw = loginPw;
         this.name = name;
         this.email = email;
-        this.emailVerified = emailVerified;
         this.phone = phone;
         this.address = address;
         this.status = status;
         LocalDateTime now = LocalDateTime.now();
         this.lastPasswordChangeDateTime = now;
         this.passwordChangeAllowedDateTime = now;
-    }
-
-    public void verifyEmail(boolean verified) {
-        this.emailVerified = verified;
     }
 
     public boolean isActive() {
@@ -98,20 +91,12 @@ public abstract class User extends BaseEntity {
         this.status = UserStatus.TRIAL;
     }
 
-    public void startActive() {
-        this.status = UserStatus.ACTIVE;
-    }
-
     public void setLastPasswordChangeDateTime(LocalDateTime lastPasswordChangeDateTime) {
         this.lastPasswordChangeDateTime = lastPasswordChangeDateTime;
     }
 
     public boolean isPasswordExpired() {
         return this.lastPasswordChangeDateTime.plusMonths(3).isBefore(LocalDateTime.now());
-    }
-
-    public boolean isAdmin() {
-        return this.roles.stream().anyMatch(userRole -> userRole.getRoleName() == RoleName.ROLE_ADMIN);
     }
 
     public void setLoginPw(String loginPw) {

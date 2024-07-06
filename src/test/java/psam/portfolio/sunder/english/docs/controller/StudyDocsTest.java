@@ -203,7 +203,6 @@ public class StudyDocsTest extends RestDocsEnvironment {
                                 parameterWithName("studyId").description("제출할 학습 아이디")
                         ),
                         requestFields(
-                                fieldWithPath("studyWords").type(ARRAY).description("제출할 학습 단어 목록"),
                                 fieldWithPath("studyWords[].id").type(NUMBER).description("단어 아이디"),
                                 fieldWithPath("studyWords[].submit").type(STRING).description("제출할 답변").optional()
                         ),
@@ -364,7 +363,6 @@ public class StudyDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.student.loginId").type(STRING).description("학생 로그인 아이디"),
                                 fieldWithPath("data.student.name").type(STRING).description("학생 이름"),
                                 fieldWithPath("data.student.email").type(STRING).description("학생 이메일"),
-                                fieldWithPath("data.student.emailVerified").type(BOOLEAN).description("학생 이메일 확인 여부"),
                                 fieldWithPath("data.student.phone").type(STRING).description("학생 전화번호"),
                                 fieldWithPath("data.student.street").type(STRING).description("학생 거리 주소"),
                                 fieldWithPath("data.student.addressDetail").type(STRING).description("학생 상세 주소"),

@@ -35,13 +35,15 @@ public class UserController {
      * @param loginId 아이디
      * @param email   이메일
      * @param phone   연락처
+     * @param userId  사용자 아이디(수정 시 중복 체크에서 제외)
      * @return 중복 여부 - 가능 = true, 중복 = false
      */
     @GetMapping("/check-dupl")
     public ApiResponse<Map<String, Boolean>> checkDuplication(@RequestParam(required = false) String loginId,
                                                               @RequestParam(required = false) String email,
-                                                              @RequestParam(required = false) String phone) {
-        boolean result = userQueryService.checkDuplication(loginId, email, phone);
+                                                              @RequestParam(required = false) String phone,
+                                                              @RequestParam(required = false) UUID userId) {
+        boolean result = userQueryService.checkDuplication(loginId, email, phone, userId);
         return ApiResponse.ok(Map.of("isOk", result));
     }
 

@@ -1,6 +1,9 @@
 package psam.portfolio.sunder.english.domain.student.service;
 
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,10 +68,8 @@ public class StudentCommandService {
         // User 회원 정보 중복 체크
         userQueryRepository.findOne(
                 user.loginId.eq(post.getLoginId()) // NotNull
-                        .or(user.email.eq(post.getEmail())) // NotNull
-                        .or(post.getPhone() != null ? user.phone.eq(post.getPhone()) : null), // nullable
-                user.status.ne(PENDING),
-                user.emailVerified.eq(true)
+                        .or(post.getEmail() != null ? user.email.eq(post.getEmail()) : null) // nullable
+                        .or(post.getPhone() != null ? user.phone.eq(post.getPhone()) : null) // nullable
         ).ifPresent(user -> {
             throw new DuplicateUserException();
         });
@@ -115,6 +116,26 @@ public class StudentCommandService {
         Student getStudent = studentQueryRepository.getById(studentId);
         if (!getTeacher.hasSameAcademy(getStudent)) {
             throw new AcademyAccessDeniedException();
+        }
+
+        // User 회원 정보 중복 체크
+        BooleanExpression emailExpression = patch.getEmail() != null ? user.email.eq(patch.getEmail()) : null;
+        BooleanExpression phoneExpression = patch.getPhone() != null ? user.phone.eq(patch.getPhone()) : null;
+
+        BooleanExpression combinedExpression = emailExpression;
+
+        if (combinedExpression != null && phoneExpression != null) {
+            combinedExpression = combinedExpression.or(phoneExpression);
+        } else if (combinedExpression == null) {
+            combinedExpression = phoneExpression;
+        }
+
+        if (combinedExpression != null) {
+            userQueryRepository.findOne(combinedExpression).ifPresent(user -> {
+                if (!user.getId().equals(getStudent.getId())) {
+                    throw new DuplicateUserException();
+                }
+            });
         }
 
         getStudent.setName(patch.getName());

@@ -48,7 +48,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
     @Autowired
     PasswordUtils passwordUtils;
 
-    // 끝에 있는 선생님 테스트의 학생 버전
     @DisplayName("선생님이 학생을 등록할 수 있다.")
     @Test
     void registerStudent() {
@@ -104,9 +103,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         assertThat(getStudent.getSchool().getGrade()).isEqualTo(school.getGrade());
         assertThat(getStudent.getParent().getName()).isEqualTo(parent.getName());
         assertThat(getStudent.getParent().getPhone()).isEqualTo(parent.getPhone());
-
-        // 등록된 학생은 이미 이메일 인증 상태로 취급한다(이메일 인증 생략)
-        assertThat(getStudent.isEmailVerified()).isTrue();
 
         // 등록된 학생은 ROLE_STUDENT 권한'만' 가진다.
         assertThat(getStudent.getAcademy().getId()).isEqualTo(academy.getId());
@@ -251,52 +247,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
                 .isInstanceOf(DuplicateAttendanceIdException.class);
     }
 
-    @DisplayName("학생 정보의 중복 검사 대상에서 PENDING 상태는 제외된다.")
-    @Test
-    void registerStudentExcludesPendingStatus() {
-        // given
-        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
-        dataCreator.createUserRoles(teacher, ROLE_DIRECTOR, ROLE_TEACHER);
-        Student student = dataCreator.registerStudent(UserStatus.PENDING, academy);
-        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
-
-        // student 와 loginId 가 중복되지만 student 의 상태가 PENDING 이므로 중복 검사에서 제외된다.
-        String loginId = student.getLoginId();
-        String password = infoContainer.getAnyRawPassword();
-        String name = "선더학생";
-        String email = infoContainer.getUniqueEmail();
-        String phoneNumber = infoContainer.getUniquePhoneNumber();
-        Address address = infoContainer.getAnyAddress();
-        String attendanceId = infoContainer.getUniqueAttendanceId();
-        String note = "note about student";
-        School school = infoContainer.getAnySchool();
-        Parent parent = infoContainer.getAnyParent();
-
-        StudentPOST post = new StudentPOST(
-                loginId,
-                password,
-                name,
-                email,
-                phoneNumber,
-                address.getStreet(),
-                address.getDetail(),
-                address.getPostalCode(),
-                attendanceId,
-                note,
-                school.getName(),
-                school.getGrade(),
-                parent.getName(),
-                parent.getPhone()
-        );
-
-        // when
-        // then
-        assertThatCode(() -> sut.register(teacher.getId(), post))
-                .doesNotThrowAnyException();
-    }
-
-    // 선생님이 학생의 정보를 수정할 수 있다.
     @DisplayName("선생님이 학생의 정보를 수정할 수 있다.")
     @Test
     void updateStudentInfo() {
