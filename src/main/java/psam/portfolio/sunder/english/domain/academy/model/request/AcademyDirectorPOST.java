@@ -38,7 +38,7 @@ public class AcademyDirectorPOST {
         @Pattern(regexp = "^[가-힣]{2,30}$")
         private String name;
 
-        @Pattern(regexp = "^010[0-9]{8}$")
+        @Pattern(regexp = "^[0-9]{8,12}$")
         private String phone;
 
         @Email

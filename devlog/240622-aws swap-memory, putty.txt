@@ -8,11 +8,6 @@
 이 dd 명령 예제에서 스왑 파일은 4GB(128MB x 32)입니다.
 $ sudo dd if=/dev/zero of=/swapfile bs=128M count=32
 
-```
-(인스턴스 사용 가능 메모리가 2GB 일 때)
-$ sudo dd if=/dev/zero of=/swapfile bs=128M count=16
-```
-
 2. 스왑 파일의 읽기 및 쓰기 권한을 업데이트합니다.
 $ sudo chmod 600 /swapfile
 
@@ -31,6 +26,26 @@ $ sudo vi /etc/fstab
 
 파일 끝에 다음 새 줄을 추가하고 파일을 저장한 다음 종료합니다.
 /swapfile swap swap defaults 0 0
+
+(내용 추가)
+7. swappiness, vfs_cache_pressure 설정
+
+* swappiness : 스왑 메모리 사용 정책을 결정하는 값. 0~100 사이의 값을 가질 수 있으며, 0일 경우 스왑 메모리를 사용하지 않고, 100일 경우 스왑 메모리를 최대한 사용한다.
+* vfs_cache_pressure : 디렉토리와 inode 오브젝트에 대한 캐시로 사용된 메모리를 반환(reclaim)하는 경향의 정도를 지정하는 값. 기본값은 100 이며, 0 으로 지정할 경우 캐시 메모리를 반환하지 않아 Out of Memory 가 발생할 수 있다. 100 이상의 값을 지정할 때 캐시를 반환하려는 경향이 높아진다.
+
+*즉시 변경
+(1) sysctl vm.swappiness=10
+(2) sysctl vm.vfs_cache_pressure=10000
+
+*파일 설정으로 영구 변경
+(1) 설정 파일 편집 sudo vi /etc/sysctl.conf
+(2) 파일 끝에 다음 두 줄을 추가
+vm.swappiness=10
+vm.vfs_cache_pressure=10000
+(3) 파일 저장 후 재시작
+sudo swapoff -a
+sudo swapon -a
+
 
 // aws putty 접속 설정(PuTTY, PuTTYgen 필요)
 

@@ -44,7 +44,7 @@ import static psam.portfolio.sunder.english.domain.study.model.request.StudyPATC
 @Service
 public class StudyCommandService {
 
-    private static final int WORD_SIZE_TO_STUDY = 5;
+    private static final int MIN_STUDY_WORDS_SIZE = 5;
 
     private final StudyCommandRepository studyCommandRepository;
     private final StudyQueryRepository studyQueryRepository;
@@ -100,8 +100,8 @@ public class StudyCommandService {
 
         // 단어 최소 개수 검사
         int wordsSize = words.size();
-        if (wordsSize < WORD_SIZE_TO_STUDY) {
-            throw new WordSizeNotEnoughToStudyException(WORD_SIZE_TO_STUDY);
+        if (wordsSize < MIN_STUDY_WORDS_SIZE) {
+            throw new WordSizeNotEnoughToStudyException(MIN_STUDY_WORDS_SIZE);
         }
 
         // 최초 한 번은 무조건 섞는다.
@@ -171,8 +171,8 @@ public class StudyCommandService {
         }
 
         int wordsSize = words.size();
-        if (wordsSize < WORD_SIZE_TO_STUDY) {
-            throw new WordSizeNotEnoughToStudyException(WORD_SIZE_TO_STUDY);
+        if (wordsSize < MIN_STUDY_WORDS_SIZE) {
+            throw new WordSizeNotEnoughToStudyException(MIN_STUDY_WORDS_SIZE);
         }
         Collections.shuffle(words);
 

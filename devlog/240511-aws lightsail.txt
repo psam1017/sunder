@@ -21,9 +21,10 @@ lightsail 인스턴스 페이지에서 바로 terminal 접속 가능.
 
 // java 설치
 - yum list | grep java-17
-	-> headless 를 설치(GUI 관련 내용이 없는 버전)
-- sudo yum install java-17-amazon-corretto-headless.x86_64
+	-> devel 를 설치(기본 자바와 컴파일이 가능)
+- sudo yum install java-17-amazon-corretto-devel.x86_64
 - java -version
+- javac -version
 
 // mariadb 설치
 - amazon-linux-extras | grep maria
