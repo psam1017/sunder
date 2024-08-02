@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.teacher.exception.SelfRoleModificationException;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
@@ -14,10 +14,10 @@ import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
@@ -25,7 +25,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
@@ -330,7 +331,6 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
 
         String newName = "Alice";
-        String newEmail = infoContainer.getUniqueEmail();
         String newPhoneNumber = infoContainer.getUniquePhoneNumber();
         String newStreet = "선더시 선더구 선더로 1";
         String newDetail = "선더빌딩 1층";
@@ -340,7 +340,6 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         TeacherPATCHInfo patch = TeacherPATCHInfo.builder()
                 .name(newName)
                 .phone(newPhoneNumber)
-                .email(newEmail)
                 .street(newStreet)
                 .addressDetail(newDetail)
                 .postalCode(newPostalCode)
@@ -353,7 +352,6 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher getTeacher = teacherQueryRepository.getById(updateTeacherId);
         assertThat(getTeacher.getId()).isEqualTo(teacher.getId());
         assertThat(getTeacher.getName()).isEqualTo(newName);
-        assertThat(getTeacher.getEmail()).isEqualTo(newEmail);
         assertThat(getTeacher.getPhone()).isEqualTo(newPhoneNumber);
         assertThat(getTeacher.getAddress().getStreet()).isEqualTo(newStreet);
         assertThat(getTeacher.getAddress().getDetail()).isEqualTo(newDetail);

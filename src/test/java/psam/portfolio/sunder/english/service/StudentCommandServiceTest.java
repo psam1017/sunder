@@ -259,7 +259,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
 
         // when
         String updatedName = "수정된 선더학생";
-        String updatedEmail = infoContainer.getUniqueEmail();
         String updatedPhoneNumber = infoContainer.getUniquePhoneNumber();
         Address updatedAddress = Address.builder()
                 .street("서울특별시 선더구 수정된 선더로 1")
@@ -280,7 +279,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         StudentPATCHInfo patch = StudentPATCHInfo.builder()
                 .name(updatedName)
                 .phone(updatedPhoneNumber)
-                .email(updatedEmail)
                 .street(updatedAddress.getStreet())
                 .addressDetail(updatedAddress.getDetail())
                 .postalCode(updatedAddress.getPostalCode())
@@ -299,7 +297,6 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         Student getStudent = studentQueryRepository.getById(updatedStudentId);
         assertThat(getStudent.getName()).isEqualTo(updatedName);
         assertThat(getStudent.getPhone()).isEqualTo(updatedPhoneNumber);
-        assertThat(getStudent.getEmail()).isEqualTo(updatedEmail);
         assertThat(getStudent.getAddress().getStreet()).isEqualTo(updatedAddress.getStreet());
         assertThat(getStudent.getAddress().getDetail()).isEqualTo(updatedAddress.getDetail());
         assertThat(getStudent.getAddress().getPostalCode()).isEqualTo(updatedAddress.getPostalCode());

@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
@@ -19,10 +19,12 @@ import java.util.Set;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.*;
@@ -406,7 +408,6 @@ public class TeacherDocsTest extends RestDocsEnvironment {
         TeacherPATCHInfo patch = TeacherPATCHInfo.builder()
                 .name("선더선생님")
                 .phone(infoContainer.getUniquePhoneNumber())
-                .email(infoContainer.getUniqueEmail())
                 .street(infoContainer.getAnyAddress().getStreet())
                 .addressDetail(infoContainer.getAnyAddress().getDetail())
                 .postalCode(infoContainer.getAnyAddress().getPostalCode())
@@ -434,7 +435,6 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                         ),
                         requestFields(
                                 fieldWithPath("name").type(STRING).description("변경할 선생님 이름"),
-                                fieldWithPath("email").type(STRING).description("변경할 선생님 이메일"),
                                 fieldWithPath("phone").type(STRING).description("변경할 선생님 전화번호").optional(),
                                 fieldWithPath("street").type(STRING).description("변경할 선생님 주소").optional(),
                                 fieldWithPath("addressDetail").type(STRING).description("변경할 선생님 상세주소").optional(),

@@ -26,9 +26,6 @@ public class StudentPATCHInfo {
     @Pattern(regexp = "^010[0-9]{8}$")
     private String phone;
 
-    @Email
-    private String email;
-
     private String street;
     private String addressDetail;
     @Pattern(regexp = "^[0-9]{5}$")

@@ -1,9 +1,7 @@
 package psam.portfolio.sunder.english.domain.student.service;
 
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,22 +21,24 @@ import psam.portfolio.sunder.english.domain.student.repository.StudentQueryRepos
 import psam.portfolio.sunder.english.domain.teacher.model.entity.QTeacher;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.ACTIVE;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.TRIAL;
 
 @RequiredArgsConstructor
 @Transactional
@@ -119,20 +119,9 @@ public class StudentCommandService {
         }
 
         // User 회원 정보 중복 체크
-        BooleanExpression emailExpression = patch.getEmail() != null ? user.email.eq(patch.getEmail()) : null;
-        BooleanExpression phoneExpression = patch.getPhone() != null ? user.phone.eq(patch.getPhone()) : null;
-
-        BooleanExpression combinedExpression = emailExpression;
-
-        if (combinedExpression != null && phoneExpression != null) {
-            combinedExpression = combinedExpression.or(phoneExpression);
-        } else if (combinedExpression == null) {
-            combinedExpression = phoneExpression;
-        }
-
-        if (combinedExpression != null) {
-            userQueryRepository.findOne(combinedExpression).ifPresent(user -> {
-                if (!user.getId().equals(getStudent.getId())) {
+        if (StringUtils.hasText(patch.getPhone())) {
+            userQueryRepository.findOne(user.phone.eq(patch.getPhone())).ifPresent(user -> {
+                if (!Objects.equals(user.getId(), getStudent.getId())) {
                     throw new DuplicateUserException();
                 }
             });
@@ -140,7 +129,6 @@ public class StudentCommandService {
 
         getStudent.setName(patch.getName());
         getStudent.setPhone(patch.getPhone());
-        getStudent.setEmail(patch.getEmail());
         getStudent.setAddress(patch.getAddress());
         getStudent.setAttendanceId(patch.getAttendanceId());
         getStudent.setNote(patch.getNote());

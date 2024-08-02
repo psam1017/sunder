@@ -111,10 +111,6 @@ public abstract class User extends BaseEntity {
         this.name = name;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setPhone(String phone) {
         this.phone = phone;
     }

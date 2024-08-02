@@ -298,7 +298,6 @@ public class StudentDocsTest extends RestDocsEnvironment {
 
         // when
         String updatedName = "수정된선더학생";
-        String updatedEmail = infoContainer.getUniqueEmail();
         String updatedPhoneNumber = infoContainer.getUniquePhoneNumber();
         Address updatedAddress = Address.builder()
                 .street("서울특별시 선더구 수정된 선더로 1")
@@ -319,7 +318,6 @@ public class StudentDocsTest extends RestDocsEnvironment {
         StudentPATCHInfo patch = StudentPATCHInfo.builder()
                 .name(updatedName)
                 .phone(updatedPhoneNumber)
-                .email(updatedEmail)
                 .street(updatedAddress.getStreet())
                 .addressDetail(updatedAddress.getDetail())
                 .postalCode(updatedAddress.getPostalCode())
@@ -350,7 +348,6 @@ public class StudentDocsTest extends RestDocsEnvironment {
                         requestFields(
                                 fieldWithPath("name").type(STRING).description("학생 이름"),
                                 fieldWithPath("phone").type(STRING).description("학생 전화번호").optional(),
-                                fieldWithPath("email").type(STRING).description("학생 이메일").optional(),
                                 fieldWithPath("street").type(STRING).description("학생 주소").optional(),
                                 fieldWithPath("addressDetail").type(STRING).description("학생 상세주소").optional(),
                                 fieldWithPath("postalCode").type(STRING).description("학생 우편번호").optional(),

@@ -155,15 +155,13 @@ public class TeacherCommandService {
 
         // User 회원 정보 중복 체크. 단, 자기 자신은 중복에서 제외
         userQueryRepository.findOne(
-                user.email.eq(patch.getEmail()) // NotNull
-                        .or(patch.getPhone() != null ? user.phone.eq(patch.getPhone()) : null), // nullable
+                patch.getPhone() != null ? user.phone.eq(patch.getPhone()) : null,
                 user.id.ne(getTeacher.getId())
         ).ifPresent(user -> {
             throw new DuplicateUserException();
         });
 
         getTeacher.setName(patch.getName());
-        getTeacher.setEmail(patch.getEmail());
         getTeacher.setPhone(patch.getPhone());
         getTeacher.setAddress(patch.getAddress());
         return getTeacher.getId();
