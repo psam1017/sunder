@@ -158,7 +158,8 @@ public class UserDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.passwordChangeRequired").type(BOOLEAN).description("비밀번호 변경 주기인지 여부"),
                                         fieldWithPath("data.userId").type(STRING).description("사용자 아이디"),
                                         fieldWithPath("data.academyId").type(STRING).description("(학원 소속인 경우)학원 아이디"),
-                                        fieldWithPath("data.roles").type(ARRAY).description("사용자가 가진 권한 목록")
+                                        fieldWithPath("data.roles").type(ARRAY).description("사용자가 가진 권한 목록"),
+                                        fieldWithPath("data.status").type(STRING).description("사용자 상태")
                                 )
                         )
                 );

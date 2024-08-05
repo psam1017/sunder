@@ -24,7 +24,7 @@ public class UserDetailsServiceJwt {
      * However, it's important to note that directly extracting data from tokens may be inaccurate compared to querying the database.
      *
      * @param token the token containing user data.
-     * @return a fully populated user record (never <code>null</code>)
+     * @return a fully populated user record (never null)
      * @throws UsernameNotFoundException if the token is invalid
      */
     public UserDetails loadUserByJwt(String token) throws UsernameNotFoundException {

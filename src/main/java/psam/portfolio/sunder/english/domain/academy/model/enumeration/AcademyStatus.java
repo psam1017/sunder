@@ -2,8 +2,8 @@ package psam.portfolio.sunder.english.domain.academy.model.enumeration;
 
 public enum AcademyStatus {
 
-    PENDING("대기"),
-    VERIFIED("인증"),
+    PENDING("대기중"),
+    VERIFIED("인증완료"),
     FORBIDDEN("차단"),
     WITHDRAWN("탈퇴");
 

@@ -25,7 +25,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Object> handleApiException(ApiException ex, HttpServletRequest request) {
 
-        log.error("[ApiException handle] request uri = {}", request.getRequestURI());
+        log.error("[ApiException handle] request URI = {}", request.getRequestURI());
         log.error("[reasons] {}", ex.getResponse().getReasons().toString());
 
         return new ResponseEntity<>(ex.getResponse(), OK);
@@ -39,7 +39,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Object> handleBindException(BindException ex, HttpServletRequest request) {
 
-        log.error("[BindException handle] request uri = {}", request.getRequestURI());
+        log.error("[BindException handle] request URI = {}", request.getRequestURI());
         log.error("[reasons] {}", ex.toString());
 
         ApiResponse<Object> body = ApiResponse.badRequest(ex);
@@ -50,7 +50,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, HttpServletRequest request) {
 
-        log.error("[ConstraintViolationException handle] request uri = {}", request.getRequestURI());
+        log.error("[ConstraintViolationException handle] request URI = {}", request.getRequestURI());
         log.error("[reasons] {}", ex.toString());
 
         ApiResponse<Object> body = ApiResponse.badRequest(ex);
@@ -61,7 +61,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(UnrecognizedPropertyException.class)
     public ResponseEntity<Object> handleUnrecognizedPropertyException(UnrecognizedPropertyException ex, HttpServletRequest request) {
 
-        log.error("[UnrecognizedPropertyException handle] request uri = {}", request.getRequestURI());
+        log.error("[UnrecognizedPropertyException handle] request URI = {}", request.getRequestURI());
         ex.printStackTrace();
 
         String message = ex.getPropertyName() + " is an unrecognized property.";
@@ -73,7 +73,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(InvalidFormatException.class)
     public ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex, HttpServletRequest request) {
 
-        log.error("[InvalidFormatException handle] request uri = {}", request.getRequestURI());
+        log.error("[InvalidFormatException handle] request URI = {}", request.getRequestURI());
         ex.printStackTrace();
 
         String message = ex.getValue() + " has invalid format.";
@@ -85,7 +85,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(JacksonException.class)
     public ResponseEntity<ApiResponse<Object>> handleJacksonException(JacksonException ex, HttpServletRequest request) {
 
-        log.error("[JacksonException handle] request uri = {}", request.getRequestURI());
+        log.error("[JacksonException handle] request URI = {}", request.getRequestURI());
         ex.printStackTrace();
 
         String message = "Unable to process json.";
@@ -97,7 +97,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<Object> handleMultipartException(MultipartException ex, HttpServletRequest request) {
 
-        log.error("[MultipartException handle] request uri = {}", request.getRequestURI());
+        log.error("[MultipartException handle] request URI = {}", request.getRequestURI());
         ex.printStackTrace();
 
         String message = "Unable to complete the multipart request. Or, You may be missing requeired parts.";

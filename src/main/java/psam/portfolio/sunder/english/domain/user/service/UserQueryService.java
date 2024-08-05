@@ -13,13 +13,13 @@ import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.IllegalStatusUserException;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
@@ -29,10 +29,14 @@ import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.ACTIVE;
+import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.TRIAL;
 import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.*;
 
 @RequiredArgsConstructor
@@ -58,7 +62,6 @@ public class UserQueryService {
      * @param email   이메일
      * @param phone   연락처
      * @param userId  사용자 아이디(수정 시 중복 체크에서 제외)
-     * @param userId
      */
     public boolean checkDuplication(String loginId, String email, String phone, UUID userId) {
         boolean hasLoginId = StringUtils.hasText(loginId);
@@ -90,7 +93,7 @@ public class UserQueryService {
     }
 
     private static boolean hasOnlyOne(boolean a, boolean b, boolean c) {
-        return a ^ b ^ c && !(a && b && c);
+        return a ^ b ^ c && !(a && b);
     }
 
     /**
@@ -131,12 +134,13 @@ public class UserQueryService {
                 ACADEMY_ID.toString(), academyId
         );
         return new LoginResult(
-                jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims), // accessToken 만료 시간은 3시간
-                jwtUtils.generateToken(getUser.getId().toString(), 43200000), // refreshToken 만료 시간은 12시간
+                jwtUtils.generateToken(getUser.getId().toString(), 1800000, claims), // accessToken 만료 시간은 30분
+                jwtUtils.generateToken(getUser.getId().toString(), 43200000, claims), // refreshToken 만료 시간은 12시간. UserDetailsService 에서 예외가 발생할 위험이 있기에 refresh token 에도 동일한 claims 를 넣어준다.
                 getUser.isPasswordExpired(),
                 getUser.getId().toString(),
                 academyId,
-                getUser.getRoles().stream().map(UserRole::getRoleName).toList()
+                getUser.getRoles().stream().map(UserRole::getRoleName).toList(),
+                getUser.getStatus()
         );
     }
 
@@ -155,7 +159,7 @@ public class UserQueryService {
         } else if (getUser instanceof Student s) {
             academyId = s.getAcademy().getId().toString();
         }
-        
+
         Map<String, Object> claims = Map.of(
                 LOGIN_ID.toString(), getUser.getLoginId(),
                 PASSWORD.toString(), getUser.getLoginPw(),
@@ -165,7 +169,7 @@ public class UserQueryService {
                 ACADEMY_ID.toString(), academyId
         );
         return new TokenRefreshResponse(
-                jwtUtils.generateToken(getUser.getId().toString(), 10800000, claims) // accessToken 만료 시간은 3시간
+                jwtUtils.generateToken(getUser.getId().toString(), 1800000, claims) // accessToken 만료 시간은 30분
         );
     }
 

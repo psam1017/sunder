@@ -7,6 +7,8 @@ import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.teacher.exception.SelfRoleModificationException;
+import psam.portfolio.sunder.english.domain.teacher.exception.SelfStatusModificationException;
+import psam.portfolio.sunder.english.domain.teacher.exception.TrialCannotChangeException;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHStatus;
@@ -216,6 +218,41 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         // then
         assertThat(status).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @DisplayName("학원장이 체험 상태일 때는 상태를 변경할 수 없다.")
+    @Test
+    void changeTeacherStatusWhenDirectorIsTrial() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
+        dataCreator.createUserRoles(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
+
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.PENDING, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+
+        TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.ACTIVE);
+
+        // when
+        // then
+        assertThatThrownBy(() -> sut.changeStatus(director.getId(), teacher.getId(), patch))
+                .isInstanceOf(TrialCannotChangeException.class);
+    }
+
+    @DisplayName("학원장이 자기 자신의 상태는 변경할 수 없다.")
+    @Test
+    void changeTeacherStatusSelf() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
+
+        TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.ACTIVE);
+
+        // when
+        // then
+        assertThatThrownBy(() -> sut.changeStatus(director.getId(), director.getId(), patch))
+                .isInstanceOf(SelfStatusModificationException.class);
     }
 
     @DisplayName("선생님에게 DIRECTOR 권한을 부여할 수 있다.")

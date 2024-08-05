@@ -177,6 +177,7 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(result.getUserId()).isEqualTo(director.getId().toString());
         assertThat(result.getAcademyId()).isEqualTo(director.getAcademy().getId().toString());
         assertThat(result.getRoles()).containsExactlyInAnyOrderElementsOf(director.getRoles().stream().map(UserRole::getRoleName).toList());
+        assertThat(result.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 
     @DisplayName("사용자 로그인 아이디가 틀리면 로그인할 수 없다.")

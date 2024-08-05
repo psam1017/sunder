@@ -134,6 +134,11 @@ public class StudentCommandService {
         getStudent.setNote(patch.getNote());
         getStudent.setSchool(patch.getSchool());
         getStudent.setParent(patch.getParent());
+
+        // 비밀번호는 값이 있을 때만 수정
+        if (StringUtils.hasText(patch.getLoginPw())) {
+            getStudent.setLoginPw(passwordUtils.encode(patch.getLoginPw()));
+        }
         return getStudent.getId();
     }
 

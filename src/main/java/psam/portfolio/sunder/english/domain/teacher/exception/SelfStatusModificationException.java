@@ -5,9 +5,9 @@ import psam.portfolio.sunder.english.global.api.v1.ApiException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
 
-public class SelfRoleModificationException extends ApiException {
+public class SelfStatusModificationException extends ApiException {
     @Override
     public ApiResponse<?> initialize() {
-        return ApiResponse.error(ApiStatus.ILLEGAL_DATA, Teacher.class, "SELF_ROLE_MODIFICATION", "자기 자신의 권한은 변경할 수 없습니다.");
+        return ApiResponse.error(ApiStatus.ILLEGAL_DATA, Teacher.class, "SELF_STATUS_MODIFICATION", "자기 자신의 상태는 변경할 수 없습니다.");
     }
 }

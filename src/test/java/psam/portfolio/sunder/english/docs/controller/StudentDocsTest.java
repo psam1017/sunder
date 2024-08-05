@@ -316,6 +316,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
                 .build();
 
         StudentPATCHInfo patch = StudentPATCHInfo.builder()
+                .loginPw(infoContainer.getAnyRawPassword())
                 .name(updatedName)
                 .phone(updatedPhoneNumber)
                 .street(updatedAddress.getStreet())
@@ -346,6 +347,7 @@ public class StudentDocsTest extends RestDocsEnvironment {
                                 parameterWithName("studentId").description("학생 아이디")
                         ),
                         requestFields(
+                                fieldWithPath("loginPw").type(STRING).description("학생 로그인 비밀번호. 값이 없으면 변경하지 않음.").optional(),
                                 fieldWithPath("name").type(STRING).description("학생 이름"),
                                 fieldWithPath("phone").type(STRING).description("학생 전화번호").optional(),
                                 fieldWithPath("street").type(STRING).description("학생 주소").optional(),

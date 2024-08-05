@@ -2,6 +2,7 @@
 
 ==== HTTP Request
 include::{snippets}/academy-docs-test/withdraw/http-request.adoc[]
+include::{snippets}/academy-docs-test/withdraw/path-parameters.adoc[]
 
 ==== HTTP Response
 include::{snippets}/academy-docs-test/withdraw/http-response.adoc[]

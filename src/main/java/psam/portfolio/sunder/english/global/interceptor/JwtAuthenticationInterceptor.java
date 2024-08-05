@@ -40,7 +40,9 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
         if(StringUtils.hasText(authorization) && Pattern.matches("^Bearer .*", authorization)) {
             String token = authorization.replaceFirst("^Bearer ", "");
             jwtUtils.hasInvalidStatus(token).ifPresent(status -> {
-                log.error("An error occurred at JwtAuthenticationInterceptor. authorization = {}, status = {}", authorization, status.name());
+                if (status != JwtStatus.EXPIRED) {
+                    log.error("An error occurred at JwtAuthenticationInterceptor. authorization = {}, status = {}", authorization, status.name());
+                }
                 throw new IllegalTokenException();
             });
             String tokenIp = jwtUtils.extractClaim(token, c -> c.get(JwtClaim.REMOTE_IP.toString(), String.class));

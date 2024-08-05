@@ -63,7 +63,7 @@ public class TeacherController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     @GetMapping("/{teacherId}")
     public ApiResponse<?> getTeacherDetail(@UserId UUID userId,
-                                                @PathVariable UUID teacherId) {
+                                           @PathVariable UUID teacherId) {
         Object teacher = teacherQueryService.getDetail(userId, teacherId);
         return ApiResponse.ok(teacher);
     }

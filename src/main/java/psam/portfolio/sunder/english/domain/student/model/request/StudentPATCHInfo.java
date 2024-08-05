@@ -19,6 +19,9 @@ import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 @Builder
 public class StudentPATCHInfo {
 
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$")
+    private String loginPw;
+
     @NotBlank
     @Pattern(regexp = "^[가-힣]{2,30}$")
     private String name;

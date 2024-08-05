@@ -68,7 +68,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HttpRequestMethodNotSupportedException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
+        log.error("[HttpRequestMethodNotSupportedException handle] request URI = {} {}", httpServletRequest.getMethod(), httpServletRequest.getRequestURI());
 
         String message = ex.getMethod() + " method is not supported for this request. Supported methods are " + ex.getSupportedHttpMethods();
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.METHOD_NOT_ALLOWED, message);
@@ -83,7 +84,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HttpMediaTypeNotSupportedException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[HttpMediaTypeNotSupportedException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = ex.getContentType() + " media type is not supported. Supported media types are " + ex.getSupportedMediaTypes();
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.UNSUPPORTED_MEDIA_TYPE, message);
@@ -94,7 +95,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotAcceptable(HttpMediaTypeNotAcceptableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HttpMediaTypeNotAcceptableException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[HttpMediaTypeNotAcceptableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "Unable to negotiate. Acceptable media types are " + ex.getSupportedMediaTypes();
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.NOT_ACCEPTABLE, message);
@@ -105,7 +106,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[MissingPathVariableException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[MissingPathVariableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "required path variable '" + ex.getVariableName() + "' is missing.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -116,7 +117,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[MissingServletRequestParameterException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[MissingServletRequestParameterException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "Required parameter '" + ex.getParameterName() + "' is missing.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -127,7 +128,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[MissingServletRequestPartException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[MissingServletRequestPartException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "Required part '" + ex.getRequestPartName() + "' is missing.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -138,7 +139,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[ServletRequestBindingException handle] request uri = {}", ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[ServletRequestBindingException handle] request URI = {}", ((ServletWebRequest)request).getRequest().getRequestURI());
         ex.printStackTrace();
 
         String message = "Server requires the request to be conditional. You may be missing a required precondition header, such as 'If-Match'";
@@ -150,7 +151,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[MethodArgumentNotValidException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[MethodArgumentNotValidException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         ApiResponse<Object> body = ApiResponse.badRequest(ex);
         return createResponseEntity(body, BAD_REQUEST);
@@ -162,7 +163,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HandlerMethodValidationException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[HandlerMethodValidationException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
         ex.printStackTrace();
 
         String message = "Unexpected exception thrown in Server Handler.";
@@ -174,7 +175,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[NoHandlerFoundException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[NoHandlerFoundException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "There is no API(or handler) for " + ex.getHttpMethod() + " /" + ex.getRequestURL();
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.NOT_FOUND, message);
@@ -186,7 +187,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getRequest();
-        log.error("[NoResourceFoundException handle] request uri = {} {}", httpServletRequest.getMethod(), httpServletRequest.getRequestURI());
+        log.error("[NoResourceFoundException handle] request URI = {} {}", httpServletRequest.getMethod(), httpServletRequest.getRequestURI());
 
         String message = "There is no API(or resource) for " + ex.getHttpMethod() + " /" + ex.getResourcePath();
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.NOT_FOUND, message);
@@ -197,7 +198,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[AsyncRequestTimeoutException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[AsyncRequestTimeoutException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "Service Unavailable. Please retry later.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.SERVICE_UNAVAILABLE, message);
@@ -208,7 +209,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleErrorResponseException(ErrorResponseException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[ErrorResponseException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[ErrorResponseException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
         ex.printStackTrace();
 
         String message = "Unexpected exception thrown.";
@@ -220,7 +221,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[MaxUploadSizeExceededException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[MaxUploadSizeExceededException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "You exceeded max upload size. max = " + ex.getMaxUploadSize() / 1024 / 1024 + "MB";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -231,7 +232,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[ConversionNotSupportedException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[ConversionNotSupportedException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
         ex.printStackTrace();
 
         String message = "Unexpected exception thrown.";
@@ -243,7 +244,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[TypeMismatchException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[TypeMismatchException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message;
         if (ex.getRequiredType() == null) {
@@ -259,7 +260,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HttpMessageNotReadableException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[HttpMessageNotReadableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
 
         String message = "Unable to read http message. Please check your request body.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -270,7 +271,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HttpMessageNotWritableException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[HttpMessageNotWritableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
         ex.printStackTrace();
 
         String message = "Unexpected exception thrown.";
@@ -282,7 +283,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMethodValidationException(MethodValidationException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        log.error("[MethodValidationException handle] request uri = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[MethodValidationException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
         ex.printStackTrace();
 
         String message = "Unexpected exception thrown.";

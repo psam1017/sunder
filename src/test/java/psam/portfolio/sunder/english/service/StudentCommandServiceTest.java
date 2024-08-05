@@ -257,7 +257,74 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
 
+        String oldPw = student.getLoginPw();
+
+        String updatedPw = "NEW1234!@#$";
+        String updatedName = "수정된 선더학생";
+        String updatedPhoneNumber = infoContainer.getUniquePhoneNumber();
+        Address updatedAddress = Address.builder()
+                .street("서울특별시 선더구 수정된 선더로 1")
+                .detail("수정된 선더빌딩")
+                .postalCode("11111")
+                .build();
+        String updatedAttendanceId = infoContainer.getUniqueAttendanceId();
+        String updatedNote = "updated note about student";
+        School updatedSchool = School.builder()
+                .name("수정된 선더초등학교")
+                .grade(4)
+                .build();
+        Parent updatedParent = Parent.builder()
+                .name("수정된 선더부모")
+                .phone("01087654321")
+                .build();
+
+        StudentPATCHInfo patch = StudentPATCHInfo.builder()
+                .loginPw(updatedPw)
+                .name(updatedName)
+                .phone(updatedPhoneNumber)
+                .street(updatedAddress.getStreet())
+                .addressDetail(updatedAddress.getDetail())
+                .postalCode(updatedAddress.getPostalCode())
+                .attendanceId(updatedAttendanceId)
+                .note(updatedNote)
+                .schoolName(updatedSchool.getName())
+                .schoolGrade(updatedSchool.getGrade())
+                .parentName(updatedParent.getName())
+                .parentPhone(updatedParent.getPhone())
+                .build();
+
         // when
+        UUID updatedStudentId = refreshAnd(() -> sut.updateInfo(teacher.getId(), student.getId(), patch));
+
+        // then
+        Student getStudent = studentQueryRepository.getById(updatedStudentId);
+        assertThat(passwordUtils.matches(updatedPw, getStudent.getLoginPw())).isTrue();
+        assertThat(passwordUtils.matches(oldPw, getStudent.getLoginPw())).isFalse();
+        assertThat(getStudent.getName()).isEqualTo(updatedName);
+        assertThat(getStudent.getPhone()).isEqualTo(updatedPhoneNumber);
+        assertThat(getStudent.getAddress().getStreet()).isEqualTo(updatedAddress.getStreet());
+        assertThat(getStudent.getAddress().getDetail()).isEqualTo(updatedAddress.getDetail());
+        assertThat(getStudent.getAddress().getPostalCode()).isEqualTo(updatedAddress.getPostalCode());
+        assertThat(getStudent.getAttendanceId()).isEqualTo(updatedAttendanceId);
+        assertThat(getStudent.getNote()).isEqualTo(updatedNote);
+        assertThat(getStudent.getSchool().getName()).isEqualTo(updatedSchool.getName());
+        assertThat(getStudent.getSchool().getGrade()).isEqualTo(updatedSchool.getGrade());
+        assertThat(getStudent.getParent().getName()).isEqualTo(updatedParent.getName());
+        assertThat(getStudent.getParent().getPhone()).isEqualTo(updatedParent.getPhone());
+    }
+
+    @DisplayName("학생을 수정할 때 비밀번호를 입력하지 않으면 비밀번호는 변경되지 않는다.")
+    @Test
+    void updateStudentInfoWithoutPassword() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, ROLE_DIRECTOR, ROLE_TEACHER);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
+
+        String oldPw = student.getLoginPw();
+
         String updatedName = "수정된 선더학생";
         String updatedPhoneNumber = infoContainer.getUniquePhoneNumber();
         Address updatedAddress = Address.builder()
@@ -295,17 +362,7 @@ class StudentCommandServiceTest extends AbstractSunderApplicationTest {
 
         // then
         Student getStudent = studentQueryRepository.getById(updatedStudentId);
-        assertThat(getStudent.getName()).isEqualTo(updatedName);
-        assertThat(getStudent.getPhone()).isEqualTo(updatedPhoneNumber);
-        assertThat(getStudent.getAddress().getStreet()).isEqualTo(updatedAddress.getStreet());
-        assertThat(getStudent.getAddress().getDetail()).isEqualTo(updatedAddress.getDetail());
-        assertThat(getStudent.getAddress().getPostalCode()).isEqualTo(updatedAddress.getPostalCode());
-        assertThat(getStudent.getAttendanceId()).isEqualTo(updatedAttendanceId);
-        assertThat(getStudent.getNote()).isEqualTo(updatedNote);
-        assertThat(getStudent.getSchool().getName()).isEqualTo(updatedSchool.getName());
-        assertThat(getStudent.getSchool().getGrade()).isEqualTo(updatedSchool.getGrade());
-        assertThat(getStudent.getParent().getName()).isEqualTo(updatedParent.getName());
-        assertThat(getStudent.getParent().getPhone()).isEqualTo(updatedParent.getPhone());
+        assertThat(getStudent.getLoginPw()).isEqualTo(oldPw);
     }
 
     @DisplayName("선생님이 PENDING 상태의 학생을 ACTIVE 상태로 변경할 수 있다.")

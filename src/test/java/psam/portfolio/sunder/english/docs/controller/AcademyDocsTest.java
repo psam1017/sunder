@@ -328,27 +328,13 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
 
-        List<Teacher> saveTeachers = new ArrayList<>();
-        saveTeachers.add(dataCreator.registerTeacher("Alice", UserStatus.ACTIVE, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Bob", UserStatus.ACTIVE, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Charlie", UserStatus.TRIAL, academy));
-        saveTeachers.add(dataCreator.registerTeacher("David", UserStatus.TRIAL, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Eve", UserStatus.PENDING, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Frank", UserStatus.PENDING, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Grace", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Hank", UserStatus.WITHDRAWN, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Ivy", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Jack", UserStatus.FORBIDDEN, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Kate", UserStatus.TRIAL_END, academy));
-        saveTeachers.add(dataCreator.registerTeacher("Liam", UserStatus.TRIAL_END, academy));
-        for (Teacher t : saveTeachers) {
-            dataCreator.createUserRoles(t, ROLE_TEACHER);
-        }
         Teacher director = dataCreator.registerTeacher("Director", UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
-
+        Teacher teacher = dataCreator.registerTeacher("Alice", UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, ROLE_TEACHER);
         Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(student, ROLE_STUDENT);
+
         String token = createBearerToken(student);
 
         refresh();
@@ -529,7 +515,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                delete("/api/academies")
+                delete("/api/academies/{academyId}", academy.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, token)
         );
@@ -539,6 +525,9 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("academyId").description("폐쇄할 학원 아이디")
+                        ),
                         relaxedResponseFields(
                                 fieldWithPath("data.academyId").type(STRING).description("페쇄를 신청한 학원 아이디")
                         )

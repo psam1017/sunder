@@ -7,6 +7,7 @@ import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDenie
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.exception.SelfRoleModificationException;
 import psam.portfolio.sunder.english.domain.teacher.exception.RoleDirectorRequiredException;
+import psam.portfolio.sunder.english.domain.teacher.exception.SelfStatusModificationException;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.QTeacher;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
@@ -15,6 +16,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
+import psam.portfolio.sunder.english.domain.teacher.exception.TrialCannotChangeException;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
@@ -92,6 +94,14 @@ public class TeacherCommandService {
         Teacher getDirector = teacherQueryRepository.getById(directorId);
         if (!getDirector.isDirector()) {
             throw new RoleDirectorRequiredException();
+        }
+
+        if (getDirector.isTrial() || getDirector.isTrialEnd()) {
+            throw new TrialCannotChangeException();
+        }
+
+        if (Objects.equals(directorId, teacherId)) {
+            throw new SelfStatusModificationException();
         }
 
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
