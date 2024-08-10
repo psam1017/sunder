@@ -93,15 +93,15 @@ public class TeacherController {
      *
      * @param directorId 학원장 아이디
      * @param teacherId  권한을 변경할 선생님 아이디
-     * @param post       변경할 권한 - 가능한 값 : ROLE_TEACHER, ROLE_DIRECTOR
+     * @param put        변경할 권한 - 가능한 값 : ROLE_TEACHER, ROLE_DIRECTOR
      * @return 선생님 아이디와 변경 완료된 권한 목록
      */
     @Secured("ROLE_DIRECTOR")
-    @PostMapping("/{teacherId}/roles")
+    @PutMapping("/{teacherId}/roles")
     public ApiResponse<Map<String, Object>> changeTeacherRoles(@UserId UUID directorId,
                                                                @PathVariable UUID teacherId,
-                                                               @RequestBody @Valid TeacherPOSTRoles post) {
-        Set<RoleName> roles = teacherCommandService.changeRoles(directorId, teacherId, post);
+                                                               @RequestBody @Valid TeacherPUTRoles put) {
+        Set<RoleName> roles = teacherCommandService.changeRoles(directorId, teacherId, put);
         return ApiResponse.ok(Map.of(
                 "teacherId", teacherId.toString(),
                 "roles", roles

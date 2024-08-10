@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.book.exception.EmptyCellFoundInBookException;
 import psam.portfolio.sunder.english.domain.book.exception.TooManyWordToSaveException;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.WordStatus;
@@ -13,7 +14,7 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
 import psam.portfolio.sunder.english.domain.book.repository.BookCommandRepository;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
 import psam.portfolio.sunder.english.domain.book.repository.WordCommandRepository;
@@ -75,14 +76,14 @@ public class BookCommandService {
     }
 
     /**
-     * 교재에 단어 추가 서비스. JSON 형식으로 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
+     * 교재에 단어 등록 서비스. JSON 형식으로 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
      *
      * @param teacherId 사용자 아이디
      * @param bookId    교재 아이디
-     * @param postList  생성/교체할 단어 목록
+     * @param put       생성/교체할 단어 목록
      * @return 생성/교체된 단어들이 속한 교재 아이디
      */
-    public UUID replaceWords(UUID teacherId, UUID bookId, WordPOSTList postList) {
+    public UUID replaceWords(UUID teacherId, UUID bookId, WordPUTJson put) {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Book getBook = bookQueryRepository.getOne(
                 QBook.book.id.eq(bookId),
@@ -93,17 +94,17 @@ public class BookCommandService {
 
         // persistence context is cleared automatically after update bulk-query
         Book refreshBook = bookQueryRepository.getById(getBook.getId());
-        List<Word> saveWords = wordCommandRepository.saveAll(postList.getWords().stream().map(w -> w.toEntity(refreshBook)).toList());
+        List<Word> saveWords = wordCommandRepository.saveAll(put.getWords().stream().map(w -> w.toEntity(refreshBook)).toList());
         refreshBook.getWords().addAll(saveWords);
 
-        // 단어 목록의 수정은 실질적으로 교재의 수정이므로 교재의 수정 시간을 강제로 갱신한다.
-        refreshBook.updateModifiedDateTimeForcibly();
+        // 단어 목록의 수정은 실질적으로 교재의 수정이므로 교재의 수정 시간을 수동으로 갱신한다.
+        refreshBook.updateModifiedDateTimeManually();
 
         return refreshBook.getId();
     }
 
     /**
-     * 교재에 단어 추가 서비스. 엑셀 파일을 업로드하여 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
+     * 교재에 단어 등록 서비스. 엑셀 파일을 업로드하여 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
      *
      * @param teacherId 사용자 아이디
      * @param bookId    교재 아이디
@@ -120,26 +121,32 @@ public class BookCommandService {
         wordCommandRepository.updateStatusByBookId(WordStatus.DELETED, getBook.getId());
 
         Book refreshBook = bookQueryRepository.getById(getBook.getId());
-        List<Word> words = new ArrayList<>();
-        for (List<String> w : excelUtils.readExcel(file, "english", "korean")) {
+        List<Word> buildWords = new ArrayList<>();
+        List<List<String>> readExcel = excelUtils.readExcel(file, "english", "korean");
+
+        for (int i = 0; i < readExcel.size(); i++) {
+            List<String> w = readExcel.get(i);
             if (StringUtils.hasText(w.get(0)) && StringUtils.hasText(w.get(1))) {
-                Word build = Word.builder()
+                Word buildWord = Word.builder()
                         .english(w.get(0))
                         .korean(w.get(1))
                         .book(refreshBook)
                         .build();
-                words.add(build);
+                buildWords.add(buildWord);
+            } else {
+                throw new EmptyCellFoundInBookException(i + 2);
             }
         }
-        if (words.size() > MAX_WORD_SIZE) {
+
+        if (readExcel.size() > MAX_WORD_SIZE) {
             throw new TooManyWordToSaveException(MAX_WORD_SIZE);
         }
 
-        List<Word> saveWords = wordCommandRepository.saveAll(words);
+        List<Word> saveWords = wordCommandRepository.saveAll(buildWords);
         refreshBook.getWords().addAll(saveWords);
 
         // 단어 목록의 수정은 실질적으로 교재의 수정이므로 교재의 수정 시간을 강제로 갱신한다.
-        refreshBook.updateModifiedDateTimeForcibly();
+        refreshBook.updateModifiedDateTimeManually();
 
         return refreshBook.getId();
     }

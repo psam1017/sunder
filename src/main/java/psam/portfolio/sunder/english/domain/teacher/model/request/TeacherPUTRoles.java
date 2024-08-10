@@ -15,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TeacherPOSTRoles {
+public class TeacherPUTRoles {
 
     // ROLE_DIRECTOR, ROLE_TEACHER 로만 변경할 수 있다.
     @NotEmpty

@@ -11,7 +11,7 @@ import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchBookException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
 import psam.portfolio.sunder.english.domain.book.service.BookCommandService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -25,7 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList.*;
+import static psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson.*;
 
 public class BookCommandServiceTest extends AbstractSunderApplicationTest {
 
@@ -139,16 +139,16 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
         Book book = dataCreator.registerAnyBook(academy);
 
-        WordPOSTList postList = WordPOSTList.builder()
+        WordPUTJson put = WordPUTJson.builder()
                 .words(List.of(
-                        new WordPOST("apple", "사과"),
-                        new WordPOST("banana", "바나나"),
-                        new WordPOST("cherry", "체리")
+                        new WordPUT("apple", "사과"),
+                        new WordPUT("banana", "바나나"),
+                        new WordPUT("cherry", "체리")
                 ))
                 .build();
 
         // when
-        UUID bookId = refreshAnd(() -> sut.replaceWords(teacher.getId(), book.getId(), postList));
+        UUID bookId = refreshAnd(() -> sut.replaceWords(teacher.getId(), book.getId(), put));
 
         // then
         Book getBook = bookQueryRepository.getById(bookId);
@@ -161,6 +161,8 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
                 );
     }
 
+    // 모듈과 실제 파일이 필요한 기능이므로 단위 테스트를 최소화하고, 통합 테스트를 진행
+    // 여유가 된다면 추후에 단위 테스트를 추가 작성
     @DisplayName("엑셀 파일로 단어 목록을 갱신할 수 있다.")
     @Test
     void replaceWordsWithExcelFile() throws IOException {

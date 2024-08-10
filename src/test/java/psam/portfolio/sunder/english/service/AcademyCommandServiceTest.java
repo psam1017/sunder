@@ -1,6 +1,5 @@
 package psam.portfolio.sunder.english.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -331,12 +330,10 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
 
         String uniqueAcademyName = infoContainer.getUniqueAcademyName();
         String uniquePhoneNumber = infoContainer.getUniquePhoneNumber();
-        String uniqueEmail = infoContainer.getUniqueEmail();
 
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(uniqueAcademyName)
                 .phone(uniquePhoneNumber)
-                .email(uniqueEmail)
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")
@@ -350,7 +347,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         Academy getAcademy = academyQueryRepository.getById(academyId);
         assertThat(getAcademy.getName()).isEqualTo(uniqueAcademyName);
         assertThat(getAcademy.getPhone()).isEqualTo(uniquePhoneNumber);
-        assertThat(getAcademy.getEmail()).isEqualTo(uniqueEmail);
         assertThat(getAcademy.getAddress().getStreet()).isEqualTo("new street");
         assertThat(getAcademy.getAddress().getDetail()).isEqualTo("new detail");
         assertThat(getAcademy.getAddress().getPostalCode()).isEqualTo("11111");
@@ -370,7 +366,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(anotherAcademy.getName())
                 .phone(infoContainer.getUniquePhoneNumber())
-                .email(infoContainer.getUniqueEmail())
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")
@@ -396,33 +391,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(infoContainer.getUniqueAcademyName())
                 .phone(anotherAcademy.getPhone())
-                .email(infoContainer.getUniqueEmail())
-                .street("new street")
-                .addressDetail("new detail")
-                .postalCode("11111")
-                .openToPublic(false)
-                .build();
-
-        // when
-        // then
-        assertThatThrownBy(() -> refreshAnd(() -> sut.updateInfo(registerDirector.getId(), academyPATCH)))
-                .isInstanceOf(DuplicateAcademyException.class);
-    }
-
-    @DisplayName("다른 학원과 이메일이 중복되면 수정할 수 없다.")
-    @Test
-    void updateInfoWithDuplicateEmail() {
-        // given
-        Academy registerAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-        Teacher registerDirector = dataCreator.registerTeacher(UserStatus.ACTIVE, registerAcademy);
-        dataCreator.createUserRoles(registerDirector, ROLE_DIRECTOR, ROLE_TEACHER);
-
-        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
-
-        AcademyPATCH academyPATCH = AcademyPATCH.builder()
-                .name(infoContainer.getUniqueAcademyName())
-                .phone(infoContainer.getUniquePhoneNumber())
-                .email(anotherAcademy.getEmail())
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")
@@ -446,7 +414,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(registerAcademy.getName())
                 .phone(infoContainer.getUniquePhoneNumber())
-                .email(infoContainer.getUniqueEmail())
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")
@@ -472,7 +439,6 @@ public class AcademyCommandServiceTest extends AbstractSunderApplicationTest {
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name(anotherAcademy.getName())
                 .phone(anotherAcademy.getPhone())
-                .email(anotherAcademy.getEmail())
                 .street("new street")
                 .addressDetail("new detail")
                 .postalCode("11111")

@@ -17,18 +17,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WordPOSTList {
+public class WordPUTJson {
 
     @Valid
     @Size(min = 1, max = 100)
     @NotEmpty
-    private List<WordPOST> words;
+    private List<WordPUT> words;
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class WordPOST {
+    public static class WordPUT {
 
         @NotBlank
         private String english;

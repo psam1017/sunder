@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
-import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -87,7 +86,7 @@ public class Book extends BaseEntity {
         this.subject = subject;
     }
 
-    public void updateModifiedDateTimeForcibly() {
+    public void updateModifiedDateTimeManually() {
         super.setModifiedDateTime(LocalDateTime.now());
     }
 

@@ -75,7 +75,7 @@ public class ExcelUtilsTest {
         assertThat(result).isFalse();
     }
 
-    @DisplayName("엑셀의 첫 줄을 포함하여 데이터를 추출할 수 있다.")
+    @DisplayName("엑셀의 첫 행을 포함하여 데이터를 추출할 수 있다.")
     @Test
     void readExcelWithFirstRow() throws IOException {
         // given
@@ -107,7 +107,7 @@ public class ExcelUtilsTest {
                 );
     }
 
-    @DisplayName("엑셀의 첫 줄을 포함하지 않고 데이터를 추출할 수 있다.")
+    @DisplayName("엑셀의 첫 행을 포함하지 않고 데이터를 추출할 수 있다.")
     @Test
     void readExcelWithoutFirstRow() throws IOException {
         // given
@@ -138,7 +138,7 @@ public class ExcelUtilsTest {
                 );
     }
 
-    @DisplayName("엑셀의 첫 줄에 올바른 열 제목이 있는지를 검사할 수 있다.")
+    @DisplayName("엑셀의 첫 행에 올바른 열 제목이 있는지를 검사할 수 있다.")
     @Test
     void inspectExcelHeader() throws IOException {
         // given
@@ -160,7 +160,7 @@ public class ExcelUtilsTest {
                 .isInstanceOf(UnmatchedExcelHeaderException.class);
     }
 
-    @DisplayName("엑셀의 첫 줄에 열 제목이 있는지를 검사하지 않을 수 있다.")
+    @DisplayName("엑셀의 첫 행에 열 제목이 있는지를 검사하지 않을 수 있다.")
     @Test
     void notInspectExcelHeader() throws IOException {
         // given

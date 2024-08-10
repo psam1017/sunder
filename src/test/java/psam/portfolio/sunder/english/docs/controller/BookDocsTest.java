@@ -10,8 +10,8 @@ import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademySta
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList.WordPOST;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson.WordPUT;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
@@ -133,11 +133,11 @@ public class BookDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(teacher, ROLE_TEACHER);
         Book book = dataCreator.registerAnyBook(academy);
 
-        WordPOSTList postList = WordPOSTList.builder()
+        WordPUTJson postList = WordPUTJson.builder()
                 .words(List.of(
-                        new WordPOST("apple", "사과"),
-                        new WordPOST("banana", "바나나"),
-                        new WordPOST("cherry", "체리")
+                        new WordPUT("apple", "사과"),
+                        new WordPUT("banana", "바나나"),
+                        new WordPUT("cherry", "체리")
                 ))
                 .build();
 
@@ -145,7 +145,7 @@ public class BookDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/api/books/{bookId}/words/json", book.getId())
+                RestDocumentationRequestBuilders.put("/api/books/{bookId}/words/json", book.getId())
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, createBearerToken(teacher))
                         .content(createJson(postList))
@@ -197,8 +197,13 @@ public class BookDocsTest extends RestDocsEnvironment {
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.multipart("/api/books/{bookId}/words/excel", book.getId())
+                RestDocumentationRequestBuilders
+                        .multipart("/api/books/{bookId}/words/excel", book.getId())
                         .file(file)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
                         .header(AUTHORIZATION, createBearerToken(teacher))
         );
 

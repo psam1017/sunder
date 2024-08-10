@@ -12,7 +12,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRoles;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 
 import java.util.Set;
@@ -367,13 +367,13 @@ public class TeacherDocsTest extends RestDocsEnvironment {
 
         String token = createBearerToken(director);
 
-        TeacherPOSTRoles put = new TeacherPOSTRoles(Set.of(ROLE_TEACHER, ROLE_DIRECTOR));
+        TeacherPUTRoles put = new TeacherPUTRoles(Set.of(ROLE_TEACHER, ROLE_DIRECTOR));
 
         refresh();
 
         // when
         ResultActions resultActions = mockMvc.perform(
-                RestDocumentationRequestBuilders.post("/api/teachers/{teacherId}/roles", teacher.getId())
+                RestDocumentationRequestBuilders.put("/api/teachers/{teacherId}/roles", teacher.getId())
                         .header(AUTHORIZATION, token)
                         .contentType(APPLICATION_JSON)
                         .content(createJson(put))

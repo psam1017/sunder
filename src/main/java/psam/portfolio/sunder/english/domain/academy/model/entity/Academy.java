@@ -109,10 +109,6 @@ public class Academy extends TimeEntity {
         this.phone = phone;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setOpenToPublic(Boolean openToPublic) {
         this.openToPublic = openToPublic;
     }

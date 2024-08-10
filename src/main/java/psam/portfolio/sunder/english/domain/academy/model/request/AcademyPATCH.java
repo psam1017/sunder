@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.domain.academy.model.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -23,9 +22,6 @@ public class AcademyPATCH {
 
     @Pattern(regexp = "^010[0-9]{8}$")
     private String phone;
-
-    @Email
-    private String email;
 
     private String street;
     private String addressDetail;

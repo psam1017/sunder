@@ -13,7 +13,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRoles;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.exception.TrialCannotChangeException;
@@ -118,10 +118,10 @@ public class TeacherCommandService {
      *
      * @param directorId 학원장 아이디
      * @param teacherId  권한을 변경할 선생님 아이디
-     * @param post       변경할 권한 - 가능한 값 : ROLE_TEACHER, ROLE_DIRECTOR
+     * @param put        변경할 권한 - 가능한 값 : ROLE_TEACHER, ROLE_DIRECTOR
      * @return 선생님 아이디와 변경 완료된 권한 목록
      */
-    public Set<RoleName> changeRoles(UUID directorId, UUID teacherId, TeacherPOSTRoles post) {
+    public Set<RoleName> changeRoles(UUID directorId, UUID teacherId, TeacherPUTRoles put) {
         // 자기 자신의 권한 변경 불가
         if (Objects.equals(directorId, teacherId)) {
             throw new SelfRoleModificationException();
@@ -145,12 +145,12 @@ public class TeacherCommandService {
         userRoleCommandRepository.deleteAll(userRoles);
         userRoles.clear();
 
-        post.getRoles().forEach(rn -> {
+        put.getRoles().forEach(rn -> {
             Role getRole = roleQueryRepository.getByName(rn);
             UserRole saveUserRole = userRoleCommandRepository.save(buildUserRole(getTeacher, getRole));
             userRoles.add(saveUserRole);
         });
-        return post.getRoles();
+        return put.getRoles();
     }
 
     /**

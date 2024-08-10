@@ -13,7 +13,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
-import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOSTRoles;
+import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRoles;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
@@ -269,7 +269,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_DIRECTOR);
         roles.add(RoleName.ROLE_TEACHER);
-        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
+        TeacherPUTRoles put = new TeacherPUTRoles(roles);
 
         // when
         Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getId(), teacher.getId(), put));
@@ -298,7 +298,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_TEACHER);
-        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
+        TeacherPUTRoles put = new TeacherPUTRoles(roles);
 
         // when
         Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getId(), teacher.getId(), put));
@@ -326,7 +326,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_DIRECTOR);
-        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
+        TeacherPUTRoles put = new TeacherPUTRoles(roles);
 
         // when
         Set<RoleName> saveRoles = refreshAnd(() -> sut.changeRoles(director.getId(), teacher.getId(), put));
@@ -351,7 +351,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         HashSet<RoleName> roles = new HashSet<>();
         roles.add(RoleName.ROLE_TEACHER);
-        TeacherPOSTRoles put = new TeacherPOSTRoles(roles);
+        TeacherPUTRoles put = new TeacherPUTRoles(roles);
 
         // when
         // then

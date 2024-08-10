@@ -156,9 +156,7 @@ public class AcademyCommandService {
         getAcademy.verify();
 
         // 인증 시점에는 모든 선생님(=only 학원장)의 상태를 인증함으로 변경한다.
-        getAcademy.getTeachers().forEach(teacher -> {
-            teacher.startTrial();
-        });
+        getAcademy.getTeachers().forEach(User::startTrial);
 
         return true;
     }
@@ -180,8 +178,7 @@ public class AcademyCommandService {
         // 중복 체크. name, phone, email 중 하나라도 중복되면 예외 발생. 단, 자기 학원은 제외.
         academyQueryRepository.findOne(
                 academy.name.eq(patch.getName())
-                        .or(patch.getPhone() != null ? academy.phone.eq(patch.getPhone()) : null)
-                        .or(patch.getEmail() != null ? academy.email.eq(patch.getEmail()) : null),
+                        .or(patch.getPhone() != null ? academy.phone.eq(patch.getPhone()) : null),
                 academy.id.ne(getAcademy.getId())
         ).ifPresent(academy -> {
             throw new DuplicateAcademyException();
@@ -190,9 +187,8 @@ public class AcademyCommandService {
         // 이메일 인증은 본인인증을 위한 것.
         // 학원의 이메일은 변경해도 조치를 취하지 않는다.
         getAcademy.setName(patch.getName());
-        getAcademy.setAddress(patch.getAddress());
         getAcademy.setPhone(patch.getPhone());
-        getAcademy.setEmail(patch.getEmail());
+        getAcademy.setAddress(patch.getAddress());
         getAcademy.setOpenToPublic(patch.getOpenToPublic());
 
         return getAcademy.getId();

@@ -17,7 +17,7 @@ import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 public class TeacherPATCHInfo {
 
     @NotBlank
-    @Pattern(regexp = "^[가-힣]{2,30}$")
+    @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$")
     private String name;
 
     @Pattern(regexp = "^010[0-9]{8}$")

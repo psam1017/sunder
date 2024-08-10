@@ -1,0 +1,52 @@
+
+# 로드 밸런싱을 위한 업스트림 설정. 포트번호 8000, 9000 의 서비스로 요청을 분산한다.
+upstream my-app {
+    # ip_hash; ip 를 기준으로 요청을 분산한다. 한 번 접속한 IP 는 계속해서 같은 서버를 이용하게 된다.
+    # least_conn; 가장 적은 연결을 가진 서버에 요청을 보낸다.
+    # least_time; 접속자가 가장 적으면서 평균 응답시간이 가장 짧은 서버에 요청을 보낸다.
+    # server localhost:8000 weight=3; 가중치를 부여하여 요청을 분산한다. 다른 서버에 비해 3배 더 많은 요청을 보낸다.
+
+    server localhost:8000;
+    server localhost:9000;
+}
+
+# 서버 설정
+server {
+    server_name  my-app.com;
+    root         /usr/share/nginx/html;
+
+    include /etc/nginx/default.d/*.conf;
+
+    location /example/ {
+        # 클라이언트로부터 전송받을 수 있는 최대 바디 사이즈.
+        # 서버에서 최대 파일 용량을 설정해도 nginx 의 client_max_body_size 가 더 작으면, 파일 첨부 용량에 제약이 생긴다.
+        client_max_body_size 8M;
+
+        proxy_pass http://my-app; # 역프록시 사용
+        proxy_set_header X-Real_IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+    }
+
+    location / {
+        deny all;
+    }
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/my-app.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/my-app.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = my-app.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen       80;
+    listen       [::]:80;
+    server_name  my-app.com;
+    return 404; # managed by Certbot
+}

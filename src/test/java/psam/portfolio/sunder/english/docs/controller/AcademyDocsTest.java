@@ -398,7 +398,6 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         AcademyPATCH academyPATCH = AcademyPATCH.builder()
                 .name("수정된학원이름")
                 .phone("01012345678")
-                .email("academy@sunder.edu")
                 .street("수정된 학원 주소")
                 .addressDetail("수정된 학원 상세주소")
                 .postalCode("12345")
@@ -424,7 +423,6 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                 requestFields(
                                         fieldWithPath("name").type(STRING).description("학원 이름"),
                                         fieldWithPath("phone").type(STRING).description("학원 전화번호").optional(),
-                                        fieldWithPath("email").type(STRING).description("학원 이메일").optional(),
                                         fieldWithPath("street").type(STRING).description("학원 주소").optional(),
                                         fieldWithPath("addressDetail").type(STRING).description("학원 상세주소").optional(),
                                         fieldWithPath("postalCode").type(STRING).description("학원 우편번호").optional(),

@@ -1,17 +1,14 @@
 package psam.portfolio.sunder.english.domain.book.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPOSTList;
+import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
 import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.service.BookCommandService;
 import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
@@ -19,8 +16,6 @@ import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,7 +26,6 @@ public class BookController {
 
     private final BookCommandService bookCommandService;
     private final BookQueryService bookQueryService;
-    private final ObjectMapper objectMapper;
 
     /**
      * 새 교재 등록 서비스
@@ -66,41 +60,41 @@ public class BookController {
     }
 
     /**
-     * 교재에 단어 추가 서비스. JSON 형식으로 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
+     * 교재에 단어 등록 서비스. JSON 형식으로 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
      *
      * @param teacherId 사용자 아이디
      * @param bookId    교재 아이디
-     * @param postList  생성/교체할 단어 목록
+     * @param put       생성/교체할 단어 목록
      * @return 생성/교체된 단어들이 속한 교재 아이디
      */
-    @PostMapping(
+    @PutMapping(
             value = "/{bookId}/words/json",
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     public ApiResponse<Map<String, UUID>> replaceWordsByJson(@UserId UUID teacherId,
                                                              @PathVariable UUID bookId,
-                                                             @RequestBody @Valid WordPOSTList postList) {
-        UUID updateBookId = bookCommandService.replaceWords(teacherId, bookId, postList);
+                                                             @RequestBody @Valid WordPUTJson put) {
+        UUID updateBookId = bookCommandService.replaceWords(teacherId, bookId, put);
         return ApiResponse.ok(Map.of("bookId", updateBookId));
     }
 
     /**
-     * 교재에 단어 추가 서비스. 엑셀 파일을 업로드하여 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
+     * 교재에 단어 등록 서비스. 엑셀 파일을 업로드하여 단어를 추가한다. 기존의 단어들은 논리 삭제된다.
      *
      * @param teacherId 사용자 아이디
      * @param bookId    교재 아이디
      * @param file      생성/교체할 단어가 입력된 엑셀 파일
      * @return 생성/교체된 단어들이 속한 교재 아이디
      */
-    @PostMapping(
+    @PutMapping(
             value = "/{bookId}/words/excel",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     public ApiResponse<Map<String, UUID>> replaceWordsByExcel(@UserId UUID teacherId,
                                                               @PathVariable UUID bookId,
-                                                              @RequestParam MultipartFile file) throws IOException {
+                                                              @RequestPart MultipartFile file) throws IOException {
         UUID updateBookId = bookCommandService.replaceWords(teacherId, bookId, file);
         return ApiResponse.ok(Map.of("bookId", updateBookId));
     }

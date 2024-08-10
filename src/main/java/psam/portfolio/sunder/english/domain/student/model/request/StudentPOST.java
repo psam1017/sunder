@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
@@ -43,7 +44,7 @@ public class StudentPOST {
     @Pattern(regexp = "^[0-9]{5}$")
     private String postalCode;
 
-    @Pattern(regexp = "^\\S{1,127}$")
+    @Length(min = 1, max = 127)
     private String attendanceId;
     private String note;
 
