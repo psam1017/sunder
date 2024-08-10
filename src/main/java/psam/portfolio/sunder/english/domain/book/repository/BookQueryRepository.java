@@ -81,17 +81,10 @@ public class BookQueryRepository {
     }
 
     public long countByPageSearchCond(long contentSize, UUID academyId, BookPageSearchCond cond) {
-        int size = cond.getSize();
-        long offset = cond.getOffset();
-
-        if (offset == 0) {
-            if (size > contentSize) {
-                return contentSize;
+        if (cond.getSize() > contentSize) {
+            if (cond.getOffset() == 0 || contentSize != 0) {
+                return cond.getOffset() + contentSize;
             }
-            return this.countByPageSearchCondQuery(academyId, cond);
-        }
-        if (contentSize != 0 && size > contentSize) {
-            return offset + contentSize;
         }
         return this.countByPageSearchCondQuery(academyId, cond);
     }

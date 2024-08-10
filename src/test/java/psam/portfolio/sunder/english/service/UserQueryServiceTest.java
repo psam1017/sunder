@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -325,5 +326,8 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
 
         // then
         assertThat(myInfo instanceof StudentFullResponse).isTrue();
+        if (myInfo instanceof StudentFullResponse s) {
+            assertThat(StringUtils.hasText(s.getNote())).isFalse();
+        }
     }
 }

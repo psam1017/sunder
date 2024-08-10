@@ -9,7 +9,7 @@ public enum UserStatus {
     PENDING("대기"),
     TRIAL("체험"),
     TRIAL_END("체험종료"),
-    ACTIVE("활성"),
+    ACTIVE("일반회원"),
     FORBIDDEN("차단"),
     WITHDRAWN("탈퇴");
 

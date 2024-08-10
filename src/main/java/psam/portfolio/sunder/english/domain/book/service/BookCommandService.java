@@ -14,7 +14,7 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
 import psam.portfolio.sunder.english.domain.book.repository.BookCommandRepository;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
 import psam.portfolio.sunder.english.domain.book.repository.WordCommandRepository;
@@ -83,7 +83,7 @@ public class BookCommandService {
      * @param put       생성/교체할 단어 목록
      * @return 생성/교체된 단어들이 속한 교재 아이디
      */
-    public UUID replaceWords(UUID teacherId, UUID bookId, WordPUTJson put) {
+    public UUID replaceWords(UUID teacherId, UUID bookId, WordPUT put) {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Book getBook = bookQueryRepository.getOne(
                 QBook.book.id.eq(bookId),

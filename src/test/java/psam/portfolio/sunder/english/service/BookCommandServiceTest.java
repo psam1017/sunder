@@ -11,7 +11,7 @@ import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchBookException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
 import psam.portfolio.sunder.english.domain.book.service.BookCommandService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -25,7 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson.*;
+import static psam.portfolio.sunder.english.domain.book.model.request.WordPUT.*;
 
 public class BookCommandServiceTest extends AbstractSunderApplicationTest {
 
@@ -139,11 +139,11 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
         Book book = dataCreator.registerAnyBook(academy);
 
-        WordPUTJson put = WordPUTJson.builder()
+        WordPUT put = WordPUT.builder()
                 .words(List.of(
-                        new WordPUT("apple", "사과"),
-                        new WordPUT("banana", "바나나"),
-                        new WordPUT("cherry", "체리")
+                        new WordPUTObject("apple", "사과"),
+                        new WordPUTObject("banana", "바나나"),
+                        new WordPUTObject("cherry", "체리")
                 ))
                 .build();
 

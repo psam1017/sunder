@@ -84,17 +84,10 @@ public class AcademyQueryRepository {
     }
 
     public long countByPageSearchCond(long contentSize, AcademyPublicPageSearchCond cond) {
-        int size = cond.getSize();
-        long offset = cond.getOffset();
-
-        if (offset == 0) {
-            if (size > contentSize) {
-                return contentSize;
+        if (cond.getSize() > contentSize) {
+            if (cond.getOffset() == 0 || contentSize != 0) {
+                return cond.getOffset() + contentSize;
             }
-            return this.countByPageSearchCondQuery(cond);
-        }
-        if (contentSize != 0 && size > contentSize) {
-            return offset + contentSize;
         }
         return this.countByPageSearchCondQuery(cond);
     }

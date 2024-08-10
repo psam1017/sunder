@@ -43,7 +43,7 @@ public class StudentPATCHInfo {
 
     private String parentName;
 
-    @Pattern(regexp = "^010[0-9]{8}$")
+    @Pattern(regexp = "^[0-9]{8,12}$")
     private String parentPhone;
 
     @JsonIgnore

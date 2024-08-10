@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
+import psam.portfolio.sunder.english.domain.user.exception.PasswordMismatchException;
 import psam.portfolio.sunder.english.domain.user.exception.UnauthorizedToChangePasswordException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginPwForm;
@@ -113,7 +114,7 @@ public class UserCommandService {
     public int authenticateToChangePassword(UUID userId, String loginPw) {
         User getUser = userQueryRepository.getById(userId);
         if (!passwordUtils.matches(loginPw, getUser.getLoginPw())) {
-            throw new LoginFailException();
+            throw new PasswordMismatchException();
         }
 
         LocalDateTime passwordChangeAllowedDateTime = LocalDateTime.now().plusMinutes(PASSWORD_CHANGE_ALLOWED_AMOUNT);

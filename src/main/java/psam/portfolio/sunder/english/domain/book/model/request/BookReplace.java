@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 
@@ -18,11 +19,15 @@ public class BookReplace {
     @NotNull
     private Boolean openToPublic;
 
+    @Length(max = 30)
     private String publisher;
 
     @NotBlank
+    @Length(max = 30)
     private String name;
+    @Length(max = 30)
     private String chapter;
+    @Length(max = 30)
     private String subject;
 
     public Book toEntity(Academy academy) {

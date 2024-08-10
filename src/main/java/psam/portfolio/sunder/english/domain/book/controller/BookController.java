@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
 import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.service.BookCommandService;
 import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
@@ -74,7 +74,7 @@ public class BookController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     public ApiResponse<Map<String, UUID>> replaceWordsByJson(@UserId UUID teacherId,
                                                              @PathVariable UUID bookId,
-                                                             @RequestBody @Valid WordPUTJson put) {
+                                                             @RequestBody @Valid WordPUT put) {
         UUID updateBookId = bookCommandService.replaceWords(teacherId, bookId, put);
         return ApiResponse.ok(Map.of("bookId", updateBookId));
     }

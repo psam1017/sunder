@@ -10,8 +10,8 @@ import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademySta
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson;
-import psam.portfolio.sunder.english.domain.book.model.request.WordPUTJson.WordPUT;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
+import psam.portfolio.sunder.english.domain.book.model.request.WordPUT.WordPUTObject;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
@@ -133,11 +133,11 @@ public class BookDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(teacher, ROLE_TEACHER);
         Book book = dataCreator.registerAnyBook(academy);
 
-        WordPUTJson postList = WordPUTJson.builder()
+        WordPUT postList = WordPUT.builder()
                 .words(List.of(
-                        new WordPUT("apple", "사과"),
-                        new WordPUT("banana", "바나나"),
-                        new WordPUT("cherry", "체리")
+                        new WordPUTObject("apple", "사과"),
+                        new WordPUTObject("banana", "바나나"),
+                        new WordPUTObject("cherry", "체리")
                 ))
                 .build();
 

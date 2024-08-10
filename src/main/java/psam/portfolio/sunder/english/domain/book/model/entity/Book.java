@@ -22,8 +22,7 @@ import java.util.UUID;
 @Table(
         name = "books",
         indexes = {
-                @Index(columnList = "academy_id"),
-                @Index(columnList = "search_text")
+                @Index(columnList = "academy_id")
         }
 )
 @Entity
