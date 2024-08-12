@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.model.embeddable.StudyRange;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyClassification;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 
@@ -28,7 +28,8 @@ import java.util.UUID;
         indexes = {
                 @Index(columnList = "student_id"),
                 @Index(columnList = "teacher_id"),
-                @Index(columnList = "sequence")
+                @Index(columnList = "sequence"),
+                @Index(columnList = "created_date_time")
         }
 )
 @Entity

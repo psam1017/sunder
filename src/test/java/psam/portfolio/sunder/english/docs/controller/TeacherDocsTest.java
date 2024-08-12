@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.docs.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
@@ -13,16 +14,20 @@ import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHIn
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHStatus;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRoles;
+import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.util.Set;
+import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,9 +36,16 @@ import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleNa
 
 public class TeacherDocsTest extends RestDocsEnvironment {
 
+    @Autowired
+    private TeacherCommandService teacherCommandService;
+
     @DisplayName("선생님이 선생님을 등록할 수 있다.")
     @Test
     void registerTeacher() throws Exception {
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
@@ -76,7 +88,60 @@ public class TeacherDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("postalCode").type(STRING).description("선생님 우편번호").optional()
                         ),
                         relaxedResponseFields(
-                                fieldWithPath("data.teacherId").type(STRING).description("등록된 선생님의 아이디")
+                                fieldWithPath("data.registered").type(BOOLEAN).description("선생님의 등록 여부")
+                        )
+                ));
+    }
+
+    @DisplayName("선생님이 이메일로 본인인증을 할 수 있다.")
+    @Test
+    void verifyTeacher() throws Exception {
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
+
+        String loginId = infoContainer.getUniqueLoginId();
+        String password = infoContainer.getAnyRawPassword();
+        String name = "name";
+        String email = infoContainer.getUniqueEmail();
+        String phoneNumber = infoContainer.getUniquePhoneNumber();
+        Address address = infoContainer.getAnyAddress();
+
+        TeacherPOST post = new TeacherPOST(
+                loginId,
+                password,
+                name,
+                email,
+                phoneNumber,
+                address.getStreet(),
+                address.getDetail(),
+                address.getPostalCode()
+        );
+
+        // when
+        UUID teacherId = refreshAnd(() -> teacherCommandService.register(director.getId(), post));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/api/teachers/{teacherId}/verify", teacherId)
+                        .contentType(APPLICATION_JSON)
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                        pathParameters(
+                                parameterWithName("teacherId").description("인증할 선생님 아이디")
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.verified").type(BOOLEAN).description("선생님의 인증 여부")
                         )
                 ));
     }

@@ -7,10 +7,10 @@ import lombok.Getter;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 import psam.portfolio.sunder.english.domain.study.model.embeddable.StudyRange;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyClassification;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
 import java.time.LocalDateTime;

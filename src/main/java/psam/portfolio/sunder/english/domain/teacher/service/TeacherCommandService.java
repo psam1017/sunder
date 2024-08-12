@@ -1,8 +1,11 @@
 package psam.portfolio.sunder.english.domain.teacher.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.teacher.exception.SelfRoleModificationException;
@@ -26,6 +29,8 @@ import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
+import psam.portfolio.sunder.english.infrastructure.mail.MailFailException;
+import psam.portfolio.sunder.english.infrastructure.mail.MailUtils;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.*;
@@ -39,6 +44,9 @@ import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 public class TeacherCommandService {
 
     private final PasswordUtils passwordUtils;
+    private final MailUtils mailUtils;
+    private final MessageSource messageSource;
+    private final TemplateEngine templateEngine;
 
     private final TeacherCommandRepository teacherCommandRepository;
     private final TeacherQueryRepository teacherQueryRepository;
@@ -49,6 +57,7 @@ public class TeacherCommandService {
 
     /**
      * 선생님 등록 서비스
+     * 등록 직후는 PENDING 상태이며, 본인인증을 통해 ACTIVE 상태로 변경할 수 있다.
      *
      * @param teacherId   학원에 등록할 선생의 아이디
      * @param teacherPOST 등록할 선생님 정보
@@ -68,18 +77,41 @@ public class TeacherCommandService {
         // Teacher 등록
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Academy getAcademy = getTeacher.getAcademy();
+        Teacher saveTeacher = teacherCommandRepository.save(teacherPOST.toEntity(getAcademy, PENDING, passwordUtils.encode(teacherPOST.getLoginPw())));
+        Role role = roleQueryRepository.getByName(RoleName.ROLE_TEACHER);
+        userRoleCommandRepository.save(buildUserRole(saveTeacher, role));
+
+        // 본인인증 링크를 이메일로 전송
+        boolean mailResult = mailUtils.sendMail(
+                saveTeacher.getEmail(),
+                messageSource.getMessage("mail.verification.teacher.subject", null, Locale.getDefault()),
+                setVerificationMailText(saveTeacher)
+        );
+        if (!mailResult) {
+            throw new MailFailException();
+        }
+
+        return saveTeacher.getId();
+    }
+
+    /**
+     * 선생님 가입 승인 서비스
+     * 승인 이후의 상태는 학원장의 상태를 따라간다.
+     *
+     * @param teacherId 인증할 선생님 아이디
+     * @return 선생님 가입 승인 여부
+     */
+    public boolean verifyTeacher(UUID teacherId) {
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         List<Teacher> directors = teacherQueryRepository.findAll(
-                QTeacher.teacher.academy.id.eq(getAcademy.getId()),
+                QTeacher.teacher.academy.teachers.any().id.eq(teacherId),
                 QTeacher.teacher.status.in(ACTIVE, TRIAL),
                 QTeacher.teacher.roles.any().role.name.eq(RoleName.ROLE_DIRECTOR)
         );
         UserStatus status = directors.get(0).getStatus();
 
-        Teacher saveTeacher = teacherCommandRepository.save(teacherPOST.toEntity(getAcademy, status, passwordUtils.encode(teacherPOST.getLoginPw())));
-        Role role = roleQueryRepository.getByName(RoleName.ROLE_TEACHER);
-        userRoleCommandRepository.save(buildUserRole(saveTeacher, role));
-
-        return saveTeacher.getId();
+        getTeacher.changeStatus(status);
+        return true;
     }
 
     /**
@@ -87,7 +119,7 @@ public class TeacherCommandService {
      *
      * @param directorId 학원장 아이디
      * @param teacherId  상태를 변경할 선생님 아이디
-     * @param patch      변경할 상태 - 가능한 값 : PENDING, ACTIVE, WITHDRAWN
+     * @param patch      변경할 상태 - 가능한 값 : ACTIVE, WITHDRAWN
      * @return 선생님 아이디와 변경된 상태
      */
     public UserStatus changeStatus(UUID directorId, UUID teacherId, TeacherPATCHStatus patch) {
@@ -182,5 +214,13 @@ public class TeacherCommandService {
                 .user(user)
                 .role(role)
                 .build();
+    }
+
+    private String setVerificationMailText(Teacher teacher) {
+        String url = messageSource.getMessage("mail.verification.teacher.url", new Object[]{teacher.getId()}, Locale.getDefault());
+
+        Context context = new Context();
+        context.setVariable("url", url);
+        return templateEngine.process("mail-verification", context);
     }
 }

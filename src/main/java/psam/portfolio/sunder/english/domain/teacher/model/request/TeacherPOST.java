@@ -39,6 +39,7 @@ public class TeacherPOST {
 
     private String street;
     private String addressDetail;
+
     @Pattern(regexp = "^[0-9]{5}$")
     private String postalCode;
 

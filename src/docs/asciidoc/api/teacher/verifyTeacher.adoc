@@ -1,0 +1,10 @@
+=== 선생님 본인인증하기
+- 이메일로 전송된 링크를 클릭하여 인증합니다.
+
+==== HTTP Request
+include::{snippets}/teacher-docs-test/verify-teacher/http-request.adoc[]
+include::{snippets}/teacher-docs-test/verify-teacher/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/teacher-docs-test/verify-teacher/http-response.adoc[]
+include::{snippets}/teacher-docs-test/verify-teacher/response-fields.adoc[]

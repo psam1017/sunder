@@ -15,6 +15,6 @@ import psam.portfolio.sunder.english.global.validator.EnumPattern;
 public class TeacherPATCHStatus {
 
     @NotNull
-    @EnumPattern(regexp = "^(PENDING|ACTIVE|WITHDRAWN)$")
+    @EnumPattern(regexp = "^(ACTIVE|WITHDRAWN)$")
     private UserStatus status;
 }

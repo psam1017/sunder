@@ -1,7 +1,7 @@
 package psam.portfolio.sunder.english.domain.study.exception;
 
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
 import psam.portfolio.sunder.english.global.api.v1.ApiException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.api.v1.ApiStatus;

@@ -216,7 +216,6 @@ public class UserQueryService {
         } else if (getUser instanceof Student s) {
             return StudentFullResponse.from(s, false); // 학생이 자신에 대한 note 를 볼 수 없다.
         }
-        // TODO: 2024-04-06 admin 조회도 생성
         throw new NotAUserException();
     }
 

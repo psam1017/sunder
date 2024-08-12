@@ -3,10 +3,10 @@ package psam.portfolio.sunder.english.domain.study.model.response;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyClassification;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

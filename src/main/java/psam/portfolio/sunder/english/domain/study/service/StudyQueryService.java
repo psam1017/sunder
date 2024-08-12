@@ -3,18 +3,17 @@ package psam.portfolio.sunder.english.domain.study.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.study.model.entity.QStudy;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 import psam.portfolio.sunder.english.domain.study.model.request.StudySlicingSearchCond;
+import psam.portfolio.sunder.english.domain.study.model.request.StudyStatisticSearchCond;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyFullResponse;
 import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingResponse;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyWordFullResponse;
 import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
 import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
@@ -120,5 +119,39 @@ public class StudyQueryService {
             responseMap.put("teacher", TeacherPublicResponse.from(getStudy.getTeacher()));
         }
         return responseMap;
+    }
+
+    public Map<String, Object> getStudyStatistic(UUID userId, StudyStatisticSearchCond cond) {
+        User getUser = userQueryRepository.getById(userId);
+        UUID academyId = null;
+        if (getUser instanceof Student s) {
+            cond.changeStudentId(s.getId());
+            academyId = s.getAcademy().getId();
+        } else if (getUser instanceof Teacher t) {
+            academyId = t.getAcademy().getId();
+        }
+        return queryStudyStatistic(cond, academyId);
+    }
+
+    public Map<String, Object> queryStudyStatistic(StudyStatisticSearchCond cond, UUID academyId) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        // 공통 응답값
+        response.put("status", studyQueryRepository.countByStatus(cond, academyId));
+        response.put("type", studyQueryRepository.countByType(cond, academyId));
+        response.put("classification", studyQueryRepository.countByClassification(cond, academyId));
+        response.put("target", studyQueryRepository.countByTarget(cond, academyId));
+        response.put("days", studyQueryRepository.countByDay(cond, academyId));
+        response.put("oldHomeworks", studyQueryRepository.findOldHomeworks(cond, academyId));
+
+        // 선생님 전용 응답값
+        if (cond.getStudentId() == null) {
+            response.put("bestAnswerRate", studyQueryRepository.findBestStudentsByAnswerRate(cond, academyId));
+            response.put("worstAnswerRate", studyQueryRepository.findWorstStudentsByAnswerRate(cond, academyId));
+            response.put("bestStudyCount", studyQueryRepository.findBestStudentsByStudyCount(cond, academyId));
+            response.put("worstStudyCount", studyQueryRepository.findWorstStudentsByStudyCount(cond, academyId));
+        }
+        return response;
     }
 }

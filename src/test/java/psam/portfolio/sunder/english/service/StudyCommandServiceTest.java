@@ -16,10 +16,10 @@ import psam.portfolio.sunder.english.domain.study.exception.WordSizeNotEnoughToS
 import psam.portfolio.sunder.english.domain.study.model.entity.QStudy;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyClassification;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit;
 import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTAssign;
 import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTStart;

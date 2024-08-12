@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyClassification;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 import psam.portfolio.sunder.english.global.validator.EnumPattern;
 
 import java.util.List;

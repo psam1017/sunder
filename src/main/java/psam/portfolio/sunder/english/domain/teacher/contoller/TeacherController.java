@@ -25,6 +25,7 @@ public class TeacherController {
 
     /**
      * 선생님 등록 서비스
+     * 등록 직후는 PENDING 상태이며, 본인인증을 통해 ACTIVE 상태로 변경할 수 있다.
      *
      * @param teacherId 학원에 등록할 선생님의 아이디
      * @param post      등록할 선생님 정보
@@ -32,10 +33,23 @@ public class TeacherController {
      */
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     @PostMapping("")
-    public ApiResponse<Map<String, UUID>> registerTeacher(@UserId UUID teacherId,
-                                                          @RequestBody @Valid TeacherPOST post) {
-        UUID newTeacherId = teacherCommandService.register(teacherId, post);
-        return ApiResponse.ok(Map.of("teacherId", newTeacherId));
+    public ApiResponse<Map<String, Boolean>> registerTeacher(@UserId UUID teacherId,
+                                                             @RequestBody @Valid TeacherPOST post) {
+        teacherCommandService.register(teacherId, post);
+        return ApiResponse.ok(Map.of("registered", true));
+    }
+
+    /**
+     * 선생님 가입 승인 서비스
+     * 승인 이후의 상태는 학원장의 상태를 따라간다.
+     *
+     * @param teacherId 인증할 선생님 아이디
+     * @return 선생님 가입 승인 여부
+     */
+    @GetMapping("/{teacherId}/verify")
+    public ApiResponse<Map<String, Boolean>> verifyTeacher(@PathVariable String teacherId) {
+        boolean result = teacherCommandService.verifyTeacher(UUID.fromString(teacherId));
+        return ApiResponse.ok(Map.of("verified", result));
     }
 
     /**
@@ -73,7 +87,7 @@ public class TeacherController {
      *
      * @param directorId 학원장 아이디
      * @param teacherId  상태를 변경할 선생님 아이디
-     * @param patch      변경할 상태 - 가능한 값 : PENDING, ACTIVE, WITHDRAWN
+     * @param patch      변경할 상태 - 가능한 값 : ACTIVE, WITHDRAWN
      * @return 선생님 아이디와 변경된 상태
      */
     @Secured("ROLE_DIRECTOR")

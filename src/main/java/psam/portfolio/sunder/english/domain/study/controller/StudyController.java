@@ -28,9 +28,6 @@ public class StudyController {
     private final StudyCommandService studyCommandService;
     private final StudyQueryService studyQueryService;
 
-    // TODO: 2024-06-29 선생님의 학생 성적 통계 대시보드
-    // TODO: 2024-06-29 학생의 자기 성적 통계 대시보드
-
     /**
      * 숙제 생성 서비스
      *
@@ -59,6 +56,23 @@ public class StudyController {
                                                      @RequestBody @Valid StudyPOSTStart post) {
         UUID studyId = studyCommandService.start(studentId, post);
         return ApiResponse.ok(Map.of("studyId", studyId));
+    }
+
+    /**
+     * 학습 통계 조회 서비스
+     * 학생이라면 자신의 학습 통계를 조회할 수 있다. 다른 학생과 관련된 통계는 조회할 수 없다.
+     * 선생님이라면 같은 학원 학생들의 학습 통계를 조회할 수 있다.
+     *
+     * @param userId    사용자 아이디
+     * @param cond      학습 통계 조회 조건
+     * @return 학습 상세 정보
+     */
+    @GetMapping("/statistic")
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
+    public ApiResponse<Map<String, Object>> getStudyStatistic(@UserId UUID userId,
+                                                              @ModelAttribute StudyStatisticSearchCond cond) {
+        Map<String, Object> response = studyQueryService.getStudyStatistic(userId, cond);
+        return ApiResponse.ok(response);
     }
 
     /**

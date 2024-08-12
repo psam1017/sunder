@@ -7,10 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyClassification;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyStatus;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyTarget;
-import psam.portfolio.sunder.english.domain.study.model.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 
 import java.util.List;
 import java.util.UUID;

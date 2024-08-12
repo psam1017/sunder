@@ -29,6 +29,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
@@ -44,6 +46,10 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
     @DisplayName("선생님이 선생님을 등록할 수 있다.")
     @Test
     void registerTeacher(){
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
@@ -91,9 +97,13 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
                 .containsOnly(RoleName.ROLE_TEACHER);
     }
 
-    @DisplayName("학원장이 TRIAL 상태이면 생성한 선생님도 TRIAL 상태로 생성된다.")
+    @DisplayName("선생님을 등록한 직후에는 PENDING 상태이다.")
     @Test
     void registerTeacherWithTrialStatus() {
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
@@ -122,7 +132,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
 
         // then
         Teacher getTeacher = teacherQueryRepository.getById(saveTeacherId);
-        assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.TRIAL);
+        assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.PENDING);
     }
 
     @DisplayName("선생님을 등록할 때 선생님 정보에 중복이 있는지 검사할 수 있다.")
@@ -159,25 +169,88 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         assertThatThrownBy(() -> sut.register(director.getId(), post))
                 .isInstanceOf(DuplicateUserException.class);
     }
-
-    @DisplayName("학원장이 PENDING 상태의 선생님을 ACTIVE 상태로 변경할 수 있다.")
+    @DisplayName("선생님을 등록한 이후 이메일로 본인인증을 할 수 있다.")
     @Test
-    void changeTeacherStatusFromPendingToActive() {
+    void verifyTeacher() {
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
         // given
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
         dataCreator.createUserRoles(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
 
-        Teacher teacher = dataCreator.registerTeacher(UserStatus.PENDING, academy);
-        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+        String loginId = infoContainer.getUniqueLoginId();
+        String password = infoContainer.getAnyRawPassword();
+        String name = "name";
+        String email = infoContainer.getUniqueEmail();
+        String phoneNumber = infoContainer.getUniquePhoneNumber();
+        Address address = infoContainer.getAnyAddress();
 
-        TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.ACTIVE);
+        TeacherPOST post = new TeacherPOST(
+                loginId,
+                password,
+                name,
+                email,
+                phoneNumber,
+                address.getStreet(),
+                address.getDetail(),
+                address.getPostalCode()
+        );
 
         // when
-        UserStatus status = refreshAnd(() -> sut.changeStatus(director.getId(), teacher.getId(), patch));
+        UUID teacherId = refreshAnd(() -> sut.register(director.getId(), post));
+
+        // when
+        boolean result = refreshAnd(() -> sut.verifyTeacher(teacherId));
 
         // then
-        assertThat(status).isEqualTo(UserStatus.ACTIVE);
+        assertThat(result).isTrue();
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @DisplayName("선생님이 본인인증을 할 때는 학원장의 상태를 따라간다.")
+    @Test
+    void verifyTeacherWithDirectorStatus() {
+        // mocking
+        given(mailUtils.sendMail(anyString(), anyString(), anyString()))
+                .willReturn(true);
+
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher director = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
+        dataCreator.createUserRoles(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
+
+        String loginId = infoContainer.getUniqueLoginId();
+        String password = infoContainer.getAnyRawPassword();
+        String name = "name";
+        String email = infoContainer.getUniqueEmail();
+        String phoneNumber = infoContainer.getUniquePhoneNumber();
+        Address address = infoContainer.getAnyAddress();
+
+        TeacherPOST post = new TeacherPOST(
+                loginId,
+                password,
+                name,
+                email,
+                phoneNumber,
+                address.getStreet(),
+                address.getDetail(),
+                address.getPostalCode()
+        );
+
+        // when
+        UUID teacherId = refreshAnd(() -> sut.register(director.getId(), post));
+
+        // when
+        boolean result = refreshAnd(() -> sut.verifyTeacher(teacherId));
+
+        // then
+        assertThat(result).isTrue();
+        Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        assertThat(getTeacher.getStatus()).isEqualTo(UserStatus.TRIAL);
     }
 
     @DisplayName("학원장이 ACTIVE 상태의 선생님을 WITHDRAWN 상태로 변경할 수 있다.")
@@ -228,7 +301,7 @@ public class TeacherCommandServiceTest extends AbstractSunderApplicationTest {
         Teacher director = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
         dataCreator.createUserRoles(director, RoleName.ROLE_DIRECTOR, RoleName.ROLE_TEACHER);
 
-        Teacher teacher = dataCreator.registerTeacher(UserStatus.PENDING, academy);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
         dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
 
         TeacherPATCHStatus patch = new TeacherPATCHStatus(UserStatus.ACTIVE);

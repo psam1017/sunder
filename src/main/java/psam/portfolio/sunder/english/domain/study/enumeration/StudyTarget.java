@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.domain.study.model.enumeration;
+package psam.portfolio.sunder.english.domain.study.enumeration;
 
 public enum StudyTarget {
 
