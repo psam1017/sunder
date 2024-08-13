@@ -1,6 +1,5 @@
 package psam.portfolio.sunder.english.service;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,18 +8,16 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.study.model.entity.Study;
-import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
-import psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit;
-import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTStart;
-import psam.portfolio.sunder.english.domain.study.model.request.StudySlicingSearchCond;
-import psam.portfolio.sunder.english.domain.study.model.request.StudyWordPATCHCorrect;
+import psam.portfolio.sunder.english.domain.study.model.entity.Study;
+import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
+import psam.portfolio.sunder.english.domain.study.model.request.*;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyFullResponse;
 import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingResponse;
+import psam.portfolio.sunder.english.domain.study.model.response.StudyStatisticResponse.CountByDay;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyWordFullResponse;
 import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepository;
 import psam.portfolio.sunder.english.domain.study.service.StudyCommandService;
@@ -30,12 +27,14 @@ import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.slicing.SlicingInfo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit.StudyWordPATCHSubmit;
+import static psam.portfolio.sunder.english.domain.study.model.response.StudyStatisticResponse.*;
 
 @SuppressWarnings("unchecked")
 class StudyQueryServiceTest extends AbstractSunderApplicationTest {
@@ -455,5 +454,180 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(slicingInfo.getLastSequence()).isEqualTo(getStudy1.getSequence());
         assertThat(slicingInfo.hasNext()).isFalse();
         assertThat(studies).hasSize(1);
+    }
+
+    @DisplayName("선생님이 자기 학원 학생들의 통계를 조회할 수 있다.")
+    @Test
+    public void getStatisticByTeacher() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
+
+        Book book = dataCreator.registerBook(false, "능률(김성곤)", "중3-1학기", "2과", "본문", academy);
+        for (int i = 1; i <= 10; i++) {
+            dataCreator.registerWord("apple" + i, "사과" + i, book);
+        }
+
+        // 배정 상태
+        dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+
+        // 시작 상태
+        dataCreator.startAnyStudy(student.getId(), List.of(book.getId()));
+
+        // 제출 상태 - 정답
+        List<UUID> correctStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study correctStudy = studyQueryRepository.getById(correctStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), correctStudy.getId(), new StudyPATCHSubmit(correctStudy.getStudyWords().stream().map(sw -> new StudyWordPATCHSubmit(sw.getId(), sw.getAnswer())).toList()));
+
+        // 제출 상태 - 오답
+        List<UUID> incorrectStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study incorrectStudy = studyQueryRepository.getById(incorrectStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), incorrectStudy.getId(), new StudyPATCHSubmit(incorrectStudy.getStudyWords().stream().map(sw -> new StudyWordPATCHSubmit(sw.getId(), sw.getAnswer() + "NO")).toList()));
+
+        StudyStatisticSearchCond cond = new StudyStatisticSearchCond(null, null, null);
+
+        // when
+        Map<String, Object> statistic = refreshAnd(() -> sut.getStudyStatistic(teacher.getId(), cond));
+
+        // then
+        List<CountByStatus> statuses = (List<CountByStatus>) statistic.get("statuses");
+        assertThat(statuses).hasSize(3)
+                .extracting(s -> tuple(s.getStatus(), s.getCount()))
+                .containsExactlyInAnyOrder(
+                        tuple(StudyStatus.ASSIGNED, 1L),
+                        tuple(StudyStatus.STARTED, 1L),
+                        tuple(StudyStatus.SUBMITTED, 2L)
+                );
+
+        List<CountByType> types = (List<CountByType>) statistic.get("types");
+        assertThat(types).hasSize(1)
+                .extracting(t -> tuple(t.getType(), t.getCount()))
+                .containsExactly(tuple(StudyType.WRITING, 4L));
+
+        List<CountByClassification> classifications = (List<CountByClassification>) statistic.get("classifications");
+        assertThat(classifications).hasSize(1)
+                .extracting(c -> tuple(c.getClassification(), c.getCount()))
+                .containsExactly(tuple(StudyClassification.EXAM, 4L));
+
+        List<CountByTarget> targets = (List<CountByTarget>) statistic.get("targets");
+        assertThat(targets).hasSize(1)
+                .extracting(t -> tuple(t.getTarget(), t.getCount()))
+                .containsExactly(tuple(StudyTarget.KOREAN, 4L));
+
+        List<CountByDay> days = (List<CountByDay>) statistic.get("days");
+        assertThat(days).hasSize(1)
+                .extracting(d -> tuple(d.getStudyDate(), d.getStudyCount(), d.getCorrectStudyWordCount(), d.getTotalStudyWordCount()))
+                .containsExactly(tuple(LocalDate.now(), 4L, 20L, 40L));
+
+        List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
+        assertThat(oldHomeworks).hasSize(2)
+                .extracting("studentId", "status")
+                .containsExactlyInAnyOrder(
+                        tuple(student.getId(), StudyStatus.ASSIGNED),
+                        tuple(student.getId(), StudyStatus.STARTED)
+                );
+
+        List<TopStudent> bestAnswerRates = (List<TopStudent>) statistic.get("bestAnswerRates");
+        assertThat(bestAnswerRates).hasSize(1)
+                .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
+                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+
+        List<TopStudent> worstAnswerRates = (List<TopStudent>) statistic.get("worstAnswerRates");
+        assertThat(worstAnswerRates).hasSize(1)
+                .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
+                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+
+        List<TopStudent> bestStudyCounts = (List<TopStudent>) statistic.get("bestStudyCounts");
+        assertThat(bestStudyCounts).hasSize(1)
+                .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
+                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+
+        List<TopStudent> worstStudyCounts = (List<TopStudent>) statistic.get("worstStudyCounts");
+        assertThat(worstStudyCounts).hasSize(1)
+                .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
+                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+    }
+
+    @DisplayName("학생은 자신의 통계만 조회할 수 있다.")
+    @Test
+    public void getStatisticByStudent() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
+
+        Book book = dataCreator.registerBook(false, "능률(김성곤)", "중3-1학기", "2과", "본문", academy);
+        for (int i = 1; i <= 10; i++) {
+            dataCreator.registerWord("apple" + i, "사과" + i, book);
+        }
+
+        // 배정 상태
+        dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+
+        // 시작 상태
+        dataCreator.startAnyStudy(student.getId(), List.of(book.getId()));
+
+        // 제출 상태 - 정답
+        List<UUID> correctStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study correctStudy = studyQueryRepository.getById(correctStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), correctStudy.getId(), new StudyPATCHSubmit(correctStudy.getStudyWords().stream().map(sw -> new StudyWordPATCHSubmit(sw.getId(), sw.getAnswer())).toList()));
+
+        // 제출 상태 - 오답
+        List<UUID> incorrectStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study incorrectStudy = studyQueryRepository.getById(incorrectStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), incorrectStudy.getId(), new StudyPATCHSubmit(incorrectStudy.getStudyWords().stream().map(sw -> new StudyWordPATCHSubmit(sw.getId(), sw.getAnswer() + "NO")).toList()));
+
+        StudyStatisticSearchCond cond = new StudyStatisticSearchCond(null, null, null);
+
+        // when
+        Map<String, Object> statistic = refreshAnd(() -> sut.getStudyStatistic(student.getId(), cond));
+
+        // then
+        List<CountByStatus> statuses = (List<CountByStatus>) statistic.get("statuses");
+        assertThat(statuses).hasSize(3)
+                .extracting(s -> tuple(s.getStatus(), s.getCount()))
+                .containsExactlyInAnyOrder(
+                        tuple(StudyStatus.ASSIGNED, 1L),
+                        tuple(StudyStatus.STARTED, 1L),
+                        tuple(StudyStatus.SUBMITTED, 2L)
+                );
+
+        List<CountByType> types = (List<CountByType>) statistic.get("types");
+        assertThat(types).hasSize(1)
+                .extracting(t -> tuple(t.getType(), t.getCount()))
+                .containsExactly(tuple(StudyType.WRITING, 4L));
+
+        List<CountByClassification> classifications = (List<CountByClassification>) statistic.get("classifications");
+        assertThat(classifications).hasSize(1)
+                .extracting(c -> tuple(c.getClassification(), c.getCount()))
+                .containsExactly(tuple(StudyClassification.EXAM, 4L));
+
+        List<CountByTarget> targets = (List<CountByTarget>) statistic.get("targets");
+        assertThat(targets).hasSize(1)
+                .extracting(t -> tuple(t.getTarget(), t.getCount()))
+                .containsExactly(tuple(StudyTarget.KOREAN, 4L));
+
+        List<CountByDay> days = (List<CountByDay>) statistic.get("days");
+        assertThat(days).hasSize(1)
+                .extracting(d -> tuple(d.getStudyDate(), d.getStudyCount(), d.getCorrectStudyWordCount(), d.getTotalStudyWordCount()))
+                .containsExactly(tuple(LocalDate.now(), 4L, 20L, 40L));
+
+        List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
+        assertThat(oldHomeworks).hasSize(2)
+                .extracting("studentId", "status")
+                .containsExactlyInAnyOrder(
+                        tuple(student.getId(), StudyStatus.ASSIGNED),
+                        tuple(student.getId(), StudyStatus.STARTED)
+                );
+
+        assertThat(statistic.get("bestAnswerRates")).isNull();
+        assertThat(statistic.get("worstAnswerRates")).isNull();
+        assertThat(statistic.get("bestStudyCounts")).isNull();
+        assertThat(statistic.get("worstStudyCounts")).isNull();
     }
 }

@@ -2,8 +2,8 @@ package psam.portfolio.sunder.english.others.testbean.data;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
@@ -13,14 +13,20 @@ import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.repository.StudentCommandRepository;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTAssign;
+import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTStart;
+import psam.portfolio.sunder.english.domain.study.service.StudyCommandService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.QRole;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.repository.RoleCommandRepository;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
@@ -30,6 +36,7 @@ import psam.portfolio.sunder.english.others.testbean.container.InfoContainer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -46,6 +53,7 @@ public class DataCreator {
     private final AcademyCommandRepository academyCommandRepository;
     private final BookCommandRepository bookCommandRepository;
     private final WordCommandRepository wordCommandRepository;
+    private final StudyCommandService studyCommandService;
 
     public void createAllRoles() {
         RoleName[] roles = RoleName.values();
@@ -191,7 +199,7 @@ public class DataCreator {
         return saveBook;
     }
 
-    public Word registerWord(String english, String korean, Book book) {
+    public void registerWord(String english, String korean, Book book) {
         Word word = Word.builder()
                 .english(english)
                 .korean(korean)
@@ -199,6 +207,13 @@ public class DataCreator {
                 .build();
         Word saveWord = wordCommandRepository.save(word);
         book.getWords().add(saveWord);
-        return saveWord;
+    }
+
+    public List<UUID> assignAnyStudy(UUID teacherId, List<UUID> bookIds, List<UUID> studentIds) {
+        return studyCommandService.assign(teacherId, new StudyPOSTAssign(bookIds, true, 20, StudyType.WRITING, StudyClassification.EXAM, StudyTarget.KOREAN, studentIds, true));
+    }
+
+    public UUID startAnyStudy(UUID studentId, List<UUID> bookIds) {
+        return studyCommandService.start(studentId, new StudyPOSTStart(bookIds, true, 10, StudyType.WRITING, StudyClassification.EXAM, StudyTarget.KOREAN));
     }
 }

@@ -9,11 +9,11 @@ import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.study.model.entity.Study;
-import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.study.model.entity.Study;
+import psam.portfolio.sunder.english.domain.study.model.entity.StudyWord;
 import psam.portfolio.sunder.english.domain.study.model.request.*;
 import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepository;
 import psam.portfolio.sunder.english.domain.study.service.StudyCommandService;
@@ -21,12 +21,12 @@ import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
@@ -200,6 +200,188 @@ public class StudyDocsTest extends RestDocsEnvironment {
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.studyId").type(STRING).description("제출된 학습 아이디")
+                        )
+                ));
+    }
+
+    @DisplayName("선생님이 자기 학원 학생들의 학습통계를 조회할 수 있다.")
+    @Test
+    public void getStatisticByTeacher() throws Exception {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
+
+        Book book = dataCreator.registerBook(false, "능률(김성곤)", "중3-1학기", "2과", "본문", academy);
+        for (int i = 1; i <= 10; i++) {
+            dataCreator.registerWord("apple" + i, "사과" + i, book);
+        }
+
+        // 배정 상태
+        dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+
+        // 시작 상태
+        dataCreator.startAnyStudy(student.getId(), List.of(book.getId()));
+
+        // 제출 상태 - 정답
+        List<UUID> correctStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study correctStudy = studyQueryRepository.getById(correctStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), correctStudy.getId(), new StudyPATCHSubmit(correctStudy.getStudyWords().stream().map(sw -> new StudyPATCHSubmit.StudyWordPATCHSubmit(sw.getId(), sw.getAnswer())).toList()));
+
+        // 제출 상태 - 오답
+        List<UUID> incorrectStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study incorrectStudy = studyQueryRepository.getById(incorrectStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), incorrectStudy.getId(), new StudyPATCHSubmit(incorrectStudy.getStudyWords().stream().map(sw -> new StudyPATCHSubmit.StudyWordPATCHSubmit(sw.getId(), sw.getAnswer() + "NO")).toList()));
+
+        StudyStatisticSearchCond cond = new StudyStatisticSearchCond(null, LocalDate.now().minusDays(14), LocalDate.now().minusDays(7));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/studies/statistic")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, createBearerToken(teacher))
+                        .param("studentId", "")
+                        .param("startDateTime", cond.getStartDateTime().toString())
+                        .param("endDateTime", cond.getEndDateTime().toString())
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                        queryParameters(
+                                parameterWithName("studentId").description("학생 아이디. 검색할 경우 bestAnswerRates, worstAnswerRates, bestStudyCounts, worstStudyCounts 가 응답되지 않는다.").optional(),
+                                parameterWithName("startDateTime").description("조회 시작 일자. 조회 종료 일자로부터 한 달 전까지만 검색할 수 있다.").optional(),
+                                parameterWithName("endDateTime").description("조회 종료 일자. 오늘 일자 이후로 검색할 수 없다.").optional()
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.statuses[].status").type(STRING).description("학습 상태"),
+                                fieldWithPath("data.statuses[].count").type(NUMBER).description("상태별 학습 수"),
+                                fieldWithPath("data.types[].type").type(STRING).description("학습 유형"),
+                                fieldWithPath("data.types[].count").type(NUMBER).description("유형별 학습 수"),
+                                fieldWithPath("data.classifications[].classification").type(STRING).description("학습 분류"),
+                                fieldWithPath("data.classifications[].count").type(NUMBER).description("분류별 학습 수"),
+                                fieldWithPath("data.targets[].target").type(STRING).description("학습 대상"),
+                                fieldWithPath("data.targets[].count").type(NUMBER).description("대상별 학습 수"),
+                                fieldWithPath("data.days[].studyDate").type(STRING).description("학습 일자"),
+                                fieldWithPath("data.days[].studyCount").type(NUMBER).description("학습한 횟수"),
+                                fieldWithPath("data.days[].correctStudyWordCount").type(NUMBER).description("맞춘 단어 개수"),
+                                fieldWithPath("data.days[].totalStudyWordCount").type(NUMBER).description("학습한 단어 개수"),
+                                fieldWithPath("data.oldHomeworks[].studyId").type(STRING).description("숙제 아이디"),
+                                fieldWithPath("data.oldHomeworks[].title").type(STRING).description("학습 제목"),
+                                fieldWithPath("data.oldHomeworks[].status").type(STRING).description("학습 상태"),
+                                fieldWithPath("data.oldHomeworks[].createdDateTime").type(STRING).description("숙제 생성 일시"),
+                                fieldWithPath("data.oldHomeworks[].studentId").type(STRING).description("학생 아이디"),
+                                fieldWithPath("data.oldHomeworks[].studentName").type(STRING).description("학생 이름"),
+                                fieldWithPath("data.oldHomeworks[].schoolName").type(STRING).description("학교 이름"),
+                                fieldWithPath("data.oldHomeworks[].schoolGrade").type(NUMBER).description("학년"),
+                                fieldWithPath("data.bestAnswerRates[].studentId").type(STRING).description("학생 아이디"),
+                                fieldWithPath("data.bestAnswerRates[].studentName").type(STRING).description("학생 이름"),
+                                fieldWithPath("data.bestAnswerRates[].schoolName").type(STRING).description("학교 이름"),
+                                fieldWithPath("data.bestAnswerRates[].schoolGrade").type(NUMBER).description("학년"),
+                                fieldWithPath("data.bestAnswerRates[].correctPercent").type(NUMBER).description("정답률"),
+                                fieldWithPath("data.bestAnswerRates[].studyCount").type(NUMBER).description("학습 횟수"),
+                                fieldWithPath("data.bestAnswerRates[].studyWordCount").type(NUMBER).description("학습 단어 수"),
+                                fieldWithPath("data.worstAnswerRates[].studentId").type(STRING).description("학생 아이디"),
+                                fieldWithPath("data.worstAnswerRates[].studentName").type(STRING).description("학생 이름"),
+                                fieldWithPath("data.worstAnswerRates[].schoolName").type(STRING).description("학교 이름"),
+                                fieldWithPath("data.worstAnswerRates[].schoolGrade").type(NUMBER).description("학년"),
+                                fieldWithPath("data.worstAnswerRates[].correctPercent").type(NUMBER).description("정답률"),
+                                fieldWithPath("data.worstAnswerRates[].studyCount").type(NUMBER).description("학습 횟수"),
+                                fieldWithPath("data.worstAnswerRates[].studyWordCount").type(NUMBER).description("학습 단어 수"),
+                                fieldWithPath("data.bestStudyCounts[].studentId").type(STRING).description("학생 아이디"),
+                                fieldWithPath("data.bestStudyCounts[].studentName").type(STRING).description("학생 이름"),
+                                fieldWithPath("data.bestStudyCounts[].schoolName").type(STRING).description("학교 이름"),
+                                fieldWithPath("data.bestStudyCounts[].schoolGrade").type(NUMBER).description("학년"),
+                                fieldWithPath("data.bestStudyCounts[].correctPercent").type(NUMBER).description("정답률"),
+                                fieldWithPath("data.bestStudyCounts[].studyCount").type(NUMBER).description("학습 횟수"),
+                                fieldWithPath("data.bestStudyCounts[].studyWordCount").type(NUMBER).description("학습 단어 수"),
+                                fieldWithPath("data.worstStudyCounts[].studentId").type(STRING).description("학생 아이디"),
+                                fieldWithPath("data.worstStudyCounts[].studentName").type(STRING).description("학생 이름"),
+                                fieldWithPath("data.worstStudyCounts[].schoolName").type(STRING).description("학교 이름"),
+                                fieldWithPath("data.worstStudyCounts[].schoolGrade").type(NUMBER).description("학년"),
+                                fieldWithPath("data.worstStudyCounts[].correctPercent").type(NUMBER).description("정답률"),
+                                fieldWithPath("data.worstStudyCounts[].studyCount").type(NUMBER).description("학습 횟수"),
+                                fieldWithPath("data.worstStudyCounts[].studyWordCount").type(NUMBER).description("학습 단어 수")
+                        )
+                ));
+    }
+
+    @DisplayName("학생이 자신의 학습통계를 조회할 수 있다.")
+    @Test
+    public void getStatisticByStudent() throws Exception {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+        Student student = dataCreator.registerStudent(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(student, RoleName.ROLE_STUDENT);
+
+        Book book = dataCreator.registerBook(false, "능률(김성곤)", "중3-1학기", "2과", "본문", academy);
+        for (int i = 1; i <= 10; i++) {
+            dataCreator.registerWord("apple" + i, "사과" + i, book);
+        }
+
+        // 배정 상태
+        dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+
+        // 시작 상태
+        dataCreator.startAnyStudy(student.getId(), List.of(book.getId()));
+
+        // 제출 상태 - 정답
+        List<UUID> correctStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study correctStudy = studyQueryRepository.getById(correctStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), correctStudy.getId(), new StudyPATCHSubmit(correctStudy.getStudyWords().stream().map(sw -> new StudyPATCHSubmit.StudyWordPATCHSubmit(sw.getId(), sw.getAnswer())).toList()));
+
+        // 제출 상태 - 오답
+        List<UUID> incorrectStudyIds = dataCreator.assignAnyStudy(teacher.getId(), List.of(book.getId()), List.of(student.getId()));
+        Study incorrectStudy = studyQueryRepository.getById(incorrectStudyIds.stream().findAny().orElseThrow());
+        studyCommandService.submit(student.getId(), incorrectStudy.getId(), new StudyPATCHSubmit(incorrectStudy.getStudyWords().stream().map(sw -> new StudyPATCHSubmit.StudyWordPATCHSubmit(sw.getId(), sw.getAnswer() + "NO")).toList()));
+
+        StudyStatisticSearchCond cond = new StudyStatisticSearchCond(null, LocalDate.now().minusDays(14), LocalDate.now().minusDays(7));
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/studies/statistic")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, createBearerToken(student))
+                        .param("startDateTime", cond.getStartDateTime().toString())
+                        .param("endDateTime", cond.getEndDateTime().toString())
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                        queryParameters(
+                                parameterWithName("startDateTime").description("조회 시작 일자. 조회 종료 일자로부터 한 달 전까지만 검색할 수 있다.").optional(),
+                                parameterWithName("endDateTime").description("조회 종료 일자. 오늘 일자 이후로 검색할 수 없다.").optional()
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.statuses[].status").type(STRING).description("학습 상태"),
+                                fieldWithPath("data.statuses[].count").type(NUMBER).description("상태별 학습 수"),
+                                fieldWithPath("data.types[].type").type(STRING).description("학습 유형"),
+                                fieldWithPath("data.types[].count").type(NUMBER).description("유형별 학습 수"),
+                                fieldWithPath("data.classifications[].classification").type(STRING).description("학습 분류"),
+                                fieldWithPath("data.classifications[].count").type(NUMBER).description("분류별 학습 수"),
+                                fieldWithPath("data.targets[].target").type(STRING).description("학습 대상"),
+                                fieldWithPath("data.targets[].count").type(NUMBER).description("대상별 학습 수"),
+                                fieldWithPath("data.days[].studyDate").type(STRING).description("학습 일자"),
+                                fieldWithPath("data.days[].studyCount").type(NUMBER).description("학습한 횟수"),
+                                fieldWithPath("data.days[].correctStudyWordCount").type(NUMBER).description("맞춘 단어 개수"),
+                                fieldWithPath("data.days[].totalStudyWordCount").type(NUMBER).description("학습한 단어 개수"),
+                                fieldWithPath("data.oldHomeworks[].studyId").type(STRING).description("숙제 아이디"),
+                                fieldWithPath("data.oldHomeworks[].title").type(STRING).description("학습 제목"),
+                                fieldWithPath("data.oldHomeworks[].status").type(STRING).description("학습 상태"),
+                                fieldWithPath("data.oldHomeworks[].createdDateTime").type(STRING).description("숙제 생성 일시"),
+                                fieldWithPath("data.oldHomeworks[].studentId").type(STRING).description("학생 아이디"),
+                                fieldWithPath("data.oldHomeworks[].studentName").type(STRING).description("학생 이름"),
+                                fieldWithPath("data.oldHomeworks[].schoolName").type(STRING).description("학교 이름"),
+                                fieldWithPath("data.oldHomeworks[].schoolGrade").type(NUMBER).description("학년")
                         )
                 ));
     }

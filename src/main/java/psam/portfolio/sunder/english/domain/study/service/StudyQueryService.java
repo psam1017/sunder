@@ -138,19 +138,19 @@ public class StudyQueryService {
         Map<String, Object> response = new HashMap<>();
 
         // 공통 응답값
-        response.put("status", studyQueryRepository.countByStatus(cond, academyId));
-        response.put("type", studyQueryRepository.countByType(cond, academyId));
-        response.put("classification", studyQueryRepository.countByClassification(cond, academyId));
-        response.put("target", studyQueryRepository.countByTarget(cond, academyId));
+        response.put("statuses", studyQueryRepository.countByStatus(cond, academyId));
+        response.put("types", studyQueryRepository.countByType(cond, academyId));
+        response.put("classifications", studyQueryRepository.countByClassification(cond, academyId));
+        response.put("targets", studyQueryRepository.countByTarget(cond, academyId));
         response.put("days", studyQueryRepository.countByDay(cond, academyId));
         response.put("oldHomeworks", studyQueryRepository.findOldHomeworks(cond, academyId));
 
         // 선생님 전용 응답값
         if (cond.getStudentId() == null) {
-            response.put("bestAnswerRate", studyQueryRepository.findBestStudentsByAnswerRate(cond, academyId));
-            response.put("worstAnswerRate", studyQueryRepository.findWorstStudentsByAnswerRate(cond, academyId));
-            response.put("bestStudyCount", studyQueryRepository.findBestStudentsByStudyCount(cond, academyId));
-            response.put("worstStudyCount", studyQueryRepository.findWorstStudentsByStudyCount(cond, academyId));
+            response.put("bestAnswerRates", studyQueryRepository.findBestStudentsByAnswerRate(cond, academyId));
+            response.put("worstAnswerRates", studyQueryRepository.findWorstStudentsByAnswerRate(cond, academyId));
+            response.put("bestStudyCounts", studyQueryRepository.findBestStudentsByStudyCount(cond, academyId));
+            response.put("worstStudyCounts", studyQueryRepository.findWorstStudentsByStudyCount(cond, academyId));
         }
         return response;
     }

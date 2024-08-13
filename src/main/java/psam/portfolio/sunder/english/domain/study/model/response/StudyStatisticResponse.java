@@ -1,57 +1,68 @@
 package psam.portfolio.sunder.english.domain.study.model.response;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDate;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.UUID;
 
 public class StudyStatisticResponse {
 
-    @Getter @Setter @NoArgsConstructor(access = AccessLevel.PUBLIC)
-    public static class StudyCountByStatus {
+    @Getter @AllArgsConstructor(access = AccessLevel.PUBLIC)
+    public static class CountByStatus {
 
-        private Long assignedCount;
-        private Long startedCount;
-        private Long submittedCount;
+        private final StudyStatus status;
+        private final Long count;
     }
 
-    @Getter @Setter @NoArgsConstructor(access = AccessLevel.PUBLIC)
-    public static class StudyCountByType {
+    @Getter @AllArgsConstructor(access = AccessLevel.PUBLIC)
+    public static class CountByType {
 
-        private Long tracingCount;
-        private Long selectCount;
-        private Long writingCount;
+        private final StudyType type;
+        private final Long count;
     }
 
-    @Getter @Setter @NoArgsConstructor(access = AccessLevel.PUBLIC)
-    public static class StudyCountByClassification {
+    @Getter @AllArgsConstructor(access = AccessLevel.PUBLIC)
+    public static class CountByClassification {
 
-        private Long examCount;
-        private Long practiceCount;
+        private final StudyClassification classification;
+        private final Long count;
     }
 
-    @Getter @Setter @NoArgsConstructor(access = AccessLevel.PUBLIC)
-    public static class StudyCountByTarget {
+    @Getter @AllArgsConstructor(access = AccessLevel.PUBLIC)
+    public static class CountByTarget {
 
-        private Long koreanCount;
-        private Long englishCount;
+        private final StudyTarget target;
+        private final Long count;
     }
 
-    @Getter @Setter @NoArgsConstructor(access = AccessLevel.PUBLIC)
-    public static class StudyCountByDay {
+    @Getter
+    public static class CountByDay {
 
+        @KoreanDate
         private LocalDate studyDate;
         private Long studyCount;
-        private Long correctCount;
-        private Long totalCount;
+        private Long correctStudyWordCount;
+        private Long totalStudyWordCount;
+
+        public CountByDay(Integer dayOfYear, Long studyCount, Long correctStudyWordCount, Long totalStudyWordCount) {
+            this.studyDate = LocalDate.ofYearDay(Year.now().getValue(), dayOfYear);
+            this.studyCount = studyCount;
+            this.correctStudyWordCount = correctStudyWordCount;
+            this.totalStudyWordCount = totalStudyWordCount;
+        }
     }
 
-    @Getter @Setter @NoArgsConstructor(access = AccessLevel.PUBLIC)
+    @Getter @AllArgsConstructor(access = AccessLevel.PUBLIC)
     public static class TopStudent {
 
         private UUID studentId;
@@ -63,12 +74,13 @@ public class StudyStatisticResponse {
         private Long studyWordCount;
     }
 
-    @Getter @Setter @NoArgsConstructor(access = AccessLevel.PUBLIC)
+    @Getter @AllArgsConstructor(access = AccessLevel.PUBLIC)
     public static class OldHomework {
 
         private UUID studyId;
         private String title;
         private StudyStatus status;
+        @KoreanDateTime
         private LocalDateTime createdDateTime;
         private UUID studentId;
         private String studentName;

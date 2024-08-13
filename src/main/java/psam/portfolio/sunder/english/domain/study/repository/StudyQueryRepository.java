@@ -1,7 +1,5 @@
 package psam.portfolio.sunder.english.domain.study.repository;
 
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -13,10 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
-import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
-import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
-import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.study.exception.NoSuchStudyException;
 import psam.portfolio.sunder.english.domain.study.model.entity.QStudyWord;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
@@ -25,9 +20,11 @@ import psam.portfolio.sunder.english.domain.study.model.request.StudyStatisticSe
 import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.study.model.entity.QStudy.study;
 import static psam.portfolio.sunder.english.domain.study.model.response.StudyStatisticResponse.*;
@@ -38,7 +35,7 @@ import static psam.portfolio.sunder.english.domain.study.model.response.StudySta
 public class StudyQueryRepository {
 
     private final static int TOP_STUDENT_LIMIT = 3;
-    private final static int NON_SUBMIT_STUDENT_LIMIT = 5;
+    private final static int NON_SUBMIT_STUDENT_LIMIT = 30;
 
     private final JPAQueryFactory query;
     private final EntityManager em;
@@ -187,11 +184,11 @@ public class StudyQueryRepository {
         return count == null ? 0 : count;
     }
 
-    public StudyCountByStatus countByStatus(StudyStatisticSearchCond cond, UUID academyId) {
-        List<Tuple> tuples = query.select(
+    public List<CountByStatus> countByStatus(StudyStatisticSearchCond cond, UUID academyId) {
+        return query.select(Projections.constructor(CountByStatus.class,
                         study.status,
                         study.id.count()
-                )
+                ))
                 .from(study)
                 .where(
                         academyIdEq(academyId),
@@ -201,27 +198,13 @@ public class StudyQueryRepository {
                 )
                 .groupBy(study.status)
                 .fetch();
-
-        StudyCountByStatus status = new StudyCountByStatus();
-        for (Tuple tuple : tuples) {
-            StudyStatus studyStatus = tuple.get(study.status);
-            Long count = tuple.get(study.id.count());
-            if (studyStatus != null) {
-                switch (studyStatus) {
-                    case ASSIGNED -> status.setAssignedCount(count);
-                    case STARTED -> status.setStartedCount(count);
-                    case SUBMITTED -> status.setSubmittedCount(count);
-                }
-            }
-        }
-        return status;
     }
 
-    public StudyCountByType countByType(StudyStatisticSearchCond cond, UUID academyId) {
-        List<Tuple> tuples = query.select(
+    public List<CountByType> countByType(StudyStatisticSearchCond cond, UUID academyId) {
+        return query.select(Projections.constructor(CountByType.class,
                         study.type,
                         study.id.count()
-                )
+                ))
                 .from(study)
                 .where(
                         academyIdEq(academyId),
@@ -231,27 +214,13 @@ public class StudyQueryRepository {
                 )
                 .groupBy(study.type)
                 .fetch();
-
-        StudyCountByType type = new StudyCountByType();
-        for (Tuple tuple : tuples) {
-            StudyType studyType = tuple.get(study.type);
-            Long count = tuple.get(study.id.count());
-            if (studyType != null) {
-                switch (studyType) {
-                    case TRACING -> type.setTracingCount(count);
-                    case SELECT -> type.setSelectCount(count);
-                    case WRITING -> type.setWritingCount(count);
-                }
-            }
-        }
-        return type;
     }
 
-    public StudyCountByClassification countByClassification(StudyStatisticSearchCond cond, UUID academyId) {
-        List<Tuple> tuples = query.select(
+    public List<CountByClassification> countByClassification(StudyStatisticSearchCond cond, UUID academyId) {
+        return query.select(Projections.constructor(CountByClassification.class,
                         study.classification,
                         study.id.count()
-                )
+                ))
                 .from(study)
                 .where(
                         academyIdEq(academyId),
@@ -261,26 +230,13 @@ public class StudyQueryRepository {
                 )
                 .groupBy(study.classification)
                 .fetch();
-
-        StudyCountByClassification classification = new StudyCountByClassification();
-        for (Tuple tuple : tuples) {
-            StudyClassification studyClassification = tuple.get(study.classification);
-            Long count = tuple.get(study.id.count());
-            if (studyClassification != null) {
-                switch (studyClassification) {
-                    case EXAM -> classification.setExamCount(count);
-                    case PRACTICE -> classification.setPracticeCount(count);
-                }
-            }
-        }
-        return classification;
     }
 
-    public StudyCountByTarget countByTarget(StudyStatisticSearchCond cond, UUID academyId) {
-        List<Tuple> tuples = query.select(
+    public List<CountByTarget> countByTarget(StudyStatisticSearchCond cond, UUID academyId) {
+        return query.select(Projections.constructor(CountByTarget.class,
                         study.target,
                         study.id.count()
-                )
+                ))
                 .from(study)
                 .where(
                         academyIdEq(academyId),
@@ -290,30 +246,17 @@ public class StudyQueryRepository {
                 )
                 .groupBy(study.target)
                 .fetch();
-
-        StudyCountByTarget target = new StudyCountByTarget();
-        for (Tuple tuple : tuples) {
-            StudyTarget studyTarget = tuple.get(study.target);
-            Long count = tuple.get(study.id.count());
-            if (studyTarget != null) {
-                switch (studyTarget) {
-                    case KOREAN -> target.setKoreanCount(count);
-                    case ENGLISH -> target.setEnglishCount(count);
-                }
-            }
-        }
-        return target;
     }
 
-    public List<StudyCountByDay> countByDay(StudyStatisticSearchCond cond, UUID academyId) {
+    public List<CountByDay> countByDay(StudyStatisticSearchCond cond, UUID academyId) {
         QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Integer> day = study.createdDateTime.dayOfYear();
-        List<Tuple> tuples = query.select(
-                        day,
-                        study.id.count(),
-                        qStudyWord.correct.count(),
-                        qStudyWord.count()
-                )
+        NumberExpression<Integer> dayOfYear = study.createdDateTime.dayOfYear();
+        return query.select(Projections.constructor(CountByDay.class,
+                        dayOfYear,
+                        study.id.countDistinct().as("studyCount"),
+                        qStudyWord.correct.isTrue().count().as("correctCount"),
+                        qStudyWord.count().as("totalCount")
+                ))
                 .from(study)
                 .join(study.studyWords, qStudyWord)
                 .where(
@@ -322,131 +265,7 @@ public class StudyQueryRepository {
                         createdDateTimeGoe(cond.getStartDateTime()),
                         createdDateTimeLoe(cond.getEndDateTime())
                 )
-                .groupBy(day)
-                .fetch();
-
-        int year = LocalDate.now().getYear();
-        List<StudyCountByDay> days = new ArrayList<>();
-        for (Tuple tuple : tuples) {
-            StudyCountByDay dayCount = new StudyCountByDay();
-            Integer dayOfYear = tuple.get(day);
-            if (dayOfYear == null) {
-                continue;
-            }
-            dayCount.setStudyDate(LocalDate.ofYearDay(year, dayOfYear));
-            dayCount.setStudyCount(tuple.get(study.id.count()));
-            dayCount.setCorrectCount(tuple.get(qStudyWord.correct.count()));
-            dayCount.setTotalCount(tuple.get(qStudyWord.count()));
-            days.add(dayCount);
-        }
-        return days;
-    }
-
-    public List<TopStudent> findBestStudentsByAnswerRate(StudyStatisticSearchCond cond, UUID academyId) {
-        QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.count().divide(qStudyWord.count().doubleValue());
-        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
-
-        return query.select(Projections.constructor(TopStudent.class,
-                        study.student.id.as("studentId"),
-                        study.student.name.as("studentName"),
-                        study.student.school.name.as("schoolName"),
-                        study.student.school.grade.as("schoolGrade"),
-                        correctPercent.multiply(100).as("correctPercent"),
-                        study.id.count().as("studyCount"),
-                        studyWordCount.as("studyWordCount")
-                ))
-                .from(study)
-                .join(study.studyWords, qStudyWord)
-                .where(
-                        academyIdEq(academyId),
-                        createdDateTimeGoe(cond.getStartDateTime()),
-                        createdDateTimeLoe(cond.getEndDateTime())
-                )
-                .groupBy(study.student.id)
-                .orderBy(correctPercent.desc())
-                .limit(TOP_STUDENT_LIMIT)
-                .fetch();
-    }
-
-    public List<TopStudent> findWorstStudentsByAnswerRate(StudyStatisticSearchCond cond, UUID academyId) {
-        QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.count().divide(qStudyWord.count().doubleValue());
-        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
-
-        return query.select(Projections.constructor(TopStudent.class,
-                        study.student.id.as("studentId"),
-                        study.student.name.as("studentName"),
-                        study.student.school.name.as("schoolName"),
-                        study.student.school.grade.as("schoolGrade"),
-                        correctPercent.multiply(100).as("correctPercent"),
-                        study.id.count().as("studyCount"),
-                        studyWordCount.as("studyWordCount")
-                ))
-                .from(study)
-                .join(study.studyWords, qStudyWord)
-                .where(
-                        academyIdEq(academyId),
-                        createdDateTimeGoe(cond.getStartDateTime()),
-                        createdDateTimeLoe(cond.getEndDateTime())
-                )
-                .groupBy(study.student.id)
-                .orderBy(correctPercent.asc())
-                .limit(TOP_STUDENT_LIMIT)
-                .fetch();
-    }
-
-    public List<TopStudent> findBestStudentsByStudyCount(StudyStatisticSearchCond cond, UUID academyId) {
-        QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.count().divide(qStudyWord.count().doubleValue());
-        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
-
-        return query.select(Projections.constructor(TopStudent.class,
-                        study.student.id.as("studentId"),
-                        study.student.name.as("studentName"),
-                        study.student.school.name.as("schoolName"),
-                        study.student.school.grade.as("schoolGrade"),
-                        correctPercent.multiply(100).as("correctPercent"),
-                        study.id.count().as("studyCount"),
-                        studyWordCount.as("studyWordCount")
-                ))
-                .from(study)
-                .join(study.studyWords, qStudyWord)
-                .where(
-                        academyIdEq(academyId),
-                        createdDateTimeGoe(cond.getStartDateTime()),
-                        createdDateTimeLoe(cond.getEndDateTime())
-                )
-                .groupBy(study.student.id)
-                .orderBy(studyWordCount.desc())
-                .limit(TOP_STUDENT_LIMIT)
-                .fetch();
-    }
-
-    public List<TopStudent> findWorstStudentsByStudyCount(StudyStatisticSearchCond cond, UUID academyId) {
-        QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.count().divide(qStudyWord.count().doubleValue());
-        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
-
-        return query.select(Projections.constructor(TopStudent.class,
-                        study.student.id.as("studentId"),
-                        study.student.name.as("studentName"),
-                        study.student.school.name.as("schoolName"),
-                        study.student.school.grade.as("schoolGrade"),
-                        correctPercent.multiply(100).as("correctPercent"),
-                        study.id.count().as("studyCount"),
-                        studyWordCount.as("studyWordCount")
-                ))
-                .from(study)
-                .join(study.studyWords, qStudyWord)
-                .where(
-                        academyIdEq(academyId),
-                        createdDateTimeGoe(cond.getStartDateTime()),
-                        createdDateTimeLoe(cond.getEndDateTime())
-                )
-                .groupBy(study.student.id)
-                .orderBy(studyWordCount.asc())
-                .limit(TOP_STUDENT_LIMIT)
+                .groupBy(dayOfYear)
                 .fetch();
     }
 
@@ -471,6 +290,114 @@ public class StudyQueryRepository {
                 )
                 .orderBy(study.createdDateTime.asc())
                 .limit(NON_SUBMIT_STUDENT_LIMIT)
+                .fetch();
+    }
+
+    public List<TopStudent> findBestStudentsByAnswerRate(StudyStatisticSearchCond cond, UUID academyId) {
+        QStudyWord qStudyWord = QStudyWord.studyWord;
+        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
+
+        return query.select(Projections.constructor(TopStudent.class,
+                        study.student.id.as("studentId"),
+                        study.student.name.as("studentName"),
+                        study.student.school.name.as("schoolName"),
+                        study.student.school.grade.as("schoolGrade"),
+                        correctPercent.multiply(100).as("correctPercent"),
+                        study.id.countDistinct().as("studyCount"),
+                        studyWordCount.as("studyWordCount")
+                ))
+                .from(study)
+                .join(study.studyWords, qStudyWord)
+                .where(
+                        academyIdEq(academyId),
+                        createdDateTimeGoe(cond.getStartDateTime()),
+                        createdDateTimeLoe(cond.getEndDateTime())
+                )
+                .groupBy(study.student.id)
+                .orderBy(correctPercent.desc())
+                .limit(TOP_STUDENT_LIMIT)
+                .fetch();
+    }
+
+    public List<TopStudent> findWorstStudentsByAnswerRate(StudyStatisticSearchCond cond, UUID academyId) {
+        QStudyWord qStudyWord = QStudyWord.studyWord;
+        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
+
+        return query.select(Projections.constructor(TopStudent.class,
+                        study.student.id.as("studentId"),
+                        study.student.name.as("studentName"),
+                        study.student.school.name.as("schoolName"),
+                        study.student.school.grade.as("schoolGrade"),
+                        correctPercent.multiply(100).as("correctPercent"),
+                        study.id.countDistinct().as("studyCount"),
+                        studyWordCount.as("studyWordCount")
+                ))
+                .from(study)
+                .join(study.studyWords, qStudyWord)
+                .where(
+                        academyIdEq(academyId),
+                        createdDateTimeGoe(cond.getStartDateTime()),
+                        createdDateTimeLoe(cond.getEndDateTime())
+                )
+                .groupBy(study.student.id)
+                .orderBy(correctPercent.asc())
+                .limit(TOP_STUDENT_LIMIT)
+                .fetch();
+    }
+
+    public List<TopStudent> findBestStudentsByStudyCount(StudyStatisticSearchCond cond, UUID academyId) {
+        QStudyWord qStudyWord = QStudyWord.studyWord;
+        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
+
+        return query.select(Projections.constructor(TopStudent.class,
+                        study.student.id.as("studentId"),
+                        study.student.name.as("studentName"),
+                        study.student.school.name.as("schoolName"),
+                        study.student.school.grade.as("schoolGrade"),
+                        correctPercent.multiply(100).as("correctPercent"),
+                        study.id.countDistinct().as("studyCount"),
+                        studyWordCount.as("studyWordCount")
+                ))
+                .from(study)
+                .join(study.studyWords, qStudyWord)
+                .where(
+                        academyIdEq(academyId),
+                        createdDateTimeGoe(cond.getStartDateTime()),
+                        createdDateTimeLoe(cond.getEndDateTime())
+                )
+                .groupBy(study.student.id)
+                .orderBy(studyWordCount.desc())
+                .limit(TOP_STUDENT_LIMIT)
+                .fetch();
+    }
+
+    public List<TopStudent> findWorstStudentsByStudyCount(StudyStatisticSearchCond cond, UUID academyId) {
+        QStudyWord qStudyWord = QStudyWord.studyWord;
+        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Long> studyWordCount = qStudyWord.id.count();
+
+        return query.select(Projections.constructor(TopStudent.class,
+                        study.student.id.as("studentId"),
+                        study.student.name.as("studentName"),
+                        study.student.school.name.as("schoolName"),
+                        study.student.school.grade.as("schoolGrade"),
+                        correctPercent.multiply(100).as("correctPercent"),
+                        study.id.countDistinct().as("studyCount"),
+                        studyWordCount.as("studyWordCount")
+                ))
+                .from(study)
+                .join(study.studyWords, qStudyWord)
+                .where(
+                        academyIdEq(academyId),
+                        createdDateTimeGoe(cond.getStartDateTime()),
+                        createdDateTimeLoe(cond.getEndDateTime())
+                )
+                .groupBy(study.student.id)
+                .orderBy(studyWordCount.asc())
+                .limit(TOP_STUDENT_LIMIT)
                 .fetch();
     }
 

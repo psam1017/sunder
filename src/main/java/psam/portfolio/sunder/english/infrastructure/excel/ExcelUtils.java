@@ -37,12 +37,13 @@ public class ExcelUtils {
      * @throws IOException 엑셀 파일 읽기 실패
      */
     public List<List<String>> readExcel(MultipartFile multipartFile, String... headerNames) throws IOException {
-        return readExcel(multipartFile, true, false, true, headerNames);
+        return readExcel(multipartFile, 120, true, false, true, headerNames);
     }
 
     /**
      * 엑셀 파일을 읽어서 데이터를 반환한다. 첫 행 포함 여부를 선택할 수 있다.
      * @param multipartFile 엑셀 파일
+     * @param maxRepeatCount 가능한 최대 반복 횟수
      * @param includeFirstRow 첫 행 포함 여부
      * @param returnFirstRow 첫 행 반환 여부
      * @param inspectFirstRow 첫 행 검사 여부
@@ -50,7 +51,7 @@ public class ExcelUtils {
      * @return 엑셀 데이터
      * @throws IOException 엑셀 파일 읽기 실패
      */
-    public List<List<String>> readExcel(MultipartFile multipartFile, boolean includeFirstRow, boolean returnFirstRow, boolean inspectFirstRow, String... headerNames) throws IOException {
+    public List<List<String>> readExcel(MultipartFile multipartFile, int maxRepeatCount, boolean includeFirstRow, boolean returnFirstRow, boolean inspectFirstRow, String... headerNames) throws IOException {
 
         // MS 엑셀 파일이 아닌 경우 예외 처리
         if (!isExcelFile(multipartFile)) {
@@ -72,43 +73,50 @@ public class ExcelUtils {
             }
         }
 
-        // sheet.getPhysicalNumberOfRows() 자체가 null 이 아닌 row 의 개수만 읽어오기 때문에 중간에 null 인 row 가 있으면 끝까지 읽지 못 한다.
-        int skippedRowCount = 0;
-
-        // 엑셀 데이터 반환. 정책상 문자와 숫자만 허용
         List<List<String>> result = new ArrayList<>();
-        for (int i = includeFirstRow && returnFirstRow ? 0 : 1; i < sheet.getPhysicalNumberOfRows(); i++) {
-            Row row = sheet.getRow(i + skippedRowCount);
-            if (row == null) {
-                skippedRowCount++;
-                continue;
-            }
-            List<String> elements = new ArrayList<>();
-            boolean hasEmptyLine = true;
-            for (int j = 0; j < headerNames.length; j++) {
-                Cell cell = row.getCell(j);
-                if (cell == null) {
-                    elements.add("");
-                    continue;
-                }
 
-                String cellValue;
-                if (Objects.equals(cell.getCellType(), CellType.NUMERIC))
-                    cellValue = String.valueOf(cell.getNumericCellValue());
-                else if (Objects.equals(cell.getCellType(), CellType.STRING)) {
-                    cellValue = cell.getStringCellValue();
-                } else {
-                    throw new IllegalCellTypeException(i + 1, j + 1);
-                }
+        // i : 현재 행 번호, maxRepeatCount : 최대 반복 횟수, foundNumberOfRows : 찾은 행 횟수, physicalNumberOfRows : 전체 행 개수
+        int i = includeFirstRow && returnFirstRow ? 0 : 1;
+        maxRepeatCount = maxRepeatCount <= i ? i + 1 : maxRepeatCount;
 
-                if (hasEmptyLine && StringUtils.hasText(cellValue)) {
-                    hasEmptyLine = false;
+        int foundNumberOfRows = i;
+        int physicalNumberOfRows = sheet.getPhysicalNumberOfRows();
+        if (i >= physicalNumberOfRows) {
+            throw new EmptyRowException();
+        }
+
+        while (i < maxRepeatCount && foundNumberOfRows < physicalNumberOfRows) {
+            Row row = sheet.getRow(i);
+            if (row != null) {
+                List<String> elements = new ArrayList<>();
+                boolean hasAnyCellValue = false;
+                for (int j = 0; j < headerNames.length; j++) {
+                    Cell cell = row.getCell(j);
+                    String cellValue = "";
+
+                    if (cell != null) {
+                        // 정책상 문자와 숫자만 허용
+                        if (Objects.equals(cell.getCellType(), CellType.NUMERIC))
+                            cellValue = String.valueOf(cell.getNumericCellValue());
+                        else if (Objects.equals(cell.getCellType(), CellType.STRING)) {
+                            cellValue = cell.getStringCellValue();
+                        } else {
+                            throw new IllegalCellTypeException(i + 1, j + 1);
+                        }
+
+                        if (!hasAnyCellValue && StringUtils.hasText(cellValue)) {
+                            hasAnyCellValue = true;
+                        }
+                    }
+                    System.out.println("cellValue = " + cellValue);
+                    elements.add(cellValue);
                 }
-                elements.add(cellValue);
+                if (hasAnyCellValue) {
+                    foundNumberOfRows++;
+                    result.add(elements);
+                }
             }
-            if (!hasEmptyLine) {
-                result.add(elements);
-            }
+            i++;
         }
         return result;
     }

@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class ExcelUtilsTest {
 
     /*
@@ -92,7 +93,7 @@ public class ExcelUtilsTest {
         }
 
         // when
-        List<List<String>> results = excelUtils.readExcel(mockMultipartFile, true, true, true, "english", "korean");
+        List<List<String>> results = excelUtils.readExcel(mockMultipartFile, 200, true, true, true, "english", "korean");
 
         // then
         assertThat(results).hasSize(6)
@@ -124,7 +125,7 @@ public class ExcelUtilsTest {
         }
 
         // when
-        List<List<String>> results = excelUtils.readExcel(mockMultipartFile, true, false, true, "english", "korean");
+        List<List<String>> results = excelUtils.readExcel(mockMultipartFile, 200, true, false, true, "english", "korean");
 
         // then
         assertThat(results).hasSize(5)
@@ -156,7 +157,7 @@ public class ExcelUtilsTest {
 
         // when
         // then
-        assertThatThrownBy(() -> excelUtils.readExcel(mockMultipartFile, true, true, true, "xxx", "yyy"))
+        assertThatThrownBy(() -> excelUtils.readExcel(mockMultipartFile, 200, true, true, true, "xxx", "yyy"))
                 .isInstanceOf(UnmatchedExcelHeaderException.class);
     }
 
@@ -178,7 +179,7 @@ public class ExcelUtilsTest {
 
         // when
         // then
-        assertThatCode(() -> excelUtils.readExcel(mockMultipartFile, true, true, false, "xxx", "yyy"))
+        assertThatCode(() -> excelUtils.readExcel(mockMultipartFile, 200, true, true, false, "xxx", "yyy"))
                 .doesNotThrowAnyException();
     }
 }

@@ -1,0 +1,9 @@
+=== 학습 통계 조회하기(학생)
+
+==== HTTP Request
+include::{snippets}/study-docs-test/get-statistic-by-student/http-request.adoc[]
+include::{snippets}/study-docs-test/get-statistic-by-student/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/study-docs-test/get-statistic-by-student/http-response.adoc[]
+include::{snippets}/study-docs-test/get-statistic-by-student/response-fields.adoc[]
