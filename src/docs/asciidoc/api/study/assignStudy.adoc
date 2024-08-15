@@ -1,4 +1,4 @@
-=== 숙제 생성하기
+=== 숙제 생성하기(선생님)
 
 ==== HTTP Request
 include::{snippets}/study-docs-test/assign-study/http-request.adoc[]

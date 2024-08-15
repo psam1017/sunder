@@ -1,4 +1,4 @@
-=== 학습 삭제하기
+=== 학습 삭제하기(선생님)
 
 ==== HTTP Request
 include::{snippets}/study-docs-test/delete-study/http-request.adoc[]

@@ -61,8 +61,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(UnrecognizedPropertyException.class)
     public ResponseEntity<Object> handleUnrecognizedPropertyException(UnrecognizedPropertyException ex, HttpServletRequest request) {
 
-        log.error("[UnrecognizedPropertyException handle] request URI = {}", request.getRequestURI());
-        ex.printStackTrace();
+        log.error("[UnrecognizedPropertyException handle] request URI = {}", request.getRequestURI(), ex);
 
         String message = ex.getPropertyName() + " is an unrecognized property.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -73,8 +72,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(InvalidFormatException.class)
     public ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex, HttpServletRequest request) {
 
-        log.error("[InvalidFormatException handle] request URI = {}", request.getRequestURI());
-        ex.printStackTrace();
+        log.error("[InvalidFormatException handle] request URI = {}", request.getRequestURI(), ex);
 
         String message = ex.getValue() + " has invalid format.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -85,8 +83,7 @@ public class WebControllerAdvice {
     @ExceptionHandler(JacksonException.class)
     public ResponseEntity<ApiResponse<Object>> handleJacksonException(JacksonException ex, HttpServletRequest request) {
 
-        log.error("[JacksonException handle] request URI = {}", request.getRequestURI());
-        ex.printStackTrace();
+        log.error("[JacksonException handle] request URI = {}", request.getRequestURI(), ex);
 
         String message = "Unable to process json.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);
@@ -97,10 +94,9 @@ public class WebControllerAdvice {
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<Object> handleMultipartException(MultipartException ex, HttpServletRequest request) {
 
-        log.error("[MultipartException handle] request URI = {}", request.getRequestURI());
-        ex.printStackTrace();
+        log.error("[MultipartException handle] request URI = {}", request.getRequestURI(), ex);
 
-        String message = "Unable to complete the multipart request. Or, You may be missing requeired parts.";
+        String message = "Unable to complete the multipart request. Or, You may be missing required parts.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.INTERNAL_SERVER_ERROR, message);
 
         return new ResponseEntity<>(body, INTERNAL_SERVER_ERROR);

@@ -1,4 +1,4 @@
-=== 학습 시작하기
+=== 학습 시작하기(학생)
 
 ==== HTTP Request
 include::{snippets}/study-docs-test/start-study/http-request.adoc[]

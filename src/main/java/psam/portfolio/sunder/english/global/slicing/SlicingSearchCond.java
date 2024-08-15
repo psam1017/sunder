@@ -20,7 +20,7 @@ public abstract class SlicingSearchCond {
         this.lastSequence = lastSequence;
     }
 
-    public void setLastSequence(long lastSequence) {
+    public void setLastSequence(Long lastSequence) {
         this.lastSequence = lastSequence;
     }
 

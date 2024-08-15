@@ -10,6 +10,7 @@ import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademySta
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
@@ -422,6 +423,7 @@ public class StudyDocsTest extends RestDocsEnvironment {
                         .param("studyTitle", book.getName())
                         .param("studentName", student.getName())
                         .param("schoolGrade", String.valueOf(student.getSchool().getGrade()))
+                        .param("studyStatus", StudyStatus.STARTED.name())
         );
 
         // then
@@ -431,12 +433,13 @@ public class StudyDocsTest extends RestDocsEnvironment {
                 .andDo(restDocs.document(
                         queryParameters(
                                 parameterWithName("size").description("한 번에 조회할 성적 수"),
-                                parameterWithName("lastSequence").description("마지막으로 조회한 sequence"),
+                                parameterWithName("lastSequence").description("마지막으로 조회한 sequence. 기본값으로 null 을 전송."),
                                 parameterWithName("startDateTime").description("조회 시작 일시").optional(),
                                 parameterWithName("endDateTime").description("조회 종료 일시").optional(),
                                 parameterWithName("studyTitle").description("학습 제목").optional(),
                                 parameterWithName("studentName").description("학생 이름").optional(),
-                                parameterWithName("schoolGrade").description("학년").optional()
+                                parameterWithName("schoolGrade").description("학년").optional(),
+                                parameterWithName("studyStatus").description("학습 상태").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.studies[].id").type(STRING).description("학습 아이디"),
@@ -455,7 +458,8 @@ public class StudyDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.studies[].correctCount").type(NUMBER).description("정답 수"),
                                 fieldWithPath("data.studies[].totalCount").type(NUMBER).description("전체 단어 수"),
                                 fieldWithPath("data.slicingInfo.size").type(NUMBER).description("조회된 학습 수"),
-                                fieldWithPath("data.slicingInfo.lastSequence").type(NUMBER).description("마지막 sequence")
+                                fieldWithPath("data.slicingInfo.lastSequence").type(NUMBER).description("마지막 sequence"),
+                                fieldWithPath("data.slicingInfo.hasNext").type(BOOLEAN).description("다음 게시물 존재 여부")
                         )
                 ));
     }

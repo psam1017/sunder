@@ -356,7 +356,7 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
             }
         }
 
-        StudySlicingSearchCond cond = new StudySlicingSearchCond(10, lastSequence, null, null, null, null, null);
+        StudySlicingSearchCond cond = new StudySlicingSearchCond(10, lastSequence, null, null, null, null, null, null);
 
         // when
         Map<String, Object> responseMap = refreshAnd(() -> sut.getStudyList(teacher.getId(), cond));
@@ -437,7 +437,7 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
         StudyPOSTStart post3 = new StudyPOSTStart(List.of(book2.getId()), true, 10, StudyType.WRITING, StudyClassification.EXAM, StudyTarget.KOREAN);
         studyCommandService.start(student1.getId(), post3);
 
-        StudySlicingSearchCond cond = new StudySlicingSearchCond(10, null, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "능률", student1.getName(), student1.getSchool().getGrade());
+        StudySlicingSearchCond cond = new StudySlicingSearchCond(10, null, LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "능률", student1.getName(), student1.getSchool().getGrade(), StudyStatus.STARTED);
 
         // when
         Map<String, Object> responseMap = refreshAnd(() -> sut.getStudyList(student1.getId(), cond));
@@ -625,9 +625,6 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
                         tuple(student.getId(), StudyStatus.STARTED)
                 );
 
-        assertThat(statistic.get("bestAnswerRates")).isNull();
-        assertThat(statistic.get("worstAnswerRates")).isNull();
-        assertThat(statistic.get("bestStudyCounts")).isNull();
-        assertThat(statistic.get("worstStudyCounts")).isNull();
+        assertThat(statistic).doesNotContainKeys("bestAnswerRates", "worstAnswerRates", "bestStudyCounts", "worstStudyCounts");
     }
 }

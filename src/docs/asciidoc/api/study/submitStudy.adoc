@@ -1,4 +1,4 @@
-=== 학습 제출하기
+=== 학습 제출하기(학생)
 
 ==== HTTP Request
 include::{snippets}/study-docs-test/submit-study/http-request.adoc[]

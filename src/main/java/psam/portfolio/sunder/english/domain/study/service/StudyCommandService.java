@@ -10,6 +10,7 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
+import psam.portfolio.sunder.english.domain.book.repository.WordQueryRepository;
 import psam.portfolio.sunder.english.domain.student.model.entity.QStudent;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.repository.StudentQueryRepository;
@@ -36,6 +37,7 @@ import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepos
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import static psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit.StudyWordPATCHSubmit;
 
@@ -54,6 +56,7 @@ public class StudyCommandService {
     private final StudentQueryRepository studentQueryRepository;
     private final BookQueryRepository bookQueryRepository;
     private final TeacherQueryRepository teacherQueryRepository;
+    private final WordQueryRepository wordQueryRepository;
 
     /**
      * 숙제 생성 서비스
@@ -91,27 +94,19 @@ public class StudyCommandService {
         );
 
         // 단어 목록부터 생성
-        List<StudyRange> studyRanges = new ArrayList<>();
-        List<Word> words = new ArrayList<>();
-        for (Book b : getBooks) {
-            studyRanges.add(StudyRange.of(b));
-            words.addAll(b.getWords());
-        }
+        List<StudyRange> studyRanges = getBooks.stream().map(StudyRange::of).toList();
 
         // 단어 최소 개수 검사
-        int wordsSize = words.size();
-        if (wordsSize < MIN_STUDY_WORDS_SIZE) {
+        List<Word> shuffledWords = wordQueryRepository.findShuffledWords(getBooks, post.getNumberOfWords());
+        if (shuffledWords.size() < MIN_STUDY_WORDS_SIZE) {
             throw new WordSizeNotEnoughToStudyException(MIN_STUDY_WORDS_SIZE);
         }
-
-        // 최초 한 번은 무조건 섞는다.
-        Collections.shuffle(words);
 
         List<UUID> saveStudyIds = new ArrayList<>();
         for (Student getStudent : getStudents) {
             // 만약 동일한 학습으로 생성하지 않는다면 매번 단어 순서를 섞는다.
             if (post.getShuffleEach()) {
-                Collections.shuffle(words);
+                Collections.shuffle(shuffledWords);
             }
 
             // 학습 생성
@@ -120,7 +115,7 @@ public class StudyCommandService {
             saveStudy.getStudyRanges().addAll(studyRanges);
 
             // 학습 단어 저장
-            List<StudyWord> buildStudyWords = buildStudyWords(post, saveStudy, words);
+            List<StudyWord> buildStudyWords = buildStudyWords(post, saveStudy, shuffledWords);
             List<StudyWord> saveStudyWords = studyWordCommandRepository.saveAll(buildStudyWords);
             saveStudy.getStudyWords().addAll(saveStudyWords);
             saveStudyIds.add(saveStudy.getId());
@@ -164,20 +159,16 @@ public class StudyCommandService {
         Study saveStudy = studyCommandRepository.save(post.toEntity(nextSequence, getStudent, title)); // status = STARTED
 
         // 학습 범위 저장
-        List<Word> words = new ArrayList<>();
-        for (Book b : getBooks) {
-            saveStudy.getStudyRanges().add(StudyRange.of(b));
-            words.addAll(b.getWords());
-        }
+        getBooks.forEach(b -> saveStudy.getStudyRanges().add(StudyRange.of(b)));
 
-        int wordsSize = words.size();
-        if (wordsSize < MIN_STUDY_WORDS_SIZE) {
+        // 단어 최소 개수 검사
+        List<Word> shuffledWords = wordQueryRepository.findShuffledWords(getBooks, post.getNumberOfWords());
+        if (shuffledWords.size() < MIN_STUDY_WORDS_SIZE) {
             throw new WordSizeNotEnoughToStudyException(MIN_STUDY_WORDS_SIZE);
         }
-        Collections.shuffle(words);
 
         // 학습 단어 저장
-        List<StudyWord> buildStudyWords = buildStudyWords(post, saveStudy, words);
+        List<StudyWord> buildStudyWords = buildStudyWords(post, saveStudy, shuffledWords);
         List<StudyWord> saveStudyWords = studyWordCommandRepository.saveAll(buildStudyWords);
         saveStudy.getStudyWords().addAll(saveStudyWords);
 

@@ -1,4 +1,4 @@
-=== 학습 단어 정정하기
+=== 학습 단어 정정하기(선생님)
 
 ==== HTTP Request
 include::{snippets}/study-docs-test/correct-study-word/http-request.adoc[]

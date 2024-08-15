@@ -1,12 +1,15 @@
 package psam.portfolio.sunder.english.domain.book.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchWordException;
+import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 
 import java.util.List;
@@ -59,6 +62,15 @@ public class WordQueryRepository {
         return query.select(word)
                 .from(word)
                 .where(expressions)
+                .fetch();
+    }
+
+    public List<Word> findShuffledWords(List<Book> getBooks, Integer numberOfWords) {
+        return query.selectDistinct(word)
+                .from(word)
+                .where(word.book.in(getBooks))
+                .orderBy(Expressions.numberTemplate(Double.class, "rand()").asc())
+                .limit(numberOfWords * 2)
                 .fetch();
     }
 }

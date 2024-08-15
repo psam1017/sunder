@@ -108,7 +108,6 @@ public class ExcelUtils {
                             hasAnyCellValue = true;
                         }
                     }
-                    System.out.println("cellValue = " + cellValue);
                     elements.add(cellValue);
                 }
                 if (hasAnyCellValue) {

@@ -1,5 +1,8 @@
 package psam.portfolio.sunder.english.global.slicing;
 
+import lombok.Getter;
+
+@Getter
 public class SlicingInfo {
 
     private int size;
@@ -10,14 +13,6 @@ public class SlicingInfo {
         this.size = size;
         this.lastSequence = lastSequence;
         this.hasNext = hasNext;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public long getLastSequence() {
-        return lastSequence;
     }
 
     public boolean hasNext() {

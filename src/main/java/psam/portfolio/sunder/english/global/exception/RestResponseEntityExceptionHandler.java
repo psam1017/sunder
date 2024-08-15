@@ -34,9 +34,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.api.v1.ApiStatus;
-import psam.portfolio.sunder.english.infrastructure.clientinfo.ClientInfoHolder;
-
-import java.util.Objects;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -60,7 +57,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         try {
             return objectMapper.writeValueAsString(body);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("Failed to create error messages.", e);
             return "Failed to create error messages.";
         }
     }
@@ -139,8 +136,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleServletRequestBindingException(ServletRequestBindingException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[ServletRequestBindingException handle] request URI = {}", ((ServletWebRequest)request).getRequest().getRequestURI());
-        ex.printStackTrace();
+        log.error("[ServletRequestBindingException handle] request URI = {}", ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         String message = "Server requires the request to be conditional. You may be missing a required precondition header, such as 'If-Match'";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.PRECONDITION_REQUIRED, message);
@@ -151,20 +147,19 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[MethodArgumentNotValidException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[MethodArgumentNotValidException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         ApiResponse<Object> body = ApiResponse.badRequest(ex);
         return createResponseEntity(body, BAD_REQUEST);
     }
 
     /**
-     * It may be bacause you didn't use @Valid, or BindingResult. Check the handler that raised this exception.
+     * It may be because you didn't use @Valid, or BindingResult. Check the handler that raised this exception.
      */
     @Override
     protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HandlerMethodValidationException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
-        ex.printStackTrace();
+        log.error("[HandlerMethodValidationException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         String message = "Unexpected exception thrown in Server Handler.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.INTERNAL_SERVER_ERROR, message);
@@ -209,8 +204,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleErrorResponseException(ErrorResponseException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[ErrorResponseException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
-        ex.printStackTrace();
+        log.error("[ErrorResponseException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         String message = "Unexpected exception thrown.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.INTERNAL_SERVER_ERROR, message);
@@ -232,8 +226,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[ConversionNotSupportedException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
-        ex.printStackTrace();
+        log.error("[ConversionNotSupportedException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         String message = "Unexpected exception thrown.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.INTERNAL_SERVER_ERROR, message);
@@ -271,8 +264,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HttpMessageNotWritableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
-        ex.printStackTrace();
+        log.error("[HttpMessageNotWritableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         String message = "Unexpected exception thrown.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.INTERNAL_SERVER_ERROR, message);
@@ -283,8 +275,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleMethodValidationException(MethodValidationException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        log.error("[MethodValidationException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
-        ex.printStackTrace();
+        log.error("[MethodValidationException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         String message = "Unexpected exception thrown.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.INTERNAL_SERVER_ERROR, message);
