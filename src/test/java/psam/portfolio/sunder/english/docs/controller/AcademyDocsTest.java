@@ -572,7 +572,6 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
         Teacher director = dataCreator.registerTeacher(UserStatus.TRIAL, academy);
         dataCreator.createUserRoles(director, ROLE_DIRECTOR, ROLE_TEACHER);
-        String token = createBearerToken(director);
 
         UserLoginForm loginForm = new UserLoginForm(director.getLoginId(), infoContainer.getAnyRawPassword());
 
@@ -582,7 +581,6 @@ public class AcademyDocsTest extends RestDocsEnvironment {
         ResultActions resultActions = mockMvc.perform(
                 post("/api/academies/end-trial")
                         .contentType(APPLICATION_JSON)
-                        .header(AUTHORIZATION, token)
                         .content(createJson(loginForm))
         );
 

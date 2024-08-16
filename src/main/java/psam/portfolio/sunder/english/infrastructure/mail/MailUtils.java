@@ -15,6 +15,7 @@ public class MailUtils {
     private final String fromEmail;
 
     // TODO: 2024-01-29 mail username, password 설정
+    // mail template refactoring
 
     public boolean sendMail(String recipient, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();

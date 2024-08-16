@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import psam.portfolio.sunder.english.domain.user.exception.LoginFailException;
 import psam.portfolio.sunder.english.domain.user.exception.PasswordMismatchException;
 import psam.portfolio.sunder.english.domain.user.exception.UnauthorizedToChangePasswordException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
@@ -98,8 +97,8 @@ public class UserCommandService {
         }
 
         for (int i = 0; i < 3; i++) {
-            int random = (int) (Math.random() * 8);
-            tempPassword.append("!@#$%^&*".charAt(random));
+            int random = (int) (Math.random() * 7);
+            tempPassword.append("!@#$%^*".charAt(random)); // & 는 html 에서 특수문자로 인식되어 &amp; 로 변환됨
         }
         return tempPassword.toString();
     }
