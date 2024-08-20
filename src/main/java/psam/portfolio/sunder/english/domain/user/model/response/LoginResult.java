@@ -1,8 +1,8 @@
 package psam.portfolio.sunder.english.domain.user.model.response;
 
 import lombok.Getter;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.List;
 

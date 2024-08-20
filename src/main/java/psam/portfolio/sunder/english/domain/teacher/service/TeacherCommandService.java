@@ -20,8 +20,8 @@ import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRole
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.exception.TrialCannotChangeException;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
@@ -35,7 +35,8 @@ import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 
 import java.util.*;
 
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.*;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.*;
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
 
 @RequiredArgsConstructor
@@ -78,7 +79,7 @@ public class TeacherCommandService {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
         Academy getAcademy = getTeacher.getAcademy();
         Teacher saveTeacher = teacherCommandRepository.save(teacherPOST.toEntity(getAcademy, PENDING, passwordUtils.encode(teacherPOST.getLoginPw())));
-        Role role = roleQueryRepository.getByName(RoleName.ROLE_TEACHER);
+        Role role = roleQueryRepository.getByName(ROLE_TEACHER);
         userRoleCommandRepository.save(buildUserRole(saveTeacher, role));
 
         // 본인인증 링크를 이메일로 전송
@@ -106,7 +107,7 @@ public class TeacherCommandService {
         List<Teacher> directors = teacherQueryRepository.findAll(
                 QTeacher.teacher.academy.teachers.any().id.eq(teacherId),
                 QTeacher.teacher.status.in(ACTIVE, TRIAL),
-                QTeacher.teacher.roles.any().role.name.eq(RoleName.ROLE_DIRECTOR)
+                QTeacher.teacher.roles.any().role.name.eq(ROLE_DIRECTOR)
         );
         UserStatus status = directors.get(0).getStatus();
 

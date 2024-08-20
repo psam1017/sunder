@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.exception.DuplicateAttendanceIdException;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
@@ -17,8 +17,8 @@ import psam.portfolio.sunder.english.domain.student.repository.StudentQueryRepos
 import psam.portfolio.sunder.english.domain.student.service.StudentCommandService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 import psam.portfolio.sunder.english.domain.user.service.UserQueryService;
@@ -28,8 +28,8 @@ import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 class StudentCommandServiceTest extends AbstractSunderApplicationTest {
 

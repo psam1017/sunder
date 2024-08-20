@@ -30,6 +30,8 @@ public class BookReplace {
     @Length(max = 30)
     private String subject;
 
+    private Integer schoolGrade;
+
     public Book toEntity(Academy academy) {
         return Book.builder()
                 .openToPublic(openToPublic)
@@ -37,6 +39,7 @@ public class BookReplace {
                 .name(name)
                 .chapter(chapter)
                 .subject(subject)
+                .schoolGrade(schoolGrade)
                 .academy(academy)
                 .build();
     }

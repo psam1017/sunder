@@ -8,8 +8,8 @@ import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 
 import java.util.ArrayList;

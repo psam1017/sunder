@@ -20,6 +20,7 @@ public class BookFullResponse {
     private String name;
     private String chapter;
     private String subject;
+    private Integer schoolGrade;
     private UUID academyId;
     private boolean openToPublic;
     @KoreanDateTime
@@ -36,6 +37,7 @@ public class BookFullResponse {
                 .name(book.getName())
                 .chapter(book.getChapter())
                 .subject(book.getSubject())
+                .schoolGrade(book.getSchoolGrade())
                 .academyId(book.getAcademy().getId())
                 .openToPublic(book.isOpenToPublic())
                 .createdDateTime(book.getCreatedDateTime())

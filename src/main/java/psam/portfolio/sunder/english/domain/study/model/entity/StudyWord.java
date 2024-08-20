@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
-import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,14 +54,6 @@ public class StudyWord {
         this.correct = correct;
         this.reason = reason;
         this.study = study;
-    }
-
-    public void setCorrect(boolean correct) {
-        this.correct = correct;
-    }
-
-    public void setReason(String incorrectReason) {
-        this.reason = incorrectReason;
     }
 
     public void submit(String submit) {

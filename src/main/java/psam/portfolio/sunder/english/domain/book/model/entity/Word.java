@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
-import psam.portfolio.sunder.english.domain.book.model.enumeration.WordStatus;
+import psam.portfolio.sunder.english.domain.book.enumeration.WordStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

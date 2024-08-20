@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
@@ -23,8 +23,8 @@ import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepositor
 import psam.portfolio.sunder.english.domain.study.service.StudyCommandService;
 import psam.portfolio.sunder.english.domain.study.service.StudyQueryService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.slicing.SlicingInfo;
 
 import java.time.LocalDate;
@@ -381,6 +381,7 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
             assertThat(s.getClassification()).isEqualTo(StudyClassification.EXAM);
             assertThat(s.getTarget()).isEqualTo(StudyTarget.KOREAN);
             assertThat(s.getSubmitDateTime()).isNotNull();
+            assertThat(s.getCreatedDateTime()).isNotNull();
             assertThat(s.getStudentId()).isNotNull();
             assertThat(s.getAttendanceId()).isNotNull();
             assertThat(s.getStudentName()).isNotNull();
@@ -520,7 +521,7 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
         List<CountByDay> days = (List<CountByDay>) statistic.get("days");
         assertThat(days).hasSize(1)
                 .extracting(d -> tuple(d.getStudyDate(), d.getStudyCount(), d.getCorrectStudyWordCount(), d.getTotalStudyWordCount()))
-                .containsExactly(tuple(LocalDate.now(), 4L, 20L, 40L));
+                .containsExactly(tuple(LocalDate.now(), 4L, 10L, 40L));
 
         List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
         assertThat(oldHomeworks).hasSize(2)
@@ -533,22 +534,22 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
         List<TopStudent> bestAnswerRates = (List<TopStudent>) statistic.get("bestAnswerRates");
         assertThat(bestAnswerRates).hasSize(1)
                 .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
-                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+                .containsExactly(tuple(student.getId(), 25.0, 4L, 40L));
 
         List<TopStudent> worstAnswerRates = (List<TopStudent>) statistic.get("worstAnswerRates");
         assertThat(worstAnswerRates).hasSize(1)
                 .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
-                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+                .containsExactly(tuple(student.getId(), 25.0, 4L, 40L));
 
         List<TopStudent> bestStudyCounts = (List<TopStudent>) statistic.get("bestStudyCounts");
         assertThat(bestStudyCounts).hasSize(1)
                 .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
-                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+                .containsExactly(tuple(student.getId(), 25.0, 4L, 40L));
 
         List<TopStudent> worstStudyCounts = (List<TopStudent>) statistic.get("worstStudyCounts");
         assertThat(worstStudyCounts).hasSize(1)
                 .extracting("studentId", "correctPercent", "studyCount", "studyWordCount")
-                .containsExactly(tuple(student.getId(), 50.0, 4L, 40L));
+                .containsExactly(tuple(student.getId(), 25.0, 4L, 40L));
     }
 
     @DisplayName("학생은 자신의 통계만 조회할 수 있다.")
@@ -615,7 +616,7 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
         List<CountByDay> days = (List<CountByDay>) statistic.get("days");
         assertThat(days).hasSize(1)
                 .extracting(d -> tuple(d.getStudyDate(), d.getStudyCount(), d.getCorrectStudyWordCount(), d.getTotalStudyWordCount()))
-                .containsExactly(tuple(LocalDate.now(), 4L, 20L, 40L));
+                .containsExactly(tuple(LocalDate.now(), 4L, 10L, 40L));
 
         List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
         assertThat(oldHomeworks).hasSize(2)

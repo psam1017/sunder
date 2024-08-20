@@ -5,7 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.exception.NoSuchRoleException;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
 

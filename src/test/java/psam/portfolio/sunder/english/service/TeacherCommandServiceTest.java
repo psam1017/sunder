@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.teacher.exception.SelfRoleModificationException;
 import psam.portfolio.sunder.english.domain.teacher.exception.SelfStatusModificationException;
 import psam.portfolio.sunder.english.domain.teacher.exception.TrialCannotChangeException;
@@ -18,8 +18,8 @@ import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepos
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserException;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 import psam.portfolio.sunder.english.infrastructure.password.PasswordUtils;
 

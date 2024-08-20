@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
@@ -19,8 +19,8 @@ import psam.portfolio.sunder.english.domain.study.model.request.*;
 import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepository;
 import psam.portfolio.sunder.english.domain.study.service.StudyCommandService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -450,6 +450,7 @@ public class StudyDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.studies[].classification").type(STRING).description("학습 분류"),
                                 fieldWithPath("data.studies[].target").type(STRING).description("학습 대상"),
                                 fieldWithPath("data.studies[].submitDateTime").type(STRING).description("학습 제출 일시").optional(),
+                                fieldWithPath("data.studies[].createdDateTime").type(STRING).description("학습 생성 일시").optional(),
                                 fieldWithPath("data.studies[].studentId").type(STRING).description("학생 아이디"),
                                 fieldWithPath("data.studies[].attendanceId").type(STRING).description("출석 아이디").optional(),
                                 fieldWithPath("data.studies[].studentName").type(STRING).description("학생 이름"),

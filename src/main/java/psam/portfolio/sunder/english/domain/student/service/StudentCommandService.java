@@ -25,8 +25,8 @@ import psam.portfolio.sunder.english.domain.user.exception.DuplicateUserExceptio
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
@@ -37,8 +37,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.ACTIVE;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.TRIAL;
+import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.ACTIVE;
+import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.TRIAL;
 
 @RequiredArgsConstructor
 @Transactional

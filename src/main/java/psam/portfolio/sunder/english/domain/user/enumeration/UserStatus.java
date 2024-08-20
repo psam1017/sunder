@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.domain.user.model.enumeration;
+package psam.portfolio.sunder.english.domain.user.enumeration;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

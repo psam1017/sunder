@@ -3,7 +3,7 @@ package psam.portfolio.sunder.english.domain.user.model.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
 
 import java.time.LocalDateTime;

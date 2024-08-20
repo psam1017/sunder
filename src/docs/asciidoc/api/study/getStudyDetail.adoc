@@ -1,5 +1,8 @@
 === 학습 상세 조회하기
 
+- 선생님이거나, 제출되었거나, (시험이 아니라)연습이라면 data.studyWords[].answer 를 볼 수 있습니다.
+- 숙제를 내 준 선생님이 있거나, 학습을 저정한 선생님이 있다면 선생님 정보가 반환됩니다.
+
 ==== HTTP Request
 include::{snippets}/study-docs-test/get-study-detail/http-request.adoc[]
 include::{snippets}/study-docs-test/get-study-detail/path-parameters.adoc[]

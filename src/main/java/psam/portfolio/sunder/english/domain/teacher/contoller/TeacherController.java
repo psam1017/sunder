@@ -8,8 +8,8 @@ import psam.portfolio.sunder.english.domain.teacher.exception.TeacherAccessDenie
 import psam.portfolio.sunder.english.domain.teacher.model.request.*;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherQueryService;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 

@@ -7,6 +7,7 @@ import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassificatio
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
+import psam.portfolio.sunder.english.global.jsonformat.KoreanDateTime;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,7 +23,10 @@ public class StudySlicingResponse {
     private StudyType type;
     private StudyClassification classification;
     private StudyTarget target;
+    @KoreanDateTime
     private LocalDateTime submitDateTime;
+    @KoreanDateTime
+    private LocalDateTime createdDateTime;
     private UUID studentId;
     private String attendanceId;
     private String studentName;

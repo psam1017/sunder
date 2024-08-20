@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
@@ -13,8 +13,8 @@ import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse
 import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.List;
 import java.util.Map;

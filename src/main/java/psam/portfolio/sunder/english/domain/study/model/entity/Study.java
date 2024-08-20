@@ -105,8 +105,8 @@ public class Study extends BaseEntity {
         return this.status == StudyStatus.ASSIGNED || this.status == StudyStatus.STARTED;
     }
 
-    public boolean hasStudyWord(StudyWord getStudyWord) {
-        return getStudyWord != null && Objects.equals(getStudyWord.getStudy().getId(), this.id);
+    public boolean hasStudyWord(StudyWord studyWord) {
+        return studyWord != null && Objects.equals(studyWord.getStudy().getId(), this.id);
     }
 
     public void submit() {

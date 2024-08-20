@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.exception.NoSuchStudentException;
 import psam.portfolio.sunder.english.domain.student.model.request.StudentPageSearchCond;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.List;
 import java.util.Optional;

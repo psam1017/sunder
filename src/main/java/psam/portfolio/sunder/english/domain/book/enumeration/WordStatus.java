@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.domain.book.model.enumeration;
+package psam.portfolio.sunder.english.domain.book.enumeration;
 
 public enum WordStatus {
 

@@ -7,7 +7,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHInfo;
@@ -15,7 +15,7 @@ import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPATCHSt
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPOST;
 import psam.portfolio.sunder.english.domain.teacher.model.request.TeacherPUTRoles;
 import psam.portfolio.sunder.english.domain.teacher.service.TeacherCommandService;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.util.Set;
@@ -32,7 +32,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 
 public class TeacherDocsTest extends RestDocsEnvironment {
 

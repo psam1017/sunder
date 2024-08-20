@@ -6,15 +6,15 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPUT.WordPUTObject;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 public class BookDocsTest extends RestDocsEnvironment {
 
@@ -46,6 +46,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                 .name("name")
                 .chapter("chapter")
                 .subject("subject")
+                .schoolGrade(3)
                 .build();
 
         refresh();
@@ -68,7 +69,8 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("publisher").type(STRING).description("출판사").optional(),
                                 fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터").optional(),
-                                fieldWithPath("subject").type(STRING).description("주제").optional()
+                                fieldWithPath("subject").type(STRING).description("주제").optional(),
+                                fieldWithPath("schoolGrade").type(NUMBER).description("학년(1~12)").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.bookId").type(STRING).description("등록된 교재 아이디")
@@ -91,6 +93,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                 .name("newName")
                 .chapter("newChapter")
                 .subject("newSubject")
+                .schoolGrade(2)
                 .build();
 
         refresh();
@@ -116,7 +119,8 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("publisher").type(STRING).description("출판사").optional(),
                                 fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터").optional(),
-                                fieldWithPath("subject").type(STRING).description("주제").optional()
+                                fieldWithPath("subject").type(STRING).description("주제").optional(),
+                                fieldWithPath("schoolGrade").type(NUMBER).description("학년(1~12)").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.bookId").type(STRING).description("수정된 교재 아이디")
@@ -261,14 +265,16 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 parameterWithName("size").description("페이지 크기"),
                                 parameterWithName("keyword").description("검색 키워드"),
                                 parameterWithName("privateOnly").description("개인 교재만 조회 여부"),
+                                parameterWithName("schoolGrade").description("학년(1~12)").optional(),
                                 parameterWithName("year").description("교재 등록 연도").optional()
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.books[].id").type(STRING).description("교재 아이디"),
-                                fieldWithPath("data.books[].publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.books[].name").type(STRING).description("교재명"),
-                                fieldWithPath("data.books[].chapter").type(STRING).description("챕터"),
-                                fieldWithPath("data.books[].subject").type(STRING).description("주제"),
+                                fieldWithPath("data.books[].publisher").type(STRING).description("출판사").optional(),
+                                fieldWithPath("data.books[].name").type(STRING).description("교재명").optional(),
+                                fieldWithPath("data.books[].chapter").type(STRING).description("챕터").optional(),
+                                fieldWithPath("data.books[].subject").type(STRING).description("주제").optional(),
+                                fieldWithPath("data.books[].schoolGrade").type(NUMBER).description("학년(1~12)").optional(),
                                 fieldWithPath("data.books[].academyId").type(STRING).description("학원 아이디"),
                                 fieldWithPath("data.books[].openToPublic").type(BOOLEAN).description("공개 여부"),
                                 fieldWithPath("data.books[].createdDateTime").type(STRING).description("생성 일시"),
@@ -318,10 +324,11 @@ public class BookDocsTest extends RestDocsEnvironment {
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.book.id").type(STRING).description("교재 아이디"),
-                                fieldWithPath("data.book.publisher").type(STRING).description("출판사"),
-                                fieldWithPath("data.book.name").type(STRING).description("교재명"),
-                                fieldWithPath("data.book.chapter").type(STRING).description("챕터"),
-                                fieldWithPath("data.book.subject").type(STRING).description("주제"),
+                                fieldWithPath("data.book.publisher").type(STRING).description("출판사").optional(),
+                                fieldWithPath("data.book.name").type(STRING).description("교재명").optional(),
+                                fieldWithPath("data.book.chapter").type(STRING).description("챕터").optional(),
+                                fieldWithPath("data.book.subject").type(STRING).description("주제").optional(),
+                                fieldWithPath("data.book.schoolGrade").type(NUMBER).description("학년(1~12)").optional(),
                                 fieldWithPath("data.book.academyId").type(STRING).description("학원 아이디"),
                                 fieldWithPath("data.book.openToPublic").type(BOOLEAN).description("공개 여부"),
                                 fieldWithPath("data.book.createdDateTime").type(STRING).description("생성 일시"),

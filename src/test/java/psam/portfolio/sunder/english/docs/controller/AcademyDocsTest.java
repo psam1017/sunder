@@ -6,19 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyDirectorPOST;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPATCH;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyCommandService;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepository;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -31,7 +29,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 
 public class AcademyDocsTest extends RestDocsEnvironment {
 

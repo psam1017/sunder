@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.exception.EmptyCellFoundInBookException;
 import psam.portfolio.sunder.english.domain.book.exception.TooManyWordToSaveException;
-import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
-import psam.portfolio.sunder.english.domain.book.model.enumeration.WordStatus;
+import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
+import psam.portfolio.sunder.english.domain.book.enumeration.WordStatus;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
@@ -70,6 +70,7 @@ public class BookCommandService {
             getBook.setName(replace.getName());
             getBook.setChapter(replace.getChapter());
             getBook.setSubject(replace.getSubject());
+            getBook.setSchoolGrade(replace.getSchoolGrade());
             getBook.updateSearchText();
             return getBook.getId();
         }

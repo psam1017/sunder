@@ -2,6 +2,7 @@ package psam.portfolio.sunder.english.domain.study.repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -80,11 +81,14 @@ public class StudyQueryRepository {
                 .fetch();
     }
 
+    // native query 로 @SqlRestriction 무시하기
     public long findNextSequenceOfLastStudy() {
-        Long lastSequence = query.select(study.sequence.max())
-                .from(study)
-                .fetchOne();
-        return lastSequence == null ? 1 : lastSequence + 1;
+        Object lastSequence = em.createNativeQuery("""
+                        SELECT MAX(s.sequence)
+                        FROM studies s
+                        """)
+                .getSingleResult();
+        return lastSequence instanceof Long ls ? ls + 1 : 1;
     }
 
     public List<StudySlicingResponse> findAllBySlicingSearchCond(Student student, StudySlicingSearchCond cond) {
@@ -107,13 +111,17 @@ public class StudyQueryRepository {
                         study.classification,
                         study.target,
                         study.submitDateTime,
+                        study.createdDateTime,
                         study.student.id.as("studentId"),
                         study.student.attendanceId.as("attendanceId"),
                         study.student.name.as("studentName"),
                         study.student.school.name.as("schoolName"),
                         study.student.school.grade.as("schoolGrade"),
-                        qStudyWord.correct.count().castToNum(Integer.class).as("correctCount"),
-                        qStudyWord.count().castToNum(Integer.class).as("totalCount")
+                        qStudyWord.correct
+                                .when(true).then(1)
+                                .otherwise(0)
+                                .sum().intValue().as("correctCount"),
+                        qStudyWord.count().intValue().as("totalCount")
                 ))
                 .distinct()
                 .from(study)
@@ -124,6 +132,7 @@ public class StudyQueryRepository {
                         academyIdEqByTeacher(teacher),
                         createdDateTimeGoe(cond.getStartDateTime()),
                         createdDateTimeLoe(cond.getEndDateTime()),
+                        studyStatusEq(cond.getStudyStatus()),
                         titleContains(cond.getSplitStudyWord()),
                         studentNameContains(cond.getStudentName()),
                         studentSchoolGradeEq(cond.getSchoolGrade())
@@ -152,6 +161,10 @@ public class StudyQueryRepository {
 
     private static BooleanExpression createdDateTimeLoe(LocalDateTime createdDateTime) {
         return createdDateTime == null ? null : study.createdDateTime.loe(createdDateTime);
+    }
+
+    private BooleanExpression studyStatusEq(StudyStatus studyStatus) {
+        return studyStatus == null ? null : study.status.eq(studyStatus);
     }
 
     private static BooleanExpression titleContains(String[] titles) {
@@ -254,7 +267,10 @@ public class StudyQueryRepository {
         return query.select(Projections.constructor(CountByDay.class,
                         dayOfYear,
                         study.id.countDistinct().as("studyCount"),
-                        qStudyWord.correct.isTrue().count().as("correctCount"),
+                        qStudyWord.correct
+                                .when(true).then(1)
+                                .otherwise(0)
+                                .sum().longValue().as("correctCount"),
                         qStudyWord.count().as("totalCount")
                 ))
                 .from(study)
@@ -295,7 +311,12 @@ public class StudyQueryRepository {
 
     public List<TopStudent> findBestStudentsByAnswerRate(StudyStatisticSearchCond cond, UUID academyId) {
         QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Double> correctPercent =
+                qStudyWord.correct
+                        .when(true).then(1)
+                        .otherwise(0)
+                        .sum()
+                        .divide(qStudyWord.count()).doubleValue();
         NumberExpression<Long> studyWordCount = qStudyWord.id.count();
 
         return query.select(Projections.constructor(TopStudent.class,
@@ -322,7 +343,12 @@ public class StudyQueryRepository {
 
     public List<TopStudent> findWorstStudentsByAnswerRate(StudyStatisticSearchCond cond, UUID academyId) {
         QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Double> correctPercent =
+                qStudyWord.correct
+                        .when(true).then(1)
+                        .otherwise(0)
+                        .sum()
+                        .divide(qStudyWord.count()).doubleValue();
         NumberExpression<Long> studyWordCount = qStudyWord.id.count();
 
         return query.select(Projections.constructor(TopStudent.class,
@@ -349,7 +375,12 @@ public class StudyQueryRepository {
 
     public List<TopStudent> findBestStudentsByStudyCount(StudyStatisticSearchCond cond, UUID academyId) {
         QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Double> correctPercent =
+                qStudyWord.correct
+                        .when(true).then(1)
+                        .otherwise(0)
+                        .sum()
+                        .divide(qStudyWord.count()).doubleValue();
         NumberExpression<Long> studyWordCount = qStudyWord.id.count();
 
         return query.select(Projections.constructor(TopStudent.class,
@@ -376,7 +407,12 @@ public class StudyQueryRepository {
 
     public List<TopStudent> findWorstStudentsByStudyCount(StudyStatisticSearchCond cond, UUID academyId) {
         QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Long> correctPercent = qStudyWord.correct.isTrue().count().divide(qStudyWord.count().doubleValue());
+        NumberExpression<Double> correctPercent =
+                qStudyWord.correct
+                        .when(true).then(1)
+                        .otherwise(0)
+                        .sum()
+                        .divide(qStudyWord.count()).doubleValue();
         NumberExpression<Long> studyWordCount = qStudyWord.id.count();
 
         return query.select(Projections.constructor(TopStudent.class,

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
 import psam.portfolio.sunder.english.domain.academy.exception.OneParamToCheckAcademyDuplException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -21,7 +21,7 @@ import psam.portfolio.sunder.english.global.pagination.PageInfo;
 import java.util.*;
 
 import static psam.portfolio.sunder.english.domain.academy.model.entity.QAcademy.academy;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

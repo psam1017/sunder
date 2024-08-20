@@ -253,7 +253,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
-        log.error("[HttpMessageNotReadableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI());
+        log.error("[HttpMessageNotReadableException handle] request URI = " + ((ServletWebRequest)request).getRequest().getRequestURI(), ex);
 
         String message = "Unable to read http message. Please check your request body.";
         ApiResponse<Object> body = ApiResponse.of(ApiStatus.BAD_REQUEST, message);

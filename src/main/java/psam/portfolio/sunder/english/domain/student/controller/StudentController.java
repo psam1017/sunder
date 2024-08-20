@@ -11,7 +11,7 @@ import psam.portfolio.sunder.english.domain.student.model.request.StudentPageSea
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
 import psam.portfolio.sunder.english.domain.student.service.StudentCommandService;
 import psam.portfolio.sunder.english.domain.student.service.StudentQueryService;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
 import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 

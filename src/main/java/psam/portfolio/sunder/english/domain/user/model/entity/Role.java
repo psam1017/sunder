@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 
 import java.util.ArrayList;
 import java.util.List;

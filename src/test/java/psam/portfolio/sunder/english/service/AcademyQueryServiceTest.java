@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.exception.OneParamToCheckAcademyDuplException;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.request.AcademyPublicPageSearchCond;
 import psam.portfolio.sunder.english.domain.academy.model.response.AcademyFullResponse;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyQueryService;
@@ -14,7 +14,7 @@ import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherFullResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.response.TeacherPublicResponse;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.pagination.PageInfo;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.*;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.*;
 
 @SuppressWarnings({"unchecked", "ConstantValue"})
 public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {

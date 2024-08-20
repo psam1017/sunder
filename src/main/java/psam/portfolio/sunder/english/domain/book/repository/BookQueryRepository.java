@@ -1,12 +1,13 @@
 package psam.portfolio.sunder.english.domain.book.repository;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
+import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchBookException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
@@ -71,7 +72,8 @@ public class BookQueryRepository {
                 .from(book)
                 .where(
                         academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
-                        createdDateTimeYearEq(cond),
+                        schoolGradeEq(cond.getSchoolGrade()),
+                        createdDateTimeYearEq(cond.getYear()),
                         searchTextContains(cond.getSplitKeyword())
                 )
                 .orderBy(book.createdDateTime.desc())
@@ -94,7 +96,8 @@ public class BookQueryRepository {
                 .from(book)
                 .where(
                         academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
-                        createdDateTimeYearEq(cond),
+                        schoolGradeEq(cond.getSchoolGrade()),
+                        createdDateTimeYearEq(cond.getYear()),
                         searchTextContains(cond.getSplitKeyword())
                 )
                 .fetchOne();
@@ -106,8 +109,12 @@ public class BookQueryRepository {
         return privateOnly ? expression : expression.or(book.academy.id.isNull());
     }
 
-    private static BooleanExpression createdDateTimeYearEq(BookPageSearchCond cond) {
-        return cond.getYear() == null ? null : book.createdDateTime.year().eq(cond.getYear());
+    private BooleanExpression schoolGradeEq(Integer schoolGrade) {
+        return schoolGrade == null ? null : book.schoolGrade.eq(schoolGrade);
+    }
+
+    private static BooleanExpression createdDateTimeYearEq(Integer year) {
+        return year == null ? null : book.createdDateTime.year().eq(year);
     }
 
     private static BooleanExpression searchTextContains(String[] keywords) {
@@ -115,7 +122,7 @@ public class BookQueryRepository {
             return null;
         }
         return Arrays.stream(keywords)
-                .map(k -> book.searchText.toLowerCase().contains(k))
+                .map(book.searchText::contains)
                 .reduce(BooleanExpression::and)
                 .orElse(null);
     }

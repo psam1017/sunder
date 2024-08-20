@@ -1,6 +1,6 @@
 package psam.portfolio.sunder.english.domain.user.exception;
 
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.global.api.v1.ApiException;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;

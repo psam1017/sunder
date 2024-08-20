@@ -10,14 +10,16 @@ public class BookPageSearchCond extends PageSearchCond {
 
     private String keyword;
     private boolean privateOnly;
+    private Integer schoolGrade;
     private Integer year;
 
     @Builder
-    public BookPageSearchCond(Integer page, Integer size, String prop, String dir, String keyword, Boolean privateOnly, Integer year) {
+    public BookPageSearchCond(Integer page, Integer size, String prop, String dir, String keyword, Boolean privateOnly, Integer schoolGrade, Integer year) {
         super(page, size, prop, dir);
         keyword = substring20AndToLowerCase(keyword);
         this.keyword = removeTwoWhiteSpaces(keyword);
         this.privateOnly = privateOnly == null || privateOnly;
+        this.schoolGrade = schoolGrade;
         this.year = year;
     }
 

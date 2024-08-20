@@ -37,7 +37,6 @@ import psam.portfolio.sunder.english.domain.teacher.repository.TeacherQueryRepos
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import static psam.portfolio.sunder.english.domain.study.model.request.StudyPATCHSubmit.StudyWordPATCHSubmit;
 
@@ -148,8 +147,8 @@ public class StudyCommandService {
 
         // 교재를 book.name, book.chapter, book.subject 순서로 오름차순 정렬
         getBooks.sort(Comparator.comparing(Book::getName)
-                .thenComparing(Book::getChapter)
-                .thenComparing(Book::getSubject));
+                .thenComparing(Book::getChapter, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(Book::getSubject, Comparator.nullsFirst(Comparator.naturalOrder())));
 
         // Title 생성
         String title = createTitle(getBooks);
@@ -295,6 +294,13 @@ public class StudyCommandService {
                     throw new StudyAccessDeniedException();
                 }
                 getStudyWord.submit(sw.getSubmit());
+            }
+        }
+
+        // 제출되지 않은 학습 단어는 null 로 제출한다.
+        for (StudyWord sw : getStudy.getStudyWords()) {
+            if (sw.getCorrect() == null) {
+                sw.submit(null);
             }
         }
         return studyId;

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.ResultActions;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
-import psam.portfolio.sunder.english.domain.academy.model.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.Parent;
 import psam.portfolio.sunder.english.domain.student.model.embeddable.School;
@@ -14,8 +14,8 @@ import psam.portfolio.sunder.english.domain.student.model.request.StudentPATCHIn
 import psam.portfolio.sunder.english.domain.student.model.request.StudentPATCHStatus;
 import psam.portfolio.sunder.english.domain.student.model.request.StudentPOST;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 
 import java.util.UUID;
@@ -28,8 +28,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_DIRECTOR;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.RoleName.ROLE_TEACHER;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_DIRECTOR;
+import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROLE_TEACHER;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class StudentDocsTest extends RestDocsEnvironment {

@@ -1,4 +1,4 @@
-package psam.portfolio.sunder.english.domain.academy.model.enumeration;
+package psam.portfolio.sunder.english.domain.academy.enumeration;
 
 public enum AcademyStatus {
 

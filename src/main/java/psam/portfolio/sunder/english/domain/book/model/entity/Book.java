@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
-import psam.portfolio.sunder.english.domain.book.model.enumeration.BookStatus;
+import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -41,6 +41,7 @@ public class Book extends BaseEntity {
     private String chapter;
     private String subject;
     private String searchText;
+    private Integer schoolGrade;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -51,13 +52,14 @@ public class Book extends BaseEntity {
     private List<Word> words = new ArrayList<>();
 
     @Builder
-    public Book(boolean openToPublic, String publisher, String name, String chapter, String subject, Academy academy) {
+    public Book(boolean openToPublic, String publisher, String name, String chapter, String subject, Integer schoolGrade, Academy academy) {
         this.status = BookStatus.CREATED;
         this.openToPublic = openToPublic;
         this.publisher = publisher;
         this.name = name;
         this.chapter = chapter;
         this.subject = subject;
+        this.schoolGrade = schoolGrade;
         this.academy = academy;
         updateSearchText();
     }
@@ -86,6 +88,10 @@ public class Book extends BaseEntity {
         this.subject = subject;
     }
 
+    public void setSchoolGrade(Integer schoolGrade) {
+        this.schoolGrade = schoolGrade;
+    }
+
     public void updateModifiedDateTimeManually() {
         super.setModifiedDateTime(LocalDateTime.now());
     }
@@ -97,7 +103,9 @@ public class Book extends BaseEntity {
     private void updateSearchText(String... strings) {
         StringBuilder searchText = new StringBuilder();
         for (String s : strings) {
-            searchText.append(s.replaceAll(" ", ""));
+            if (s != null) {
+                searchText.append(s.replaceAll(" ", ""));
+            }
         }
         this.searchText = searchText.toString().toLowerCase();
     }

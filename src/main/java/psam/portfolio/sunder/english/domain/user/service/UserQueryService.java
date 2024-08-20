@@ -19,7 +19,7 @@ import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
 import psam.portfolio.sunder.english.domain.user.exception.OneParamToCheckUserDuplException;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.request.LostLoginIdForm;
 import psam.portfolio.sunder.english.domain.user.model.request.UserLoginForm;
 import psam.portfolio.sunder.english.domain.user.model.response.LoginResult;
@@ -35,8 +35,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.user.model.entity.QUser.user;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.ACTIVE;
-import static psam.portfolio.sunder.english.domain.user.model.enumeration.UserStatus.TRIAL;
+import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.ACTIVE;
+import static psam.portfolio.sunder.english.domain.user.enumeration.UserStatus.TRIAL;
 import static psam.portfolio.sunder.english.infrastructure.jwt.JwtClaim.*;
 
 @RequiredArgsConstructor
