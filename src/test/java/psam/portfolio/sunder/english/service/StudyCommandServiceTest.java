@@ -97,11 +97,6 @@ class StudyCommandServiceTest extends AbstractSunderApplicationTest {
                 );
         assertThat(getStudies.get(0).getSequence()).isNotEqualTo(getStudies.get(1).getSequence());
         assertThat(getStudies.get(0).getStudent().getId()).isNotEqualTo(getStudies.get(1).getStudent().getId());
-        for (Study s : getStudies) {
-            for (StudyWord sw : s.getStudyWords()) {
-                System.out.println("sw.getQuestion() = " + sw.getQuestion());
-            }
-        }
     }
 
     @DisplayName("학생이 학습을 시작할 수 있다.")

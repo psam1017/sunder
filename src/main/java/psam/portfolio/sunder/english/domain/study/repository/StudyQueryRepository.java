@@ -190,13 +190,6 @@ public class StudyQueryRepository {
         return schoolGrade == null ? null : study.student.school.grade.eq(schoolGrade);
     }
 
-    public long countAll() {
-        Long count = query.select(study.id.count())
-                .from(study)
-                .fetchOne();
-        return count == null ? 0 : count;
-    }
-
     public List<CountByStatus> countByStatus(StudyStatisticSearchCond cond, UUID academyId) {
         return query.select(Projections.constructor(CountByStatus.class,
                         study.status,

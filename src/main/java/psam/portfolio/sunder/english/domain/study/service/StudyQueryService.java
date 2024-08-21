@@ -1,6 +1,7 @@
 package psam.portfolio.sunder.english.domain.study.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -43,11 +45,6 @@ public class StudyQueryService {
      * @return 학습 목록과 슬라이싱 정보
      */
     public Map<String, Object> getStudyList(UUID userId, StudySlicingSearchCond cond) {
-
-        if (cond.getLastSequence() == null) {
-            long count = studyQueryRepository.countAll();
-            cond.setLastSequence(count + 1);
-        }
 
         // 올바른 사용자인지 확인하고 학습 목록을 가져온다.
         User getUser = userQueryRepository.getById(userId);

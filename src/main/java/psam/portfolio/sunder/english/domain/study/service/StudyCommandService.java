@@ -81,8 +81,8 @@ public class StudyCommandService {
 
         // 교재를 book.name, book.chapter, book.subject 순서로 오름차순 정렬
         getBooks.sort(Comparator.comparing(Book::getName)
-                .thenComparing(Book::getChapter)
-                .thenComparing(Book::getSubject));
+                .thenComparing(Book::getChapter, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(Book::getSubject, Comparator.nullsFirst(Comparator.naturalOrder())));
 
         // Title 생성
         String title = createTitle(getBooks);

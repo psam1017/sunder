@@ -51,3 +51,10 @@ Compiler - Annotation Processors 에서 Enable annotation processing 허용
 
 Project Structure 에서 ...
 SDK 와 Language level 설정(jbr-17 로 설정)
+
+(내용 추가 - 테스트 제목 인코딩이 깨지는 경우)
+Help > Edit Custom VM Options... 에서 다음을 추가한 후 IDE 를 재시작
+```
+-Dfile.encoding=UTF-8
+-Dconsole.encoding=UTF-8
+```
