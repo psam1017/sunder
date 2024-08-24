@@ -143,10 +143,12 @@ public class AcademyQueryService {
     public Map<String, Object> getPublicList(AcademyPublicPageSearchCond cond) {
         List<Academy> academies = academyQueryRepository.findAllByPageSearchCond(cond);
         long count = academyQueryRepository.countByPageSearchCond(academies.size(), cond);
+        long total = academyQueryRepository.countAll();
 
         return Map.of(
                 "academies", academies.stream().map(AcademyFullResponse::from).toList(),
-                "pageInfo", new PageInfo(cond.getPage(), cond.getSize(), count, PAGE_SET_AMOUNT)
+                "pageInfo", new PageInfo(cond.getPage(), cond.getSize(), count, PAGE_SET_AMOUNT),
+                "total", total
         );
     }
 }

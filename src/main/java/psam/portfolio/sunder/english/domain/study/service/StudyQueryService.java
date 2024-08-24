@@ -1,7 +1,6 @@
 package psam.portfolio.sunder.english.domain.study.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
@@ -12,6 +11,7 @@ import psam.portfolio.sunder.english.domain.study.model.request.StudySlicingSear
 import psam.portfolio.sunder.english.domain.study.model.request.StudyStatisticSearchCond;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyFullResponse;
 import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingResponse;
+import psam.portfolio.sunder.english.domain.study.model.response.StudyStatisticResponse;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyWordFullResponse;
 import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -21,12 +21,11 @@ import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.slicing.SlicingInfo;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 
-@Slf4j
+import static psam.portfolio.sunder.english.domain.study.model.response.StudyStatisticResponse.*;
+
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -139,8 +138,28 @@ public class StudyQueryService {
         response.put("types", studyQueryRepository.countByType(cond, academyId));
         response.put("classifications", studyQueryRepository.countByClassification(cond, academyId));
         response.put("targets", studyQueryRepository.countByTarget(cond, academyId));
-        response.put("days", studyQueryRepository.countByDay(cond, academyId));
         response.put("oldHomeworks", studyQueryRepository.findOldHomeworks(cond, academyId));
+
+        List<CountByDay> countByDays = studyQueryRepository.countByDay(cond, academyId);
+        LocalDateTime startDateTime = cond.getStartDateTime();
+        LocalDateTime endDateTime = cond.getEndDateTime();
+        while (startDateTime.isBefore(endDateTime)) {
+            boolean dateEmpty = true;
+            int index = 0;
+            for (int i = 0; i < countByDays.size(); i++) {
+                CountByDay c = countByDays.get(i);
+                if (c.getStudyDate().isEqual(startDateTime.toLocalDate())) {
+                    dateEmpty = false;
+                    index = i;
+                    break;
+                }
+            }
+            if (dateEmpty) {
+                countByDays.add(index, new CountByDay(startDateTime.getDayOfYear(), 0L, 0L, 0L));
+            }
+            startDateTime = startDateTime.plusDays(1);
+        }
+        response.put("days", countByDays);
 
         // 선생님 전용 응답값
         if (cond.getStudentId() == null) {

@@ -73,9 +73,10 @@ public class AcademyQueryRepository {
         return query.selectDistinct(academy)
                 .from(academy)
                 .where(
-                        academyNameContains(cond.getAcademyName()),
                         openToPublicEq(true),
-                        academyStatusEq(AcademyStatus.VERIFIED)
+                        academyStatusEq(AcademyStatus.VERIFIED),
+                        academyNameContains(cond.getAcademyName()),
+                        academyAddressContains(cond.getAcademyAddress())
                 )
                 .orderBy(specifyOrder(cond))
                 .offset(cond.getOffset())
@@ -96,9 +97,10 @@ public class AcademyQueryRepository {
         Long count = query.select(academy.countDistinct())
                 .from(academy)
                 .where(
-                        academyNameContains(cond.getAcademyName()),
                         openToPublicEq(true),
-                        academyStatusEq(AcademyStatus.VERIFIED)
+                        academyStatusEq(AcademyStatus.VERIFIED),
+                        academyNameContains(cond.getAcademyName()),
+                        academyAddressContains(cond.getAcademyAddress())
                 )
                 .fetchOne();
         return count == null ? 0L : count;
@@ -121,6 +123,15 @@ public class AcademyQueryRepository {
         return null;
     }
 
+    private static BooleanExpression academyAddressContains(String academyAddress) {
+        if (StringUtils.hasText(academyAddress)) {
+            return Expressions
+                    .stringTemplate("replace({0}, ' ', '')", academy.address.street.concat(academy.address.detail).concat(academy.address.postalCode).toLowerCase())
+                    .contains(academyAddress.replaceAll(" ", "").toLowerCase());
+        }
+        return null;
+    }
+
     private OrderSpecifier<?> specifyOrder(AcademyPublicPageSearchCond cond) {
         String prop = cond.getProp();
         Order order = cond.getDir();
@@ -129,5 +140,12 @@ public class AcademyQueryRepository {
             case "name" -> new OrderSpecifier<>(order, academy.name);
             default -> new OrderSpecifier<>(order, academy.createdDateTime);
         };
+    }
+
+    public long countAll() {
+        Long count = query.select(academy.count())
+                .from(academy)
+                .fetchOne();
+        return count == null ? 0L : count;
     }
 }

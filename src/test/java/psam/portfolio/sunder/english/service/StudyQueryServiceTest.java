@@ -519,9 +519,9 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
                 .containsExactly(tuple(StudyTarget.KOREAN, 4L));
 
         List<CountByDay> days = (List<CountByDay>) statistic.get("days");
-        assertThat(days).hasSize(1)
+        assertThat(days).hasSize(7)
                 .extracting(d -> tuple(d.getStudyDate(), d.getStudyCount(), d.getCorrectStudyWordCount(), d.getTotalStudyWordCount()))
-                .containsExactly(tuple(LocalDate.now(), 4L, 10L, 40L));
+                .contains(tuple(LocalDate.now(), 4L, 10L, 40L));
 
         List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
         assertThat(oldHomeworks).hasSize(2)
@@ -614,9 +614,9 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
                 .containsExactly(tuple(StudyTarget.KOREAN, 4L));
 
         List<CountByDay> days = (List<CountByDay>) statistic.get("days");
-        assertThat(days).hasSize(1)
+        assertThat(days).hasSize(7)
                 .extracting(d -> tuple(d.getStudyDate(), d.getStudyCount(), d.getCorrectStudyWordCount(), d.getTotalStudyWordCount()))
-                .containsExactly(tuple(LocalDate.now(), 4L, 10L, 40L));
+                .contains(tuple(LocalDate.now(), 4L, 10L, 40L));
 
         List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
         assertThat(oldHomeworks).hasSize(2)

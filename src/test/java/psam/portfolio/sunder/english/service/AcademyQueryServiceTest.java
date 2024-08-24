@@ -247,6 +247,7 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
                 .prop("name")
                 .dir("asc")
                 .academyName(registerAcademy.getName())
+                .academyAddress(registerAcademy.getAddress().getStreet())
                 .build();
 
         // when
@@ -268,6 +269,9 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(pageInfo.getEnd()).isEqualTo(1);
         assertThat(pageInfo.hasPrev()).isFalse();
         assertThat(pageInfo.hasNext()).isFalse();
+
+        long total = (long) result.get("total");
+        assertThat(total).isEqualTo(1);
     }
 
     @DisplayName("공개된 학원의 목록에서 다음 페이지를 조회할 수 있다.")
@@ -303,5 +307,9 @@ public class AcademyQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(pageInfo.getEnd()).isEqualTo(2);
         assertThat(pageInfo.hasPrev()).isFalse();
         assertThat(pageInfo.hasNext()).isFalse();
+
+        // openToPublic 과 상관 없이 전체 학원 수를 조회한다.
+        long total = (long) result.get("total");
+        assertThat(total).isEqualTo(12);
     }
 }

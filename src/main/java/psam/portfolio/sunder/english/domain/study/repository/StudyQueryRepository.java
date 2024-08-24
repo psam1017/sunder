@@ -275,6 +275,7 @@ public class StudyQueryRepository {
                         createdDateTimeLoe(cond.getEndDateTime())
                 )
                 .groupBy(dayOfYear)
+                .orderBy(dayOfYear.asc())
                 .fetch();
     }
 

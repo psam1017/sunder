@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Builder
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class BookFullResponse {
 
     private UUID id;
@@ -29,6 +29,7 @@ public class BookFullResponse {
     private LocalDateTime modifiedDateTime;
     private UUID createdBy;
     private UUID modifiedBy;
+    private Integer wordCount;
 
     public static BookFullResponse from(Book book) {
         return BookFullResponse.builder()
@@ -44,6 +45,7 @@ public class BookFullResponse {
                 .modifiedDateTime(book.getModifiedDateTime())
                 .createdBy(book.getCreatedBy())
                 .modifiedBy(book.getModifiedBy())
+                .wordCount(book.getWords().size())
                 .build();
     }
 }

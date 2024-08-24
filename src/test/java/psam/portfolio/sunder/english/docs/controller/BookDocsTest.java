@@ -281,6 +281,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.books[].modifiedDateTime").type(STRING).description("수정 일시"),
                                 fieldWithPath("data.books[].createdBy").type(STRING).description("생성자 아이디").optional(),
                                 fieldWithPath("data.books[].modifiedBy").type(STRING).description("수정자 아이디").optional(),
+                                fieldWithPath("data.books[].wordCount").type(NUMBER).description("단어 수"),
                                 fieldWithPath("data.pageInfo.page").type(NUMBER).description("현재 페이지 번호"),
                                 fieldWithPath("data.pageInfo.size").type(NUMBER).description("페이지 크기"),
                                 fieldWithPath("data.pageInfo.total").type(NUMBER).description("전체 학원 수"),

@@ -1,6 +1,7 @@
 package psam.portfolio.sunder.english.domain.study.model.request;
 
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,8 +14,8 @@ public class StudyStatisticSearchCond {
     private final LocalDateTime startDateTime;
     private final LocalDateTime endDateTime;
 
-    public StudyStatisticSearchCond(UUID studentId, LocalDate startDate, LocalDate endDate) {
-        this.studentId = studentId;
+    public StudyStatisticSearchCond(String studentId, LocalDate startDate, LocalDate endDate) {
+        this.studentId = StringUtils.hasText(studentId) ? UUID.fromString(studentId) : null;
 
         // default is tomorrow, and maximum date is tomorrow
         LocalDateTime tomorrow = LocalDate.now().plusDays(1).atStartOfDay();

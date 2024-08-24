@@ -450,6 +450,7 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                         .param("prop", "name")
                         .param("dir", "asc")
                         .param("academyName", "학원")
+                        .param("academyAddress", "서울")
         );
 
         // then
@@ -470,7 +471,8 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                                 - asc : 오름차순 +
                                                 - desc : 내림차순(기본값)
                                                 """).optional(),
-                                        parameterWithName("academyName").description("검색할 학원 이름").optional()
+                                        parameterWithName("academyName").description("검색할 학원 이름").optional(),
+                                        parameterWithName("academyAddress").description("검색할 학원 주소").optional()
                                 ),
                                 relaxedResponseFields(
                                         fieldWithPath("data.academies[].id").type(STRING).description("학원 아이디"),
@@ -491,12 +493,12 @@ public class AcademyDocsTest extends RestDocsEnvironment {
                                         fieldWithPath("data.pageInfo.start").type(NUMBER).description("페이지 세트의 시작 번호"),
                                         fieldWithPath("data.pageInfo.end").type(NUMBER).description("페이지 세트의 끝 번호"),
                                         fieldWithPath("data.pageInfo.hasPrev").type(BOOLEAN).description("이전 페이지 존재 여부"),
-                                        fieldWithPath("data.pageInfo.hasNext").type(BOOLEAN).description("다음 페이지 존재 여부")
+                                        fieldWithPath("data.pageInfo.hasNext").type(BOOLEAN).description("다음 페이지 존재 여부"),
+                                        fieldWithPath("data.total").type(NUMBER).description("전체 학원 수")
                                 )
                         )
                 );
     }
-
 
     @DisplayName("학원장은 자기 학원을 폐쇄 신청할 수 있다.")
     @Test

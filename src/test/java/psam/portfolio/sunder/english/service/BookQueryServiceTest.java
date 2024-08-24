@@ -54,9 +54,9 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
         // then
         List<BookFullResponse> books = (List<BookFullResponse>) result.get("books");
         assertThat(books).hasSize(1)
-                .extracting("publisher", "name", "chapter", "subject", "academyId", "openToPublic")
+                .extracting("publisher", "name", "chapter", "subject", "academyId", "openToPublic", "wordCount")
                 .containsExactly(
-                        tuple("능률(김성곤)", "중3", "1과", "본문", academy.getId(), false)
+                        tuple("능률(김성곤)", "중3", "1과", "본문", academy.getId(), false, 0)
                 );
     }
 

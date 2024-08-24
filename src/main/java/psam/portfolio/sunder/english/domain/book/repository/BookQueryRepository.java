@@ -1,6 +1,7 @@
 package psam.portfolio.sunder.english.domain.book.repository;
 
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -10,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchBookException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
+import psam.portfolio.sunder.english.domain.book.model.entity.QWord;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
 
 import java.util.Arrays;
 import java.util.List;
@@ -67,6 +70,7 @@ public class BookQueryRepository {
                 .fetch();
     }
 
+    @SuppressWarnings("unused")
     public List<Book> findAllByPageSearchCond(UUID academyId, BookPageSearchCond cond) {
         return query.selectDistinct(book)
                 .from(book)
@@ -76,6 +80,38 @@ public class BookQueryRepository {
                         createdDateTimeYearEq(cond.getYear()),
                         searchTextContains(cond.getSplitKeyword())
                 )
+                .orderBy(book.createdDateTime.desc())
+                .offset(cond.getOffset())
+                .limit(cond.getSize())
+                .fetch();
+    }
+
+    public List<BookFullResponse> findAllDTOByPageSearchCond(UUID academyId, BookPageSearchCond cond) {
+        QWord qWord = QWord.word;
+        return query.select(Projections.constructor(BookFullResponse.class,
+                        book.id,
+                        book.publisher,
+                        book.name,
+                        book.chapter,
+                        book.subject,
+                        book.schoolGrade,
+                        book.academy.id,
+                        book.openToPublic,
+                        book.createdDateTime,
+                        book.modifiedDateTime,
+                        book.createdBy,
+                        book.modifiedBy,
+                        qWord.count().intValue().coalesce(0)
+                ))
+                .from(book)
+                .leftJoin(book.words, qWord)
+                .where(
+                        academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
+                        schoolGradeEq(cond.getSchoolGrade()),
+                        createdDateTimeYearEq(cond.getYear()),
+                        searchTextContains(cond.getSplitKeyword())
+                )
+                .groupBy(book.id)
                 .orderBy(book.createdDateTime.desc())
                 .offset(cond.getOffset())
                 .limit(cond.getSize())

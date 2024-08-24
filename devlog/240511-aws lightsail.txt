@@ -50,8 +50,8 @@ GRANT ALL PRIVILEGES ON *.* TO `username`@`localhost`;
 FLUSH PRIVILEGES;
 SHOW GRANTS FOR `username`@`localhost`;
 
--- 이후 DB 를 만들 때 잊지 말고 utf8 로 설정해주자.
-CREATE DATABASE [데이타베이스명] CHARACTER SET utf8 COLLATE utf8_general_ci;
+-- 이후 DB 를 만들 때 잊지 말고 utf8mb4 로 설정해주자.
+CREATE DATABASE [데이타베이스명] CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ```
 
 // mariadb 자동 실행

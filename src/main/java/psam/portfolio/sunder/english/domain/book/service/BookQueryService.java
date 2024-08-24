@@ -44,11 +44,11 @@ public class BookQueryService {
         User getUser = userQueryRepository.getById(userId);
         UUID academyId = getAcademyFromUser(getUser).getId();
 
-        List<Book> books = bookQueryRepository.findAllByPageSearchCond(academyId, cond);
+        List<BookFullResponse> books = bookQueryRepository.findAllDTOByPageSearchCond(academyId, cond);
         long count = bookQueryRepository.countByPageSearchCond(books.size(), academyId, cond);
 
         return Map.of(
-                "books", books.stream().map(BookFullResponse::from).toList(),
+                "books", books,
                 "pageInfo", new PageInfo(cond.getPage(), cond.getSize(), count, PAGE_SET_AMOUNT)
         );
     }
