@@ -11,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchWordException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
+import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static psam.portfolio.sunder.english.domain.book.model.entity.QWord.word;
 
@@ -71,6 +73,15 @@ public class WordQueryRepository {
                 .where(word.book.in(getBooks))
                 .orderBy(Expressions.numberTemplate(Double.class, "rand()").asc())
                 .limit(numberOfWords * 2)
+                .fetch();
+    }
+
+    public List<Word> findRandomWords(List<UUID> bookIds, long limit) {
+        return query.select(word)
+                .from(word)
+                .where(word.book.id.in(bookIds))
+                .orderBy(Expressions.numberTemplate(Double.class, "rand()").asc())
+                .limit(limit)
                 .fetch();
     }
 }

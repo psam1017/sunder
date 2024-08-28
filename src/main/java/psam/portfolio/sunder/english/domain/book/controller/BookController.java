@@ -9,7 +9,9 @@ import org.springframework.web.multipart.MultipartFile;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
+import psam.portfolio.sunder.english.domain.book.model.request.WordSearchForm;
 import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
+import psam.portfolio.sunder.english.domain.book.model.response.RandomWordResponse;
 import psam.portfolio.sunder.english.domain.book.service.BookCommandService;
 import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
 import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
@@ -37,7 +39,7 @@ public class BookController {
     @PostMapping("")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     public ApiResponse<Map<String, UUID>> registerBook(@UserId UUID teacherId,
-                                                       @RequestBody BookReplace replace) {
+                                                       @RequestBody @Valid BookReplace replace) {
         UUID newBookId = bookCommandService.replaceBook(teacherId, null, replace);
         return ApiResponse.ok(Map.of("bookId", newBookId));
     }
@@ -54,7 +56,7 @@ public class BookController {
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
     public ApiResponse<Map<String, UUID>> updateBook(@UserId UUID teacherId,
                                                      @PathVariable UUID bookId,
-                                                     @RequestBody BookReplace replace) {
+                                                     @RequestBody @Valid BookReplace replace) {
         UUID updateBookId = bookCommandService.replaceBook(teacherId, bookId, replace);
         return ApiResponse.ok(Map.of("bookId", updateBookId));
     }
@@ -142,5 +144,21 @@ public class BookController {
                                                      @PathVariable UUID bookId) {
         UUID deletedBookId = bookCommandService.deleteBook(teacherId, bookId);
         return ApiResponse.ok(Map.of("bookId", deletedBookId));
+    }
+
+    /**
+     * 교재에 속한 단어 목록을 무작위로 조회 서비스.
+     * 주로 시험지 생성을 위해 사용된다.
+     *
+     * @param teacherId 선생님 아이디
+     * @param form      단어 목록 조회 조건
+     * @return 조회된 단어 목록과 시험 제목
+     */
+    @GetMapping("/words/random")
+    @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER"})
+    public ApiResponse<RandomWordResponse> findRandomWords(@UserId UUID teacherId,
+                                                           @ModelAttribute WordSearchForm form) {
+        RandomWordResponse response = bookQueryService.findRandomWords(teacherId, form);
+        return ApiResponse.ok(response);
     }
 }

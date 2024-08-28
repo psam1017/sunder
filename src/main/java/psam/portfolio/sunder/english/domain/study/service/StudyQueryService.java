@@ -145,20 +145,18 @@ public class StudyQueryService {
         LocalDateTime endDateTime = cond.getEndDateTime();
         while (startDateTime.isBefore(endDateTime)) {
             boolean dateEmpty = true;
-            int index = 0;
-            for (int i = 0; i < countByDays.size(); i++) {
-                CountByDay c = countByDays.get(i);
+            for (CountByDay c : countByDays) {
                 if (c.getStudyDate().isEqual(startDateTime.toLocalDate())) {
                     dateEmpty = false;
-                    index = i;
                     break;
                 }
             }
             if (dateEmpty) {
-                countByDays.add(index, new CountByDay(startDateTime.getDayOfYear(), 0L, 0L, 0L));
+                countByDays.add(new CountByDay(startDateTime.getDayOfYear(), 0L, 0L, 0L));
             }
             startDateTime = startDateTime.plusDays(1);
         }
+        countByDays.sort(Comparator.comparing(CountByDay::getStudyDate));
         response.put("days", countByDays);
 
         // 선생님 전용 응답값

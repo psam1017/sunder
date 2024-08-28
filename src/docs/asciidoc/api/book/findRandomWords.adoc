@@ -1,0 +1,11 @@
+=== 단어목록 무작위로 조회하기
+
+- 주로 시험지 출력을 위해 사용됩니다.
+
+==== HTTP Request
+include::{snippets}/book-docs-test/find-random-words/http-request.adoc[]
+include::{snippets}/book-docs-test/find-random-words/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/book-docs-test/find-random-words/http-response.adoc[]
+include::{snippets}/book-docs-test/find-random-words/response-fields.adoc[]

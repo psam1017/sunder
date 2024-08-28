@@ -4,7 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -12,11 +16,16 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPUT.WordPUTObject;
+import psam.portfolio.sunder.english.domain.book.model.request.WordSearchForm;
+import psam.portfolio.sunder.english.domain.book.model.response.RandomWordResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
+import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
+import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -371,6 +380,49 @@ public class BookDocsTest extends RestDocsEnvironment {
                         ),
                         relaxedResponseFields(
                                 fieldWithPath("data.bookId").type(STRING).description("삭제된 교재 아이디")
+                        )
+                ));
+    }
+
+    @DisplayName("시험지 생성을 위해 단어 목록을 조회할 수 있다.")
+    @Test
+    void findRandomWords() throws Exception {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+        Book book1 = dataCreator.registerBook(false, "능률(김성곤)", "중3", "1과", "본문", academy);
+        Book book2 = dataCreator.registerBook(false, "미래(최연희)", "중3", "1과", "본문", academy);
+        dataCreator.registerWord("apple", "사과", book1);
+        dataCreator.registerWord("banana", "바나나", book1);
+        dataCreator.registerWord("cherry", "체리", book1);
+        dataCreator.registerWord("dog", "개", book2);
+        dataCreator.registerWord("elephant", "코끼리", book2);
+        dataCreator.registerWord("fox", "여우", book2);
+
+        refresh();
+
+        // when
+        ResultActions resultActions = mockMvc.perform(
+                get("/api/books/words/random")
+                        .contentType(APPLICATION_JSON)
+                        .header(AUTHORIZATION, createBearerToken(teacher))
+                        .param("bookIds", book1.getId().toString(), book2.getId().toString())
+        );
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("code").value("200"))
+                .andDo(restDocs.document(
+                        queryParameters(
+                                parameterWithName("bookIds").description("단어를 조회할 교재 아이디 목록")
+                        ),
+                        relaxedResponseFields(
+                                fieldWithPath("data.title").type(STRING).description("시험 제목"),
+                                fieldWithPath("data.words[].id").type(NUMBER).description("단어 아이디"),
+                                fieldWithPath("data.words[].english").type(STRING).description("영어 단어"),
+                                fieldWithPath("data.words[].korean").type(STRING).description("한글 뜻")
                         )
                 ));
     }

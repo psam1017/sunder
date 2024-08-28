@@ -3,14 +3,19 @@ package psam.portfolio.sunder.english.domain.book.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.exception.BookAccessDeniedException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
+import psam.portfolio.sunder.english.domain.book.model.entity.QBook;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.request.WordSearchForm;
 import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
+import psam.portfolio.sunder.english.domain.book.model.response.RandomWordResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 import psam.portfolio.sunder.english.domain.book.repository.BookQueryRepository;
+import psam.portfolio.sunder.english.domain.book.repository.WordQueryRepository;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.exception.NotAUserException;
@@ -18,10 +23,7 @@ import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.pagination.PageInfo;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -29,9 +31,11 @@ import java.util.UUID;
 public class BookQueryService {
 
     private static final int PAGE_SET_AMOUNT = 10;
+    private static final int TEST_WORD_AMOUNT = 50;
 
     private final BookQueryRepository bookQueryRepository;
     private final UserQueryRepository userQueryRepository;
+    private final WordQueryRepository wordQueryRepository;
 
     /**
      * 교재 목록 조회 서비스
@@ -82,5 +86,67 @@ public class BookQueryService {
             return student.getAcademy();
         }
         throw new NotAUserException();
+    }
+
+    /**
+     * 교재에 속한 단어 목록을 무작위로 조회 서비스.
+     * 주로 시험지 생성을 위해 사용된다.
+     *
+     * @param teacherId 선생님 아이디
+     * @param form      단어 목록 조회 조건
+     * @return 조회된 단어 목록과 시험 제목
+     */
+    public RandomWordResponse findRandomWords(UUID teacherId, WordSearchForm form) {
+
+        User getUser = userQueryRepository.getById(teacherId);
+        Academy academy = getAcademyFromUser(getUser);
+
+        List<Book> books = bookQueryRepository.findAll(
+                QBook.book.academy.id.eq(academy.getId()),
+                QBook.book.id.in(form.getBookIds())
+        );
+
+        books.sort(Comparator.comparing(Book::getName));
+        String title = createTitle(books);
+
+        List<UUID> bookIds = books.stream().map(Book::getId).toList();
+        List<WordFullResponse> words = wordQueryRepository.findRandomWords(bookIds, TEST_WORD_AMOUNT).stream().map(WordFullResponse::from).toList();
+
+        return RandomWordResponse.builder()
+                .title(title)
+                .words(words)
+                .build();
+    }
+
+    private String createTitle(List<Book> books) {
+        Book firstBook = books.get(0);
+        String title = buildTitleSegment(firstBook);
+
+        if (books.size() > 1) {
+            Book lastBook = books.get(books.size() - 1);
+            title += " ~ " + buildTitleSegment(lastBook);
+        }
+        return title;
+    }
+
+    private String buildTitleSegment(Book book) {
+        StringBuilder titleSegment = new StringBuilder();
+
+        if (StringUtils.hasText(book.getPublisher())) {
+            titleSegment.append(book.getPublisher()).append(" ");
+        }
+        titleSegment.append(book.getName());
+
+        boolean chapterExist = StringUtils.hasText(book.getChapter());
+        boolean subjectExist = StringUtils.hasText(book.getSubject());
+
+        if (chapterExist && subjectExist) {
+            titleSegment.append("(").append(book.getChapter()).append(" ").append(book.getSubject()).append(")");
+        } else if (chapterExist) {
+            titleSegment.append("(").append(book.getChapter()).append(")");
+        } else if (subjectExist) {
+            titleSegment.append("(").append(book.getSubject()).append(")");
+        }
+        return titleSegment.toString();
     }
 }

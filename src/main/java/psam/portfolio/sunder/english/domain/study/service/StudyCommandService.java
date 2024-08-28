@@ -110,7 +110,7 @@ public class StudyCommandService {
 
             // 학습 생성
             long nextSequence = studyQueryRepository.findNextSequenceOfLastStudy();
-            Study saveStudy = studyCommandRepository.save(post.toEntity(nextSequence, getStudent, title)); // status = ASSIGNED
+            Study saveStudy = studyCommandRepository.save(post.toEntity(title, nextSequence, getStudent, getTeacher)); // status = ASSIGNED
             saveStudy.getStudyRanges().addAll(studyRanges);
 
             // 학습 단어 저장
@@ -119,7 +119,6 @@ public class StudyCommandService {
             saveStudy.getStudyWords().addAll(saveStudyWords);
             saveStudyIds.add(saveStudy.getId());
         }
-
         return saveStudyIds;
     }
 

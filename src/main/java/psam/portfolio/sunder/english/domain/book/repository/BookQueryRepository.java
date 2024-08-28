@@ -14,6 +14,7 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QWord;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
+import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 
 import java.util.Arrays;
 import java.util.List;

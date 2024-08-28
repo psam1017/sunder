@@ -8,8 +8,10 @@ import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
+import psam.portfolio.sunder.english.domain.book.model.request.WordSearchForm;
 import psam.portfolio.sunder.english.domain.book.model.response.BookAndWordFullResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
+import psam.portfolio.sunder.english.domain.book.model.response.RandomWordResponse;
 import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 import psam.portfolio.sunder.english.domain.book.service.BookQueryService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -91,6 +93,44 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
                         tuple("사과", "apple"),
                         tuple("바나나", "banana"),
                         tuple("체리", "cherry")
+                );
+    }
+
+    @DisplayName("시험지 생성을 위해 단어 목록을 조회할 수 있다.")
+    @Test
+    void findRandomWords() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+        Book book1 = dataCreator.registerBook(false, "능률(김성곤)", "중3", "1과", "본문", academy);
+        Book book2 = dataCreator.registerBook(false, "미래(최연희)", "중3", "1과", "본문", academy);
+        dataCreator.registerWord("apple", "사과", book1);
+        dataCreator.registerWord("banana", "바나나", book1);
+        dataCreator.registerWord("cherry", "체리", book1);
+        dataCreator.registerWord("dog", "개", book2);
+        dataCreator.registerWord("elephant", "코끼리", book2);
+        dataCreator.registerWord("fox", "여우", book2);
+
+        WordSearchForm form = WordSearchForm.builder()
+                .bookIds(List.of(book1.getId(), book2.getId()))
+                .build();
+
+        // when
+        RandomWordResponse result = refreshAnd(() -> sut.findRandomWords(teacher.getId(), form));
+
+        // then
+        assertThat(result.getTitle()).isNotBlank();
+        List<WordFullResponse> words = result.getWords();
+        assertThat(words).hasSize(6)
+                .extracting("korean", "english")
+                .containsExactlyInAnyOrder(
+                        tuple("사과", "apple"),
+                        tuple("바나나", "banana"),
+                        tuple("체리", "cherry"),
+                        tuple("개", "dog"),
+                        tuple("코끼리", "elephant"),
+                        tuple("여우", "fox")
                 );
     }
 }

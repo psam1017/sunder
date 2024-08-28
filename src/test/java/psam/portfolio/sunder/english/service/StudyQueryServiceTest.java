@@ -524,12 +524,9 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
                 .contains(tuple(LocalDate.now(), 4L, 10L, 40L));
 
         List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
-        assertThat(oldHomeworks).hasSize(2)
+        assertThat(oldHomeworks).hasSize(1)
                 .extracting("studentId", "status")
-                .containsExactlyInAnyOrder(
-                        tuple(student.getId(), StudyStatus.ASSIGNED),
-                        tuple(student.getId(), StudyStatus.STARTED)
-                );
+                .containsExactlyInAnyOrder(tuple(student.getId(), StudyStatus.ASSIGNED));
 
         List<TopStudent> bestAnswerRates = (List<TopStudent>) statistic.get("bestAnswerRates");
         assertThat(bestAnswerRates).hasSize(1)
@@ -619,12 +616,9 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
                 .contains(tuple(LocalDate.now(), 4L, 10L, 40L));
 
         List<OldHomework> oldHomeworks = (List<OldHomework>) statistic.get("oldHomeworks");
-        assertThat(oldHomeworks).hasSize(2)
+        assertThat(oldHomeworks).hasSize(1)
                 .extracting("studentId", "status")
-                .containsExactlyInAnyOrder(
-                        tuple(student.getId(), StudyStatus.ASSIGNED),
-                        tuple(student.getId(), StudyStatus.STARTED)
-                );
+                .containsExactlyInAnyOrder(tuple(student.getId(), StudyStatus.ASSIGNED));
 
         assertThat(statistic).doesNotContainKeys("bestAnswerRates", "worstAnswerRates", "bestStudyCounts", "worstStudyCounts");
     }

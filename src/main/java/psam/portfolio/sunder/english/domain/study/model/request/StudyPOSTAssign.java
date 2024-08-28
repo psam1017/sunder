@@ -11,6 +11,7 @@ import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassificatio
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
 import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
+import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,8 +33,7 @@ public class StudyPOSTAssign extends StudyPOSTStart {
         this.shuffleEach = shuffleEach;
     }
 
-    @Override
-    public Study toEntity(long sequence, Student student, String title) {
+    public Study toEntity(String title, long sequence, Student student, Teacher teacher) {
         return Study.builder()
                 .sequence(sequence)
                 .ignoreCase(ignoreCase == null || ignoreCase)
@@ -43,6 +43,7 @@ public class StudyPOSTAssign extends StudyPOSTStart {
                 .classification(super.getClassification())
                 .target(super.getTarget())
                 .student(student)
+                .teacher(teacher)
                 .build();
     }
 }

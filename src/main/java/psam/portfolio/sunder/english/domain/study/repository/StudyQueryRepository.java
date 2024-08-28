@@ -296,7 +296,7 @@ public class StudyQueryRepository {
                         studentIdEq(cond.getStudentId()),
                         createdDateTimeGoe(cond.getStartDateTime()),
                         createdDateTimeLoe(cond.getEndDateTime()),
-                        statusNe(StudyStatus.SUBMITTED)
+                        studyStatusEq(StudyStatus.ASSIGNED)
                 )
                 .orderBy(study.createdDateTime.asc())
                 .limit(NON_SUBMIT_STUDENT_LIMIT)
