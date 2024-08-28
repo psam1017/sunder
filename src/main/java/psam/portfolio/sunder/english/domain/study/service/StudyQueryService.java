@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import psam.portfolio.sunder.english.domain.student.model.entity.Student;
 import psam.portfolio.sunder.english.domain.student.model.response.StudentFullResponse;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyClassification;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyStatus;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyTarget;
+import psam.portfolio.sunder.english.domain.study.enumeration.StudyType;
 import psam.portfolio.sunder.english.domain.study.model.entity.QStudy;
 import psam.portfolio.sunder.english.domain.study.model.entity.Study;
 import psam.portfolio.sunder.english.domain.study.model.request.StudySlicingSearchCond;
@@ -134,12 +138,50 @@ public class StudyQueryService {
         Map<String, Object> response = new HashMap<>();
 
         // 공통 응답값
-        response.put("statuses", studyQueryRepository.countByStatus(cond, academyId));
-        response.put("types", studyQueryRepository.countByType(cond, academyId));
-        response.put("classifications", studyQueryRepository.countByClassification(cond, academyId));
-        response.put("targets", studyQueryRepository.countByTarget(cond, academyId));
         response.put("oldHomeworks", studyQueryRepository.findOldHomeworks(cond, academyId));
 
+        // group 에 의해 값이 없다면 0 으로 채워준다.
+        // status
+        List<CountByStatus> statuses = studyQueryRepository.countByStatus(cond, academyId);
+        for (StudyStatus e : StudyStatus.values()) {
+            if (e == StudyStatus.DELETED) {
+                continue;
+            }
+            if (statuses.stream().noneMatch(c -> c.getStatus() == e)) {
+                statuses.add(new CountByStatus(e, 0L));
+            }
+        }
+        response.put("statuses", statuses);
+
+        // type
+        List<CountByType> types = studyQueryRepository.countByType(cond, academyId);
+        for (StudyType e : StudyType.values()) {
+            if (types.stream().noneMatch(c -> c.getType() == e)) {
+                types.add(new CountByType(e, 0L));
+            }
+        }
+        response.put("types", types);
+
+
+        // classifications
+        List<CountByClassification> classifications = studyQueryRepository.countByClassification(cond, academyId);
+        for (StudyClassification e : StudyClassification.values()) {
+            if (classifications.stream().noneMatch(c -> c.getClassification() == e)) {
+                classifications.add(new CountByClassification(e, 0L));
+            }
+        }
+        response.put("classifications", classifications);
+
+        // targets
+        List<CountByTarget> targets = studyQueryRepository.countByTarget(cond, academyId);
+        for (StudyTarget e : StudyTarget.values()) {
+            if (targets.stream().noneMatch(c -> c.getTarget() == e)) {
+                targets.add(new CountByTarget(e, 0L));
+            }
+        }
+        response.put("targets", targets);
+
+        // days
         List<CountByDay> countByDays = studyQueryRepository.countByDay(cond, academyId);
         LocalDateTime startDateTime = cond.getStartDateTime();
         LocalDateTime endDateTime = cond.getEndDateTime();

@@ -504,19 +504,29 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
                 );
 
         List<CountByType> types = (List<CountByType>) statistic.get("types");
-        assertThat(types).hasSize(1)
+        assertThat(types).hasSize(3)
                 .extracting(t -> tuple(t.getType(), t.getCount()))
-                .containsExactly(tuple(StudyType.WRITING, 4L));
+                .containsExactlyInAnyOrder(
+                        tuple(StudyType.WRITING, 4L),
+                        tuple(StudyType.SELECT, 0L),
+                        tuple(StudyType.TRACING, 0L)
+                );
 
         List<CountByClassification> classifications = (List<CountByClassification>) statistic.get("classifications");
-        assertThat(classifications).hasSize(1)
+        assertThat(classifications).hasSize(2)
                 .extracting(c -> tuple(c.getClassification(), c.getCount()))
-                .containsExactly(tuple(StudyClassification.EXAM, 4L));
+                .containsExactlyInAnyOrder(
+                        tuple(StudyClassification.EXAM, 4L),
+                        tuple(StudyClassification.PRACTICE, 0L)
+                );
 
         List<CountByTarget> targets = (List<CountByTarget>) statistic.get("targets");
-        assertThat(targets).hasSize(1)
+        assertThat(targets).hasSize(2)
                 .extracting(t -> tuple(t.getTarget(), t.getCount()))
-                .containsExactly(tuple(StudyTarget.KOREAN, 4L));
+                .containsExactlyInAnyOrder(
+                        tuple(StudyTarget.KOREAN, 4L),
+                        tuple(StudyTarget.ENGLISH, 0L)
+                );
 
         List<CountByDay> days = (List<CountByDay>) statistic.get("days");
         assertThat(days).hasSize(7)
@@ -596,19 +606,29 @@ class StudyQueryServiceTest extends AbstractSunderApplicationTest {
                 );
 
         List<CountByType> types = (List<CountByType>) statistic.get("types");
-        assertThat(types).hasSize(1)
+        assertThat(types).hasSize(3)
                 .extracting(t -> tuple(t.getType(), t.getCount()))
-                .containsExactly(tuple(StudyType.WRITING, 4L));
+                .containsExactlyInAnyOrder(
+                        tuple(StudyType.WRITING, 4L),
+                        tuple(StudyType.SELECT, 0L),
+                        tuple(StudyType.TRACING, 0L)
+                );
 
         List<CountByClassification> classifications = (List<CountByClassification>) statistic.get("classifications");
-        assertThat(classifications).hasSize(1)
+        assertThat(classifications).hasSize(2)
                 .extracting(c -> tuple(c.getClassification(), c.getCount()))
-                .containsExactly(tuple(StudyClassification.EXAM, 4L));
+                .containsExactlyInAnyOrder(
+                        tuple(StudyClassification.EXAM, 4L),
+                        tuple(StudyClassification.PRACTICE, 0L)
+                );
 
         List<CountByTarget> targets = (List<CountByTarget>) statistic.get("targets");
-        assertThat(targets).hasSize(1)
+        assertThat(targets).hasSize(2)
                 .extracting(t -> tuple(t.getTarget(), t.getCount()))
-                .containsExactly(tuple(StudyTarget.KOREAN, 4L));
+                .containsExactlyInAnyOrder(
+                        tuple(StudyTarget.KOREAN, 4L),
+                        tuple(StudyTarget.ENGLISH, 0L)
+                );
 
         List<CountByDay> days = (List<CountByDay>) statistic.get("days");
         assertThat(days).hasSize(7)
