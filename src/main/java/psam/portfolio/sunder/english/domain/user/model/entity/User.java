@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
@@ -19,13 +18,16 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(
         name = "users",
-        indexes = @Index(columnList = "created_date_time")
+        indexes = {
+                @Index(columnList = "created_date_time"),
+                @Index(columnList = "login_id"),
+                @Index(columnList = "email"),
+        }
 )
 @Entity
 public abstract class User extends BaseEntity {
 
     // 탈퇴일도 추가하면 좋을 듯. 하지만 지금은 modifiedDateTime 으로 대체.
-
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 

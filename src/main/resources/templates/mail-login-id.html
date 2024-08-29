@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
-<head>
-	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-	<meta content="IE=edge" http-equiv="X-UA-Compatible">
-	<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-	<title>Login Id</title>
-</head>
-<body>
-<div class="container mt-5 text-center">
-	<div class="row">
-		<div class="col-md-12">
-			<h1>로그인 아이디</h1>
-			<!--/*@thymesVar id="loginId" type="java.lang.String"*/-->
-			<p>로그인 아이디는 <strong th:text="${loginId}"></strong> 입니다.</p>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>로그인 아이디</title>
+	</head>
+	<body>
+		<div style="width: 100%; margin-top: 3rem; text-align: center;">
+			<div style="display: flex; justify-content: center;">
+				<div style="width: 100%; max-width: 37.5rem;">
+					<h1 style="font-size: 2.5rem; margin-bottom: 1.25rem;">로그인 아이디</h1>
+					<p style="font-size: 1rem; line-height: 1.5;">
+						안녕하세요. 썬더에듀입니다.<br/>
+						<!--/*@thymesVar id="loginId" type="java.lang.String"*/-->
+						로그인 아이디는 <strong th:text="${loginId}" style="font-weight: bold;"></strong> 입니다.
+					</p>
+				</div>
+			</div>
 		</div>
-	</div>
-</div>
-</body>
+	</body>
 </html>

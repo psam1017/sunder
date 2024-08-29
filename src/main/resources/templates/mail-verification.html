@@ -1,10 +1,20 @@
-<div class="container mt-5 text-center">
-	<div class="row">
-		<div class="col-md-12">
-			<h1>이메일 인증 메시지</h1>
-			<p>아래 링크를 클릭하면 이메일 인증이 완료됩니다.</p>
-			<!--/*@thymesVar id="url" type="java.lang.String"*/-->
-			<a th:href="${url}" target="_blank" class="btn btn-primary">이메일 인증</a>
+<!DOCTYPE html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>이메일 인증</title>
+	</head>
+	<body>
+		<div style="width: 100%; margin-top: 3rem; text-align: center;">
+			<div style="display: flex; justify-content: center;">
+				<div style="max-width: 37.5rem; width: 100%;">
+					<h1 style="font-size: 2rem; margin-bottom: 1rem;">이메일 인증 메시지</h1>
+					<p style="font-size: 1rem; line-height: 1.5; margin-bottom: 1.5rem;">아래 링크를 클릭하면 이메일 인증이 완료됩니다.</p>
+					<!--/*@thymesVar id="url" type="java.lang.String"*/-->
+					<a th:href="${url}" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; font-size: 1rem; text-decoration: none; color: #ffffff; background-color: #007bff; border-radius: 0.25rem; font-weight: bold;">이메일 인증</a>
+				</div>
+			</div>
 		</div>
-	</div>
-</div>
+	</body>
+</html>

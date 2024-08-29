@@ -1,11 +1,12 @@
 package psam.portfolio.sunder.english.infrastructure.mail;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -15,18 +16,17 @@ public class MailUtils {
     private final String fromEmail;
 
     // TODO: 2024-01-29 mail username, password 설정
-    // mail template refactoring
 
     public boolean sendMail(String recipient, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(recipient);
-        message.setFrom(fromEmail);
-        message.setSubject(subject);
-        message.setText(text);
-
         try {
-            javaMailSender.send(message);
-        } catch (MailException e) {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            mimeMessageHelper.setTo(recipient);
+            mimeMessageHelper.setFrom(fromEmail);
+            mimeMessageHelper.setSubject(subject);
+            mimeMessageHelper.setText(text, true);
+            javaMailSender.send(mimeMessage);
+        } catch (MailException | MessagingException e) {
             log.info("failed to send mail to {}", recipient, e);
             return false;
         }
