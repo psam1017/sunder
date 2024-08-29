@@ -15,6 +15,7 @@ endif::[]
 [[Teacher]]
 == Teacher API
 include::api/teacher/registerTeacher.adoc[]
+include::api/teacher/verifyTeacher.adoc[]
 include::api/teacher/getTeacherListByTeacher.adoc[]
 include::api/teacher/getTeacherDetailByTeacher.adoc[]
 include::api/teacher/getTeacherListByStudent.adoc[]
