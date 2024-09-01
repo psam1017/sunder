@@ -13,13 +13,11 @@ import java.util.Set;
 public class UserDetailsJwt implements UserDetails {
 
     private final String username;
-    private final String password;
     private final UserStatus status;
     private final List<RoleName> roles;
 
-    public UserDetailsJwt(String username, String password, String status, List<RoleName> roles) {
+    public UserDetailsJwt(String username, String status, List<RoleName> roles) {
         this.username = username;
-        this.password = password;
         this.status = UserStatus.ofNullable(status);
         this.roles = roles;
     }
@@ -38,7 +36,7 @@ public class UserDetailsJwt implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.password;
+        return null;
     }
 
     // 계정 활성화 여부

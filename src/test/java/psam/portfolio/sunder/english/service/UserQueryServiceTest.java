@@ -171,7 +171,6 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
         assertThat(refreshTokenSubject).isEqualTo(director.getId().toString());
         Claims claims = jwtUtils.extractAllClaims(accessToken);
-        assertThat(claims.get(JwtClaim.PASSWORD.toString(), String.class)).isEqualTo(director.getLoginPw());
         assertThat(claims.get(JwtClaim.USER_STATUS.toString(), String.class)).isEqualTo(UserStatus.ACTIVE.toString());
         assertThat(claims.get(JwtClaim.REMOTE_IP.toString(), String.class)).isEqualTo(remoteIp);
 
@@ -269,7 +268,6 @@ class UserQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(accessTokenSubject).isEqualTo(director.getId().toString());
 
         Claims claims = jwtUtils.extractAllClaims(accessToken);
-        assertThat(claims.get(JwtClaim.PASSWORD.toString(), String.class)).isEqualTo(director.getLoginPw());
         assertThat(claims.get(JwtClaim.USER_STATUS.toString(), String.class)).isEqualTo(UserStatus.ACTIVE.toString());
         assertThat(claims.get(JwtClaim.REMOTE_IP.toString(), String.class)).isEqualTo(remoteIp);
 

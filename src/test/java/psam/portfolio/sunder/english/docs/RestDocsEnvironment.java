@@ -59,7 +59,6 @@ public class RestDocsEnvironment extends AbstractSunderApplicationTest {
 
         Map<String, Object> claims = Map.of(
                 LOGIN_ID.toString(), user.getLoginId(),
-                PASSWORD.toString(), user.getLoginPw(),
                 USER_STATUS.toString(), user.getStatus().toString(),
                 ROLE_NAMES.toString(), createJson(user.getRoles().stream().map(UserRole::getRoleName).toList()),
                 ACADEMY_ID.toString(), academyId

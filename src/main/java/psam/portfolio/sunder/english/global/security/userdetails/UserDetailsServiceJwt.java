@@ -32,7 +32,6 @@ public class UserDetailsServiceJwt {
             Claims claims = jwtUtils.extractAllClaims(token);
             return new UserDetailsJwt(
                     jwtUtils.extractSubject(token),
-                    claims.get(PASSWORD.toString(), String.class),
                     claims.get(USER_STATUS.toString(), String.class),
                     objectMapper.readValue(claims.get(ROLE_NAMES.toString(), String.class), new TypeReference<>() {})
             );

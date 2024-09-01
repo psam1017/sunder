@@ -127,7 +127,6 @@ public class UserQueryService {
 
         Map<String, Object> claims = Map.of(
                 LOGIN_ID.toString(), getUser.getLoginId(),
-                PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
                 REMOTE_IP.toString(), remoteIp,
                 ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList()),
@@ -162,7 +161,6 @@ public class UserQueryService {
 
         Map<String, Object> claims = Map.of(
                 LOGIN_ID.toString(), getUser.getLoginId(),
-                PASSWORD.toString(), getUser.getLoginPw(),
                 USER_STATUS.toString(), getUser.getStatus().toString(),
                 REMOTE_IP.toString(), remoteIp,
                 ROLE_NAMES.toString(), createJson(getUser.getRoles().stream().map(UserRole::getRoleName).toList()),
