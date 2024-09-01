@@ -80,9 +80,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         CorsConfiguration configuration = new CorsConfiguration();
-        // TODO: 2024-05-14 프론트 개발 종료 후 origin 을 localhost:3000 으로 변경한다.
-//        configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedOrigin("https://ssunder.link");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
