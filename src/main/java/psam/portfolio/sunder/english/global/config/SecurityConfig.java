@@ -35,6 +35,8 @@ import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServ
 import psam.portfolio.sunder.english.global.security.userdetails.UserDetailsServiceRepo;
 import psam.portfolio.sunder.english.infrastructure.jwt.JwtUtils;
 
+import java.util.List;
+
 @Configuration
 @EnableMethodSecurity(securedEnabled = true)
 @EnableWebSecurity
@@ -79,10 +81,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
+        // TODO: 2024-09-01 localhost:3000 을 제거
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("https://ssunder.link");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
+        configuration.setAllowedOrigins(List.of(
+                "https://ssunder.link",
+                "http://localhost:3000"
+        ));
+        configuration.addAllowedHeader(CorsConfiguration.ALL);
+        configuration.addAllowedMethod(CorsConfiguration.ALL);
         configuration.setAllowCredentials(true);
         source.registerCorsConfiguration("/api/**", configuration);
 
