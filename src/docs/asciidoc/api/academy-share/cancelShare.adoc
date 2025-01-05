@@ -1,0 +1,9 @@
+=== 교재를 공유한 학원의 공유 취소하기
+
+==== HTTP Request
+include::{snippets}/academy-share-docs-test/cancel-share/http-request.adoc[]
+include::{snippets}/academy-share-docs-test/cancel-share/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-share-docs-test/cancel-share/http-response.adoc[]
+include::{snippets}/academy-share-docs-test/cancel-share/response-fields.adoc[]

@@ -1,0 +1,9 @@
+=== 교재를 공유할 학원 추가하기
+
+==== HTTP Request
+include::{snippets}/academy-share-docs-test/share/http-request.adoc[]
+include::{snippets}/academy-share-docs-test/share/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-share-docs-test/share/http-response.adoc[]
+include::{snippets}/academy-share-docs-test/share/response-fields.adoc[]

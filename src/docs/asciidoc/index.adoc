@@ -15,6 +15,9 @@ endif::[]
 [[Academy]]
 == link:academy.html[Academy API]
 
+[[AcademyShare]]
+== link:academy-share.html[Academy Share API]
+
 [[Teacher]]
 == link:teacher.html[Teacher API]
 

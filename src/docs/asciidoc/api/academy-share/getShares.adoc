@@ -1,0 +1,9 @@
+=== 교재를 공유 중인 학원 목록 조회하기
+
+==== HTTP Request
+include::{snippets}/academy-share-docs-test/get-shares/http-request.adoc[]
+include::{snippets}/academy-share-docs-test/get-shares/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/academy-share-docs-test/get-shares/http-response.adoc[]
+include::{snippets}/academy-share-docs-test/get-shares/response-fields.adoc[]
