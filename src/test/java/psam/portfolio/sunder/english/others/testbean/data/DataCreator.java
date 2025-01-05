@@ -2,9 +2,13 @@ package psam.portfolio.sunder.english.others.testbean.data;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
+import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.model.entity.AcademyShare;
+import psam.portfolio.sunder.english.domain.academy.model.entity.QAcademyShare;
 import psam.portfolio.sunder.english.domain.academy.repository.AcademyCommandRepository;
+import psam.portfolio.sunder.english.domain.academy.repository.AcademyShareQueryRepository;
+import psam.portfolio.sunder.english.domain.academy.service.AcademyShareCommandService;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.Word;
 import psam.portfolio.sunder.english.domain.book.repository.BookCommandRepository;
@@ -21,12 +25,12 @@ import psam.portfolio.sunder.english.domain.study.model.request.StudyPOSTStart;
 import psam.portfolio.sunder.english.domain.study.service.StudyCommandService;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.teacher.repository.TeacherCommandRepository;
+import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
+import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.model.entity.QRole;
 import psam.portfolio.sunder.english.domain.user.model.entity.Role;
 import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.model.entity.UserRole;
-import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
-import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
 import psam.portfolio.sunder.english.domain.user.repository.RoleCommandRepository;
 import psam.portfolio.sunder.english.domain.user.repository.RoleQueryRepository;
 import psam.portfolio.sunder.english.domain.user.repository.UserRoleCommandRepository;
@@ -51,6 +55,8 @@ public class DataCreator {
     private final StudentCommandRepository studentCommandRepository;
     private final TeacherCommandRepository teacherCommandRepository;
     private final AcademyCommandRepository academyCommandRepository;
+    private final AcademyShareCommandService academyShareCommandService;
+    private final AcademyShareQueryRepository academyShareQueryRepository;
     private final BookCommandRepository bookCommandRepository;
     private final WordCommandRepository wordCommandRepository;
     private final StudyCommandService studyCommandService;
@@ -215,5 +221,13 @@ public class DataCreator {
 
     public UUID startAnyStudy(UUID studentId, List<UUID> bookIds) {
         return studyCommandService.start(studentId, new StudyPOSTStart(bookIds, true, 10, StudyType.WRITING, StudyClassification.EXAM, StudyTarget.KOREAN));
+    }
+
+    public AcademyShare registerAcademyShare(Academy sharingAcademy, Academy sharedAcademy) {
+        academyShareCommandService.share(sharingAcademy.getId(), sharedAcademy.getId());
+        return academyShareQueryRepository.getOne(
+                QAcademyShare.academyShare.sharingAcademy.id.eq(sharingAcademy.getId()),
+                QAcademyShare.academyShare.sharedAcademy.id.eq(sharedAcademy.getId())
+        );
     }
 }
