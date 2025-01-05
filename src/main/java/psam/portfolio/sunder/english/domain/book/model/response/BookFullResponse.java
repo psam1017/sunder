@@ -22,7 +22,7 @@ public class BookFullResponse {
     private String subject;
     private Integer schoolGrade;
     private UUID academyId;
-    private boolean openToPublic;
+    private boolean shared;
     @KoreanDateTime
     private LocalDateTime createdDateTime;
     @KoreanDateTime
@@ -40,7 +40,7 @@ public class BookFullResponse {
                 .subject(book.getSubject())
                 .schoolGrade(book.getSchoolGrade())
                 .academyId(book.getAcademy().getId())
-                .openToPublic(book.isOpenToPublic())
+                .shared(book.isShared())
                 .createdDateTime(book.getCreatedDateTime())
                 .modifiedDateTime(book.getModifiedDateTime())
                 .createdBy(book.getCreatedBy())

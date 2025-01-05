@@ -1,6 +1,5 @@
 package psam.portfolio.sunder.english.domain.book.repository;
 
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -8,13 +7,11 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import psam.portfolio.sunder.english.domain.book.enumeration.BookStatus;
 import psam.portfolio.sunder.english.domain.book.exception.NoSuchBookException;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.entity.QWord;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.response.BookFullResponse;
-import psam.portfolio.sunder.english.domain.book.model.response.WordFullResponse;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +73,7 @@ public class BookQueryRepository {
         return query.selectDistinct(book)
                 .from(book)
                 .where(
-                        academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
+                        academyIdEqOrShared(academyId, cond.isShared()),
                         schoolGradeEq(cond.getSchoolGrade()),
                         createdDateTimeYearEq(cond.getYear()),
                         searchTextContains(cond.getSplitKeyword())
@@ -97,7 +94,7 @@ public class BookQueryRepository {
                         book.subject,
                         book.schoolGrade,
                         book.academy.id,
-                        book.openToPublic,
+                        book.shared,
                         book.createdDateTime,
                         book.modifiedDateTime,
                         book.createdBy,
@@ -107,7 +104,7 @@ public class BookQueryRepository {
                 .from(book)
                 .leftJoin(book.words, qWord)
                 .where(
-                        academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
+                        academyIdEqOrShared(academyId, cond.isShared()),
                         schoolGradeEq(cond.getSchoolGrade()),
                         createdDateTimeYearEq(cond.getYear()),
                         searchTextContains(cond.getSplitKeyword())
@@ -132,7 +129,7 @@ public class BookQueryRepository {
         Long count = query.select(book.countDistinct())
                 .from(book)
                 .where(
-                        academyIdEqOrIsNullByPrivateOnly(academyId, cond.isPrivateOnly()),
+                        academyIdEqOrShared(academyId, cond.isShared()),
                         schoolGradeEq(cond.getSchoolGrade()),
                         createdDateTimeYearEq(cond.getYear()),
                         searchTextContains(cond.getSplitKeyword())
@@ -141,9 +138,11 @@ public class BookQueryRepository {
         return count == null ? 0 : count;
     }
 
-    private static BooleanExpression academyIdEqOrIsNullByPrivateOnly(UUID academyId, boolean privateOnly) {
+    private static BooleanExpression academyIdEqOrShared(UUID academyId, boolean shared) {
         BooleanExpression expression = book.academy.id.eq(academyId);
-        return privateOnly ? expression : expression.or(book.academy.id.isNull());
+        return shared ? expression : expression
+                .or(book.academy.id.isNull())
+                .or(book.academy.academyShares.any().sharedAcademy.id.eq(academyId));
     }
 
     private BooleanExpression schoolGradeEq(Integer schoolGrade) {

@@ -205,7 +205,7 @@ class StudyCommandServiceTest extends AbstractSunderApplicationTest {
         }
 
         Book book2 = dataCreator.registerAnyBook(null);
-        book2.setOpenToPublic(false);
+        book2.setShared(false);
         for (int i = 1; i <= 10; i++) {
             dataCreator.registerWord("apple" + i, "사과" + i, book2);
         }

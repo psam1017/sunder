@@ -56,6 +56,9 @@ public class Academy extends TimeEntity {
     @OneToMany(mappedBy = "academy")
     private List<Book> books = new ArrayList<>();
 
+    @OneToMany(mappedBy = "sharingAcademy")
+    private List<AcademyShare> academyShares = new ArrayList<>();
+
     @Builder
     public Academy(String name, Address address, String phone, String email, boolean openToPublic, AcademyStatus status) {
         this.name = name;
@@ -119,5 +122,10 @@ public class Academy extends TimeEntity {
 
     public void setWithdrawalAt(LocalDateTime withdrawalAt) {
         this.withdrawalAt = withdrawalAt;
+    }
+
+    public boolean isSameOrShared(Academy academy) {
+        return Objects.equals(this.id, academy.getId())
+                || academyShares.stream().anyMatch(as -> Objects.equals(as.getSharedAcademy().getId(), academy.getId()));
     }
 }

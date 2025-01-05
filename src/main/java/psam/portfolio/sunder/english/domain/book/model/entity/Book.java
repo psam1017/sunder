@@ -13,7 +13,6 @@ import psam.portfolio.sunder.english.global.jpa.audit.BaseEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -32,7 +31,7 @@ public class Book extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private boolean openToPublic;
+    private boolean shared;
     @Enumerated(EnumType.STRING)
     private BookStatus status;
 
@@ -52,9 +51,9 @@ public class Book extends BaseEntity {
     private List<Word> words = new ArrayList<>();
 
     @Builder
-    public Book(boolean openToPublic, String publisher, String name, String chapter, String subject, Integer schoolGrade, Academy academy) {
+    public Book(boolean shared, String publisher, String name, String chapter, String subject, Integer schoolGrade, Academy academy) {
         this.status = BookStatus.CREATED;
-        this.openToPublic = openToPublic;
+        this.shared = shared;
         this.publisher = publisher;
         this.name = name;
         this.chapter = chapter;
@@ -64,8 +63,8 @@ public class Book extends BaseEntity {
         updateSearchText();
     }
 
-    public void setOpenToPublic(boolean openToPublic) {
-        this.openToPublic = openToPublic;
+    public void setShared(boolean openToPublic) {
+        this.shared = openToPublic;
     }
 
     public void setStatus(BookStatus status) {
@@ -110,7 +109,7 @@ public class Book extends BaseEntity {
         this.searchText = searchText.toString().toLowerCase();
     }
 
-    public boolean isSameAcademyOrPublic(Academy academy) {
-        return openToPublic || this.academy == null || Objects.equals(this.academy.getId(), academy.getId());
+    public boolean canAccess(Academy academy) {
+        return this.academy == null || this.academy.isSameOrShared(academy);
     }
 }

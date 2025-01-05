@@ -17,11 +17,9 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 public class BookReplace {
 
     @NotNull
-    private Boolean openToPublic;
-
+    private Boolean shared;
     @Length(max = 30)
     private String publisher;
-
     @NotBlank
     @Length(max = 30)
     private String name;
@@ -29,12 +27,11 @@ public class BookReplace {
     private String chapter;
     @Length(max = 30)
     private String subject;
-
     private Integer schoolGrade;
 
     public Book toEntity(Academy academy) {
         return Book.builder()
-                .openToPublic(openToPublic)
+                .shared(shared)
                 .publisher(publisher)
                 .name(name)
                 .chapter(chapter)

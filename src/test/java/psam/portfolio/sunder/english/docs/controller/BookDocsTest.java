@@ -4,11 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import psam.portfolio.sunder.english.docs.RestDocsEnvironment;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
@@ -16,16 +12,11 @@ import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookReplace;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPUT;
 import psam.portfolio.sunder.english.domain.book.model.request.WordPUT.WordPUTObject;
-import psam.portfolio.sunder.english.domain.book.model.request.WordSearchForm;
-import psam.portfolio.sunder.english.domain.book.model.response.RandomWordResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 import psam.portfolio.sunder.english.domain.user.enumeration.RoleName;
 import psam.portfolio.sunder.english.domain.user.enumeration.UserStatus;
-import psam.portfolio.sunder.english.global.api.v1.ApiResponse;
-import psam.portfolio.sunder.english.global.resolver.argument.UserId;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -50,7 +41,7 @@ public class BookDocsTest extends RestDocsEnvironment {
         dataCreator.createUserRoles(teacher, ROLE_TEACHER);
 
         BookReplace replace = BookReplace.builder()
-                .openToPublic(false)
+                .shared(false)
                 .publisher("publisher")
                 .name("name")
                 .chapter("chapter")
@@ -97,7 +88,7 @@ public class BookDocsTest extends RestDocsEnvironment {
         Book book = dataCreator.registerAnyBook(academy);
 
         BookReplace replace = BookReplace.builder()
-                .openToPublic(true)
+                .shared(true)
                 .publisher("newPublisher")
                 .name("newName")
                 .chapter("newChapter")

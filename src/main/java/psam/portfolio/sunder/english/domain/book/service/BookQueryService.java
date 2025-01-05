@@ -23,7 +23,10 @@ import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.pagination.PageInfo;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -69,7 +72,7 @@ public class BookQueryService {
         Academy academy = getAcademyFromUser(getUser);
 
         Book getBook = bookQueryRepository.getById(bookId);
-        if (!getBook.isSameAcademyOrPublic(academy)) {
+        if (!getBook.canAccess(academy)) {
             throw new BookAccessDeniedException();
         }
 
@@ -101,9 +104,12 @@ public class BookQueryService {
         User getUser = userQueryRepository.getById(teacherId);
         Academy academy = getAcademyFromUser(getUser);
 
+        QBook qBook = QBook.book;
         List<Book> books = bookQueryRepository.findAll(
-                QBook.book.academy.id.eq(academy.getId()),
-                QBook.book.id.in(form.getBookIds())
+                qBook.id.in(form.getBookIds()),
+                qBook.academy.id.eq(academy.getId())
+                        .or(qBook.academy.id.isNull())
+                        .or(qBook.academy.academyShares.any().sharedAcademy.id.eq(academy.getId()))
         );
 
         books.sort(Comparator.comparing(Book::getName));

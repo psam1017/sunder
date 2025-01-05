@@ -49,7 +49,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         String subject = "subject";
 
         BookReplace replace = BookReplace.builder()
-                .openToPublic(false)
+                .shared(false)
                 .publisher(publisher)
                 .name(name)
                 .chapter(chapter)
@@ -85,7 +85,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         String subject = "updatedSubject";
 
         BookReplace replace = BookReplace.builder()
-                .openToPublic(openToPublic)
+                .shared(openToPublic)
                 .publisher(publisher)
                 .name(name)
                 .chapter(chapter)
@@ -97,7 +97,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
 
         // then
         Book getBook = bookQueryRepository.getById(bookId);
-        assertThat(getBook.isOpenToPublic()).isEqualTo(openToPublic);
+        assertThat(getBook.isShared()).isEqualTo(openToPublic);
         assertThat(getBook.getPublisher()).isEqualTo(publisher);
         assertThat(getBook.getName()).isEqualTo(name);
         assertThat(getBook.getChapter()).isEqualTo(chapter);
@@ -117,7 +117,7 @@ public class BookCommandServiceTest extends AbstractSunderApplicationTest {
         book.setStatus(BookStatus.DELETED);
 
         BookReplace replace = BookReplace.builder()
-                .openToPublic(false)
+                .shared(false)
                 .publisher("updatedPublisher")
                 .name("updatedName")
                 .chapter("updatedChapter")

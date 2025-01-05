@@ -46,7 +46,7 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
 
         BookPageSearchCond cond = BookPageSearchCond.builder()
                 .keyword("능률 김 중3 1과 본문")
-                .privateOnly(false)
+                .shared(false)
                 .year(null)
                 .build();
 
@@ -84,7 +84,7 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
         assertThat(getBook.getChapter()).isEqualTo(book.getChapter());
         assertThat(getBook.getSubject()).isEqualTo(book.getSubject());
         assertThat(getBook.getAcademyId()).isEqualTo(book.getAcademy().getId());
-        assertThat(getBook.isOpenToPublic()).isEqualTo(book.isOpenToPublic());
+        assertThat(getBook.isShared()).isEqualTo(book.isShared());
 
         List<WordFullResponse> words = result.getWords();
         assertThat(words).hasSize(3)

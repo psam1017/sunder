@@ -189,9 +189,9 @@ public class DataCreator {
         return registerBook(false, "publisher", "name", "chapter", "subject", academy);
     }
 
-    public Book registerBook(boolean openToPublic, String publisher, String name, String chapter, String subject, Academy academy) {
+    public Book registerBook(boolean shared, String publisher, String name, String chapter, String subject, Academy academy) {
         Book book = Book.builder()
-                .openToPublic(openToPublic)
+                .shared(shared)
                 .publisher(publisher)
                 .name(name)
                 .chapter(chapter)
