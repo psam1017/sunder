@@ -1,10 +1,7 @@
 package psam.portfolio.sunder.english.domain.study.repository;
 
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +18,7 @@ import psam.portfolio.sunder.english.domain.study.model.request.StudyStatisticSe
 import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingResponse;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -256,9 +254,12 @@ public class StudyQueryRepository {
 
     public List<CountByDay> countByDay(StudyStatisticSearchCond cond, UUID academyId) {
         QStudyWord qStudyWord = QStudyWord.studyWord;
-        NumberExpression<Integer> dayOfYear = study.createdDateTime.dayOfYear();
+        StringExpression studyDate = Expressions.stringTemplate(
+                "DATE_FORMAT({0}, '%Y-%m-%d')",
+                study.createdDateTime
+        );
         return query.select(Projections.constructor(CountByDay.class,
-                        dayOfYear,
+                        studyDate,
                         study.id.countDistinct().as("studyCount"),
                         qStudyWord.correct
                                 .when(true).then(1)
@@ -274,8 +275,8 @@ public class StudyQueryRepository {
                         createdDateTimeGoe(cond.getStartDateTime()),
                         createdDateTimeLoe(cond.getEndDateTime())
                 )
-                .groupBy(dayOfYear)
-                .orderBy(dayOfYear.asc())
+                .groupBy(studyDate)
+                .orderBy(studyDate.asc())
                 .fetch();
     }
 
@@ -437,9 +438,5 @@ public class StudyQueryRepository {
 
     private BooleanExpression studentIdEq(UUID studentId) {
         return studentId == null ? null : study.student.id.eq(studentId);
-    }
-
-    private BooleanExpression statusNe(StudyStatus status) {
-        return status == null ? null : study.status.ne(status);
     }
 }

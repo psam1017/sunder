@@ -54,8 +54,16 @@ public class StudyStatisticResponse {
         private Long correctStudyWordCount;
         private Long totalStudyWordCount;
 
-        public CountByDay(Integer dayOfYear, Long studyCount, Long correctStudyWordCount, Long totalStudyWordCount) {
-            this.studyDate = LocalDate.ofYearDay(Year.now().getValue(), dayOfYear);
+        public CountByDay(LocalDate studyDate, Long studyCount, Long correctStudyWordCount, Long totalStudyWordCount) {
+            this.studyDate = studyDate;
+            this.studyCount = studyCount;
+            this.correctStudyWordCount = correctStudyWordCount;
+            this.totalStudyWordCount = totalStudyWordCount;
+        }
+
+        @SuppressWarnings("unused")
+        public CountByDay(String studyDate, Long studyCount, Long correctStudyWordCount, Long totalStudyWordCount) {
+            this.studyDate = LocalDate.parse(studyDate);
             this.studyCount = studyCount;
             this.correctStudyWordCount = correctStudyWordCount;
             this.totalStudyWordCount = totalStudyWordCount;

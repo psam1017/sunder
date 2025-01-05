@@ -15,7 +15,6 @@ import psam.portfolio.sunder.english.domain.study.model.request.StudySlicingSear
 import psam.portfolio.sunder.english.domain.study.model.request.StudyStatisticSearchCond;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyFullResponse;
 import psam.portfolio.sunder.english.domain.study.model.response.StudySlicingResponse;
-import psam.portfolio.sunder.english.domain.study.model.response.StudyStatisticResponse;
 import psam.portfolio.sunder.english.domain.study.model.response.StudyWordFullResponse;
 import psam.portfolio.sunder.english.domain.study.repository.StudyQueryRepository;
 import psam.portfolio.sunder.english.domain.teacher.model.entity.Teacher;
@@ -25,7 +24,7 @@ import psam.portfolio.sunder.english.domain.user.model.entity.User;
 import psam.portfolio.sunder.english.domain.user.repository.UserQueryRepository;
 import psam.portfolio.sunder.english.global.slicing.SlicingInfo;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.*;
 
 import static psam.portfolio.sunder.english.domain.study.model.response.StudyStatisticResponse.*;
@@ -183,20 +182,20 @@ public class StudyQueryService {
 
         // days
         List<CountByDay> countByDays = studyQueryRepository.countByDay(cond, academyId);
-        LocalDateTime startDateTime = cond.getStartDateTime();
-        LocalDateTime endDateTime = cond.getEndDateTime();
-        while (startDateTime.isBefore(endDateTime)) {
+        LocalDate currentDate = cond.getStartDateTime().toLocalDate();
+        LocalDate endDate = cond.getEndDateTime().toLocalDate();
+        while (currentDate.isBefore(endDate)) {
             boolean dateEmpty = true;
             for (CountByDay c : countByDays) {
-                if (c.getStudyDate().isEqual(startDateTime.toLocalDate())) {
+                if (c.getStudyDate().isEqual(currentDate)) {
                     dateEmpty = false;
                     break;
                 }
             }
             if (dateEmpty) {
-                countByDays.add(new CountByDay(startDateTime.getDayOfYear(), 0L, 0L, 0L));
+                countByDays.add(new CountByDay(currentDate, 0L, 0L, 0L));
             }
-            startDateTime = startDateTime.plusDays(1);
+            currentDate = currentDate.plusDays(1);
         }
         countByDays.sort(Comparator.comparing(CountByDay::getStudyDate));
         response.put("days", countByDays);

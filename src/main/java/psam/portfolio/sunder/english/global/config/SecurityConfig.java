@@ -81,12 +81,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        // TODO: 2024-09-01 localhost:3000 을 제거
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "https://ssunder.link",
-                "http://localhost:3000"
-        ));
+        configuration.setAllowedOrigins(List.of("https://ssunder.link"));
         configuration.addAllowedHeader(CorsConfiguration.ALL);
         configuration.addAllowedMethod(CorsConfiguration.ALL);
         configuration.setAllowCredentials(true);
