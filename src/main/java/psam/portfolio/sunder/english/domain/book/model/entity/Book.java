@@ -63,8 +63,8 @@ public class Book extends BaseEntity {
         updateSearchText();
     }
 
-    public void setShared(boolean openToPublic) {
-        this.shared = openToPublic;
+    public void setShared(boolean shared) {
+        this.shared = shared;
     }
 
     public void setStatus(BookStatus status) {

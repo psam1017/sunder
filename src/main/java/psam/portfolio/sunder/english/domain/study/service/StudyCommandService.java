@@ -138,7 +138,6 @@ public class StudyCommandService {
         List<Book> getBooks = bookQueryRepository.findAll(
                 qBook.id.in(post.getBookIds()),
                 qBook.academy.id.eq(getStudent.getAcademy().getId())
-                        .or(qBook.academy.id.isNull())
                         .or(qBook.academy.academyShares.any().sharedAcademy.id.eq(getStudent.getAcademy().getId()))
         );
 

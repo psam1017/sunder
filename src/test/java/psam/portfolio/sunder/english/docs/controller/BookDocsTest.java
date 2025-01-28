@@ -65,7 +65,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                 .andExpect(jsonPath("code").value("200"))
                 .andDo(restDocs.document(
                         requestFields(
-                                fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
+                                fieldWithPath("shared").type(BOOLEAN).description("교재 공유 여부"),
                                 fieldWithPath("publisher").type(STRING).description("출판사").optional(),
                                 fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터").optional(),
@@ -115,7 +115,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 parameterWithName("bookId").description("수정할 교재 아이디")
                         ),
                         requestFields(
-                                fieldWithPath("openToPublic").type(BOOLEAN).description("교재 공개 여부"),
+                                fieldWithPath("shared").type(BOOLEAN).description("교재 공유 여부"),
                                 fieldWithPath("publisher").type(STRING).description("출판사").optional(),
                                 fieldWithPath("name").type(STRING).description("교재명"),
                                 fieldWithPath("chapter").type(STRING).description("챕터").optional(),
@@ -252,7 +252,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                         .param("page", "1")
                         .param("size", "10")
                         .param("keyword", "능률 김 중3 1과 본문")
-                        .param("privateOnly", "true")
+                        .param("shared", "true")
         );
 
         // then
@@ -264,7 +264,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 parameterWithName("page").description("조회할 페이지 번호"),
                                 parameterWithName("size").description("페이지 크기"),
                                 parameterWithName("keyword").description("검색 키워드"),
-                                parameterWithName("privateOnly").description("개인 교재만 조회 여부"),
+                                parameterWithName("shared").description("공유 받은 교재 포함 여부"),
                                 parameterWithName("schoolGrade").description("학년(1~12)").optional(),
                                 parameterWithName("year").description("교재 등록 연도").optional()
                         ),
@@ -276,7 +276,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.books[].subject").type(STRING).description("주제").optional(),
                                 fieldWithPath("data.books[].schoolGrade").type(NUMBER).description("학년(1~12)").optional(),
                                 fieldWithPath("data.books[].academyId").type(STRING).description("학원 아이디"),
-                                fieldWithPath("data.books[].openToPublic").type(BOOLEAN).description("공개 여부"),
+                                fieldWithPath("data.books[].shared").type(BOOLEAN).description("공유 여부"),
                                 fieldWithPath("data.books[].createdDateTime").type(STRING).description("생성 일시"),
                                 fieldWithPath("data.books[].modifiedDateTime").type(STRING).description("수정 일시"),
                                 fieldWithPath("data.books[].createdBy").type(STRING).description("생성자 아이디").optional(),
@@ -331,7 +331,7 @@ public class BookDocsTest extends RestDocsEnvironment {
                                 fieldWithPath("data.book.subject").type(STRING).description("주제").optional(),
                                 fieldWithPath("data.book.schoolGrade").type(NUMBER).description("학년(1~12)").optional(),
                                 fieldWithPath("data.book.academyId").type(STRING).description("학원 아이디"),
-                                fieldWithPath("data.book.openToPublic").type(BOOLEAN).description("공개 여부"),
+                                fieldWithPath("data.book.shared").type(BOOLEAN).description("공유 여부"),
                                 fieldWithPath("data.book.createdDateTime").type(STRING).description("생성 일시"),
                                 fieldWithPath("data.book.modifiedDateTime").type(STRING).description("수정 일시"),
                                 fieldWithPath("data.book.createdBy").type(STRING).description("생성자 아이디").optional(),

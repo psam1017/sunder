@@ -7,11 +7,6 @@ public class SunderApplicationTests extends AbstractSunderApplicationTest {
 	// TODO: 2024-07-06 생성자로 생성한 request model 들을 builder 로 변경
 	// TODO: 2024-07-06 DataCreator 에 startStudy, assignStudy 등의 메소드 추가
 
-	// TODO
-	//   변경점 테스트
-	//   POST /api/books : openToPublic -> shared
-	//   GET /api/books : privateOnly -> shared
-
 	@Test
 	void contextLoads() {
 

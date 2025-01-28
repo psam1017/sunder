@@ -188,7 +188,7 @@ class StudyCommandServiceTest extends AbstractSunderApplicationTest {
                 .isInstanceOf(WordSizeNotEnoughToStudyException.class);
     }
 
-    @DisplayName("다른 학원 또는 공개되지 않은 교재로는 학습할 수 없다.")
+    @DisplayName("공유 받지 않은 다른 학원의 교재로는 학습할 수 없다.")
     @Test
     public void startStudyThrownByNoSuchBookException() {
         // given
@@ -205,7 +205,6 @@ class StudyCommandServiceTest extends AbstractSunderApplicationTest {
         }
 
         Book book2 = dataCreator.registerAnyBook(null);
-        book2.setShared(false);
         for (int i = 1; i <= 10; i++) {
             dataCreator.registerWord("apple" + i, "사과" + i, book2);
         }

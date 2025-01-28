@@ -141,7 +141,6 @@ public class BookQueryRepository {
     private static BooleanExpression academyIdEqOrShared(UUID academyId, boolean shared) {
         BooleanExpression expression = book.academy.id.eq(academyId);
         return shared ? expression : expression
-                .or(book.academy.id.isNull())
                 .or(book.academy.academyShares.any().sharedAcademy.id.eq(academyId));
     }
 
