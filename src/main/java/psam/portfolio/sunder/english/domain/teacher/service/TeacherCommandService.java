@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
@@ -197,12 +198,15 @@ public class TeacherCommandService {
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
 
         // User 회원 정보 중복 체크. 단, 자기 자신은 중복에서 제외
-        userQueryRepository.findOne(
-                patch.getPhone() != null ? user.phone.eq(patch.getPhone()) : null,
-                user.id.ne(getTeacher.getId())
-        ).ifPresent(user -> {
-            throw new DuplicateUserException();
-        });
+        if (StringUtils.hasText(patch.getPhone())) {
+            userQueryRepository.findOne(
+                    user.phone.eq(patch.getPhone()),
+                    user.id.ne(getTeacher.getId())
+            ).ifPresent(user -> {
+                throw new DuplicateUserException();
+            });
+        }
+
 
         getTeacher.setName(patch.getName());
         getTeacher.setPhone(patch.getPhone());

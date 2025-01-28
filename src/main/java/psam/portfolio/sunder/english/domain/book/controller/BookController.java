@@ -111,7 +111,7 @@ public class BookController {
     @GetMapping("")
     @Secured({"ROLE_DIRECTOR", "ROLE_TEACHER", "ROLE_STUDENT"})
     public ApiResponse<Map<String, Object>> getBookList(@UserId UUID userId,
-                                                   @ModelAttribute BookPageSearchCond cond) {
+                                                        @ModelAttribute BookPageSearchCond cond) {
         Map<String, Object> response = bookQueryService.getBookList(userId, cond);
         return ApiResponse.ok(response);
     }

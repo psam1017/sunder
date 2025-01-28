@@ -67,13 +67,15 @@ public class StudyCommandService {
     public List<UUID> assign(UUID teacherId, StudyPOSTAssign post) {
 
         Teacher getTeacher = teacherQueryRepository.getById(teacherId);
+        UUID teacherAcademyId = getTeacher.getAcademy().getId();
 
         QBook qBook = QBook.book;
         List<Book> getBooks = bookQueryRepository.findAll(
                 qBook.id.in(post.getBookIds()),
-                qBook.academy.id.eq(getTeacher.getAcademy().getId())
-                        .or(qBook.academy.id.isNull())
-                        .or(qBook.academy.academyShares.any().sharedAcademy.id.eq(getTeacher.getAcademy().getId()))
+                qBook.academy.id.eq(teacherAcademyId)
+                        .or(qBook.shared.isTrue()
+                                .and(qBook.academy.academyShares.any().sharedAcademy.id.eq(teacherAcademyId))
+                        )
         );
 
         if (ObjectUtils.isEmpty(getBooks)) {
@@ -90,7 +92,7 @@ public class StudyCommandService {
 
         List<Student> getStudents = studentQueryRepository.findAll(
                 QStudent.student.id.in(post.getStudentIds()),
-                QStudent.student.academy.id.eq(getTeacher.getAcademy().getId())
+                QStudent.student.academy.id.eq(teacherAcademyId)
         );
 
         // 단어 목록부터 생성
@@ -135,10 +137,13 @@ public class StudyCommandService {
         Student getStudent = studentQueryRepository.getById(studentId);
 
         QBook qBook = QBook.book;
+        UUID studentAcademyId = getStudent.getAcademy().getId();
         List<Book> getBooks = bookQueryRepository.findAll(
                 qBook.id.in(post.getBookIds()),
-                qBook.academy.id.eq(getStudent.getAcademy().getId())
-                        .or(qBook.academy.academyShares.any().sharedAcademy.id.eq(getStudent.getAcademy().getId()))
+                qBook.academy.id.eq(studentAcademyId)
+                        .or(qBook.shared.isTrue()
+                                .and(qBook.academy.academyShares.any().sharedAcademy.id.eq(studentAcademyId))
+                        )
         );
 
         if (ObjectUtils.isEmpty(getBooks)) {

@@ -24,8 +24,14 @@ public class AcademyShareCommandService {
     public void share(UUID sharingAcademyId, UUID sharedAcademyId) {
         Academy sharingAcademy = academyQueryRepository.getById(sharingAcademyId);
         Academy sharedAcademy = academyQueryRepository.getById(sharedAcademyId);
-        AcademyShare academyShare = buildAcademyShare(sharingAcademy, sharedAcademy);
-        academyShareCommandRepository.save(academyShare);
+        academyShareQueryRepository.findOne(
+                        QAcademyShare.academyShare.sharingAcademy.id.eq(sharingAcademyId),
+                        QAcademyShare.academyShare.sharedAcademy.id.eq(sharedAcademyId)
+                )
+                .ifPresentOrElse(
+                        academy -> {},
+                        () -> academyShareCommandRepository.save(buildAcademyShare(sharingAcademy, sharedAcademy))
+                );
     }
 
     public void cancelShare(UUID sharingAcademyId, UUID sharedAcademyId) {

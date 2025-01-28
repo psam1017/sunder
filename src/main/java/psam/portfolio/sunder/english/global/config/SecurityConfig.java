@@ -82,7 +82,14 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://ssunder.link"));
+        configuration.setAllowedOrigins(List.of(
+                "https://ssunder.link",
+                "localhost:3000",
+                "http://localhost:3000",
+                "http://localhost:3000/",
+                "https://localhost:3000",
+                "https://localhost:3000/"
+        ));
         configuration.addAllowedHeader(CorsConfiguration.ALL);
         configuration.addAllowedMethod(CorsConfiguration.ALL);
         configuration.setAllowCredentials(true);

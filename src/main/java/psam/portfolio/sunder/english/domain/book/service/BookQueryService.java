@@ -108,8 +108,9 @@ public class BookQueryService {
         List<Book> books = bookQueryRepository.findAll(
                 qBook.id.in(form.getBookIds()),
                 qBook.academy.id.eq(academy.getId())
-                        .or(qBook.academy.id.isNull())
-                        .or(qBook.academy.academyShares.any().sharedAcademy.id.eq(academy.getId()))
+                        .or(qBook.shared.isTrue()
+                                .and(qBook.academy.academyShares.any().sharedAcademy.id.eq(academy.getId()))
+                        )
         );
 
         books.sort(Comparator.comparing(Book::getName));

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import psam.portfolio.sunder.english.domain.academy.exception.AcademyAccessDeniedException;
+import psam.portfolio.sunder.english.domain.academy.exception.NoSuchAcademyException;
 import psam.portfolio.sunder.english.domain.academy.model.response.AcademyShareSummary;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyShareCommandService;
 import psam.portfolio.sunder.english.domain.academy.service.AcademyShareQueryService;
@@ -36,8 +37,9 @@ public class AcademyShareController {
     public ApiResponse<Map<String, String>> share(@PathVariable String academyId,
                                                   @AcademyId UUID tokenAcademyId,
                                                   @PathVariable String sharedAcademyId) {
-        if (!Objects.equals(tokenAcademyId, UUID.fromString(academyId))) {
-            throw new AcademyAccessDeniedException();
+
+        if (isNotUuid(sharedAcademyId) || !Objects.equals(tokenAcademyId, UUID.fromString(academyId))) {
+            throw new NoSuchAcademyException();
         }
         academyShareCommandService.share(UUID.fromString(academyId), UUID.fromString(sharedAcademyId));
         return ApiResponse.ok(Map.of("sharedAcademyId", sharedAcademyId));
@@ -78,5 +80,15 @@ public class AcademyShareController {
         }
         academyShareCommandService.cancelShare(UUID.fromString(academyId), UUID.fromString(sharedAcademyId));
         return ApiResponse.ok(Map.of("sharedAcademyId", sharedAcademyId));
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private boolean isNotUuid(String str) {
+        try {
+            UUID.fromString(str);
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
     }
 }

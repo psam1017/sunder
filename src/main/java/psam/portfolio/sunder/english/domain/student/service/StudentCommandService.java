@@ -120,11 +120,14 @@ public class StudentCommandService {
 
         // User 회원 정보 중복 체크
         if (StringUtils.hasText(patch.getPhone())) {
-            userQueryRepository.findOne(user.phone.eq(patch.getPhone())).ifPresent(user -> {
-                if (!Objects.equals(user.getId(), getStudent.getId())) {
-                    throw new DuplicateUserException();
-                }
-            });
+            userQueryRepository.findOne(
+                            user.phone.eq(patch.getPhone())
+                    )
+                    .ifPresent(user -> {
+                        if (!Objects.equals(user.getId(), getStudent.getId())) {
+                            throw new DuplicateUserException();
+                        }
+                    });
         }
 
         getStudent.setName(patch.getName());

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import psam.portfolio.sunder.english.AbstractSunderApplicationTest;
 import psam.portfolio.sunder.english.domain.academy.enumeration.AcademyStatus;
 import psam.portfolio.sunder.english.domain.academy.model.entity.Academy;
+import psam.portfolio.sunder.english.domain.academy.service.AcademyShareCommandService;
 import psam.portfolio.sunder.english.domain.book.model.entity.Book;
 import psam.portfolio.sunder.english.domain.book.model.request.BookPageSearchCond;
 import psam.portfolio.sunder.english.domain.book.model.request.WordSearchForm;
@@ -29,6 +30,10 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
 
     @Autowired
     BookQueryService sut; // system under test
+
+    @Autowired
+    AcademyShareCommandService academyShareCommandService;
+
 
     @DisplayName("교재 목록을 출판사, 교재명, 챕터, 주제 상관 없이 검색할 수 있다.")
     @Test
@@ -60,6 +65,66 @@ public class BookQueryServiceTest extends AbstractSunderApplicationTest {
                 .containsExactly(
                         tuple("능률(김성곤)", "중3", "1과", "본문", academy.getId(), false, 0)
                 );
+    }
+
+    @DisplayName("교재를 공유받으면 이를 검색할 수 있다.")
+    @Test
+    void getSharedBookList() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+
+        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Book book = dataCreator.registerBook(true, "능률(김성곤)", "중3-1학기", "1과", "본문", anotherAcademy);
+        for (int i = 1; i <= 10; i++) {
+            dataCreator.registerWord("apple" + i, "사과" + i, book);
+        }
+
+        academyShareCommandService.share(anotherAcademy.getId(), academy.getId());
+
+        BookPageSearchCond cond = BookPageSearchCond.builder()
+                .shared(true)
+                .build();
+
+        // when
+        Map<String, Object> result = refreshAnd(() -> sut.getBookList(teacher.getId(), cond));
+
+        // then
+        List<BookFullResponse> books = (List<BookFullResponse>) result.get("books");
+        assertThat(books).hasSize(1)
+                .extracting("publisher", "name", "chapter", "subject", "academyId", "shared", "wordCount")
+                .containsExactly(
+                        tuple("능률(김성곤)", "중3-1학기", "1과", "본문", anotherAcademy.getId(), true, 10)
+                );
+    }
+
+    @DisplayName("학원 공유 대상에 있더라도 교재가 공유되지 않으면 조회할 수 없다.")
+    @Test
+    void getSharedBookListEmpty() {
+        // given
+        Academy academy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Teacher teacher = dataCreator.registerTeacher(UserStatus.ACTIVE, academy);
+        dataCreator.createUserRoles(teacher, RoleName.ROLE_TEACHER);
+
+        Academy anotherAcademy = dataCreator.registerAcademy(AcademyStatus.VERIFIED);
+        Book book = dataCreator.registerBook(false, "능률(김성곤)", "중3-1학기", "1과", "본문", anotherAcademy);
+        for (int i = 1; i <= 10; i++) {
+            dataCreator.registerWord("apple" + i, "사과" + i, book);
+        }
+
+        academyShareCommandService.share(anotherAcademy.getId(), academy.getId());
+
+        BookPageSearchCond cond = BookPageSearchCond.builder()
+                .shared(true)
+                .build();
+
+        // when
+        Map<String, Object> result = refreshAnd(() -> sut.getBookList(teacher.getId(), cond));
+
+        // then
+        List<BookFullResponse> books = (List<BookFullResponse>) result.get("books");
+        assertThat(books).isEmpty();
     }
 
     @DisplayName("교재 상세와 함께 교재의 단어 목록을 조회할 수 있다.")
