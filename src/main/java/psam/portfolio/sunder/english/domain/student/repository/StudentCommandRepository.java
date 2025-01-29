@@ -17,4 +17,12 @@ public interface StudentCommandRepository extends JpaRepository<Student, UUID> {
             where s.academy.id = :academyId
             """)
     void startActiveByAcademyId(@Param("academyId") UUID academyId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("""
+            update Student s
+            set s.school.grade = s.school.grade + 1
+            where s.school.grade < :grade
+            """)
+    void increaseGradeLessThen(@Param("grade") int grade);
 }

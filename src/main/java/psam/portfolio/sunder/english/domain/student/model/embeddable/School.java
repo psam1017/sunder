@@ -23,4 +23,8 @@ public class School {
         this.name = name;
         this.grade = grade;
     }
+
+    public void setGrade(Integer grade) {
+        this.grade = grade;
+    }
 }

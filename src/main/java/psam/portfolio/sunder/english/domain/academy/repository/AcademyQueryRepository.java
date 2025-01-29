@@ -69,6 +69,14 @@ public class AcademyQueryRepository {
                 .fetch();
     }
 
+    public List<UUID> findAllIds(BooleanExpression... expression) {
+        return query
+                .select(academy.id)
+                .from(academy)
+                .where(expression)
+                .fetch();
+    }
+
     public List<Academy> findAllByPageSearchCond(AcademyPublicPageSearchCond cond) {
         return query.selectDistinct(academy)
                 .from(academy)

@@ -109,4 +109,11 @@ public class TeacherQueryRepository {
             default -> new OrderSpecifier<>(order, teacher.createdDateTime);
         };
     }
+
+    public List<UUID> findAllIds(BooleanExpression... expressions) {
+        return query.select(teacher.id)
+                .from(teacher)
+                .where(expressions)
+                .fetch();
+    }
 }

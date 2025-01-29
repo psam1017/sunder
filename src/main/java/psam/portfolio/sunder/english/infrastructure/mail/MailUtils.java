@@ -15,7 +15,7 @@ public class MailUtils {
     private final JavaMailSender javaMailSender;
     private final String fromEmail;
 
-    // TODO: 2024-01-29 mail username, password 설정
+    // TODO: 2024-01-29 mail username, password 따로 설정
 
     public boolean sendMail(String recipient, String subject, String text) {
         try {

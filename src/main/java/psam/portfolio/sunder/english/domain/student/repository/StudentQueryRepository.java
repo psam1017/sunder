@@ -195,4 +195,11 @@ public class StudentQueryRepository {
     private static OrderSpecifier<String> specifyDefaultOrder() {
         return student.attendanceId.asc().nullsLast();
     }
+
+    public List<UUID> findAllIds(BooleanExpression... expressions) {
+        return query.select(student.id)
+                .from(student)
+                .where(expressions)
+                .fetch();
+    }
 }

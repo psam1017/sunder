@@ -50,6 +50,8 @@ import static psam.portfolio.sunder.english.domain.user.enumeration.RoleName.ROL
 @Service
 public class AcademyCommandService {
 
+    private static final int revokePeriod = 15;
+
     private final TemplateEngine templateEngine;
     private final MessageSource messageSource;
     private final MailUtils mailUtils;
@@ -195,7 +197,7 @@ public class AcademyCommandService {
     }
 
     /**
-     * 학원 폐쇄 서비스. 학원장만 가능. 폐쇄 후 7일 후에 DB 에서 완전히 삭제된다.
+     * 학원 폐쇄 서비스. 학원장만 가능. 폐쇄 후 15일 후에 DB 에서 완전히 삭제된다.
      *
      * @param directorId 학원장 아이디
      * @return 폐쇄 요청한 학원 아이디
@@ -209,12 +211,12 @@ public class AcademyCommandService {
 
         Academy academy = director.getAcademy();
         academy.setStatus(AcademyStatus.WITHDRAWN);
-        academy.setWithdrawalAt(LocalDate.now().plusDays(8).atStartOfDay());
+        academy.setWithdrawalAt(LocalDate.now().plusDays(revokePeriod).atStartOfDay());
         return academy.getId();
     }
 
     /**
-     * 학원 폐쇄 취소 서비스. 학원장만 가능. 폐쇄 신청 후 7일 이내에만 가능하다.
+     * 학원 폐쇄 취소 서비스. 학원장만 가능. 폐쇄 신청 후 14일 이내에만 가능하다.
      *
      * @param directorId 학원장 아이디
      * @return 폐쇄 취소한 학원 아이디

@@ -119,7 +119,7 @@ public class AcademyController {
     }
 
     /**
-     * 학원 페쇄 신청 서비스. 페쇄 신청을 하고 7일 후에 DB 에서 완전히 삭제된다.
+     * 학원 페쇄 신청 서비스. 페쇄 신청을 하고 14일 후에 DB 에서 완전히 삭제된다.
      *
      * @param directorId 학원장 아이디
      * @param academyId  학원 아이디

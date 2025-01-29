@@ -22,7 +22,7 @@ class AcademySchedulerTest extends AbstractSunderApplicationTest {
     @Autowired
     AcademyQueryRepository academyQueryRepository;
 
-    @DisplayName("폐쇄 요청한지 7일 이상 지난 학원은 삭제할 수 있다.")
+    @DisplayName("폐쇄 요청 후 유예 기간이 지난 학원은 삭제할 수 있다.")
     @Test
     public void deleteWithdrawnAcademy() {
         // given
