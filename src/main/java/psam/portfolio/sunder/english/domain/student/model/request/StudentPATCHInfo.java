@@ -26,7 +26,7 @@ public class StudentPATCHInfo {
     @Pattern(regexp = "^[가-힣a-zA-Z0-9]{2,10}$")
     private String name;
 
-    @Pattern(regexp = "^010[0-9]{8}$")
+    @Pattern(regexp = "^$|^010[0-9]{8}$")
     private String phone;
 
     private String street;
@@ -43,7 +43,8 @@ public class StudentPATCHInfo {
 
     private String parentName;
 
-    @Pattern(regexp = "^[0-9]{8,12}$")
+//    @Pattern(regexp = "^[0-9]{8,12}$")
+    @Pattern(regexp = "^$|^[0-9]{8,12}$")
     private String parentPhone;
 
     @JsonIgnore

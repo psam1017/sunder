@@ -68,8 +68,8 @@ public class StudentCommandService {
         // User 회원 정보 중복 체크
         userQueryRepository.findOne(
                 user.loginId.eq(post.getLoginId()) // NotNull
-                        .or(post.getEmail() != null ? user.email.eq(post.getEmail()) : null) // nullable
-                        .or(post.getPhone() != null ? user.phone.eq(post.getPhone()) : null) // nullable
+                        .or(StringUtils.hasText(post.getEmail()) ? user.email.eq(post.getEmail()) : null) // nullable
+                        .or(StringUtils.hasText(post.getPhone()) ? user.phone.eq(post.getPhone()) : null) // nullable
         ).ifPresent(user -> {
             throw new DuplicateUserException();
         });

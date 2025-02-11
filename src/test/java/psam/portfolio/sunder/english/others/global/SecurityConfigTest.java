@@ -30,7 +30,7 @@ public class SecurityConfigTest extends AbstractSunderApplicationTest {
         resultActions.andExpect(status().isForbidden());
     }
 
-    // 빈으로 등록한 CorsConfigurationSource 에서 "https://ssunder.link" 를 허용함
+    // 빈으로 등록한 CorsConfigurationSource 에서 "https://ssunder.net" 를 허용함
     @DisplayName("프론트서버인 localhost:3000 을 Origin 으로 허용할 수 있다.")
     @Test
     void corsCrossOriginFrontEndAllowed() throws Exception {
@@ -41,7 +41,7 @@ public class SecurityConfigTest extends AbstractSunderApplicationTest {
         ResultActions resultActions = mockMvc.perform(
                 get(url)
                         .header("Access-Control-Request-Method", "GET")
-                        .header("Origin", "https://ssunder.link")
+                        .header("Origin", "https://ssunder.net")
                         .contentType(MediaType.APPLICATION_JSON)
         );
 

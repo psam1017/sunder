@@ -17,7 +17,7 @@ import psam.portfolio.sunder.english.global.jpa.embeddable.Address;
 public class AcademyPATCH {
 
     @NotBlank
-    @Pattern(regexp = "^[가-힣]{2,30}$")
+    @Pattern(regexp = "^(?=(?:.*[가-힣]){2,})[가-힣 ]{2,30}$")
     private String name;
 
     @Pattern(regexp = "^010[0-9]{8}$")

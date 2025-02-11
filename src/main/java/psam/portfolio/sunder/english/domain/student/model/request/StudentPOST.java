@@ -36,7 +36,7 @@ public class StudentPOST {
     @Email
     private String email;
 
-    @Pattern(regexp = "^010[0-9]{8}$")
+    @Pattern(regexp = "^$|^010[0-9]{8}$")
     private String phone;
 
     private String street;
@@ -53,7 +53,8 @@ public class StudentPOST {
 
     private String parentName;
 
-    @Pattern(regexp = "^[0-9]{8,12}$")
+//    @Pattern(regexp = "^[0-9]{8,12}$")
+    @Pattern(regexp = "^$|^[0-9]{8,12}$")
     private String parentPhone;
 
     // toEntity 생성

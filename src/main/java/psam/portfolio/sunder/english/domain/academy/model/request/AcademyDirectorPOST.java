@@ -35,7 +35,7 @@ public class AcademyDirectorPOST {
     public static class AcademyPOST {
 
         @NotBlank
-        @Pattern(regexp = "^[가-힣]{2,30}$")
+        @Pattern(regexp = "^(?=(?:.*[가-힣]){2,})[가-힣 ]{2,30}$")
         private String name;
 
         @Pattern(regexp = "^[0-9]{8,12}$")

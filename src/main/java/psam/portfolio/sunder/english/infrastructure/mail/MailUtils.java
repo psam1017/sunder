@@ -15,7 +15,6 @@ public class MailUtils {
     private final JavaMailSender javaMailSender;
     private final String fromEmail;
 
-    // TODO: 2024-01-29 mail username, password 따로 설정
 
     public boolean sendMail(String recipient, String subject, String text) {
         try {
@@ -27,7 +26,7 @@ public class MailUtils {
             mimeMessageHelper.setText(text, true);
             javaMailSender.send(mimeMessage);
         } catch (MailException | MessagingException e) {
-            log.info("failed to send mail to {}", recipient, e);
+            log.error("failed to send mail to {}", recipient, e);
             return false;
         }
         return true;
